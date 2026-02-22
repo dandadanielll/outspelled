@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.canvas.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane xmlns="http://javafx.com/javafx"
+           xmlns:fx="http://javafx.com/fxml"
+           fx:controller="com.rst.outspelled.ui.WheelController"
+           style="-fx-background-color: #1a1a2e;"
+           prefWidth="900"
+           prefHeight="650">
+
+    <BorderPane>
+
+        <!-- TOP -->
+        <top>
+            <VBox alignment="CENTER"
+                  style="-fx-background-color: #12122a; -fx-padding: 15;">
+                <Label text="⚡ Mana Wheel — Who Goes First?"
+                       style="-fx-text-fill: #e2b96f;
+                              -fx-font-size: 22px;
+                              -fx-font-weight: bold;
+                              -fx-font-family: 'Georgia';"/>
+                <Label text="Press SPACEBAR when the needle hits the golden zone!"
+                       style="-fx-text-fill: #a0a0c0; -fx-font-size: 13px;"/>
+            </VBox>
+        </top>
+
+        <!-- CENTER -->
+        <center>
+            <HBox alignment="CENTER" spacing="40"
+                  style="-fx-padding: 20;">
+
+                <!-- Player 1 Panel -->
+                <VBox alignment="CENTER" spacing="12" prefWidth="200">
+                    <Label fx:id="player1NameLabel" text="Player 1"
+                           style="-fx-text-fill: #e2b96f;
+                                  -fx-font-size: 16px;
+                                  -fx-font-weight: bold;"/>
+                    <Label text="🔵 Mana"
+                           style="-fx-text-fill: #a0a0c0; -fx-font-size: 12px;"/>
+                    <Label fx:id="player1ManaLabel" text="0"
+                           style="-fx-text-fill: #e2b96f;
+                                  -fx-font-size: 48px;
+                                  -fx-font-weight: bold;"/>
+                    <Label fx:id="player1FeedbackLabel" text=""
+                           style="-fx-font-size: 22px;"/>
+                </VBox>
+
+                <!-- Wheel + Timer Center -->
+                <VBox alignment="CENTER" spacing="15">
+                    <Canvas fx:id="wheelCanvas" width="300" height="300"/>
+                    <Label fx:id="timerLabel" text="15"
+                           style="-fx-text-fill: #e2b96f;
+                                  -fx-font-size: 36px;
+                                  -fx-font-weight: bold;"/>
+                    <Label fx:id="statusLabel" text="Get Ready..."
+                           style="-fx-text-fill: #a0a0c0;
+                                  -fx-font-size: 14px;
+                                  -fx-font-family: 'Georgia';"/>
+                </VBox>
+
+                <!-- Player 2 Panel -->
+                <VBox alignment="CENTER" spacing="12" prefWidth="200">
+                    <Label fx:id="player2NameLabel" text="Player 2"
+                           style="-fx-text-fill: #7eb8e2;
+                                  -fx-font-size: 16px;
+                                  -fx-font-weight: bold;"/>
+                    <Label text="🔵 Mana"
+                           style="-fx-text-fill: #a0a0c0; -fx-font-size: 12px;"/>
+                    <Label fx:id="player2ManaLabel" text="0"
+                           style="-fx-text-fill: #7eb8e2;
+                                  -fx-font-size: 48px;
+                                  -fx-font-weight: bold;"/>
+                    <Label fx:id="player2FeedbackLabel" text=""
+                           style="-fx-font-size: 22px;"/>
+                </VBox>
+
+            </HBox>
+        </center>
+
+        <!-- BOTTOM -->
+        <bottom>
+            <VBox alignment="CENTER"
+                  style="-fx-background-color: #12122a; -fx-padding: 15;">
+                <Label text="Press SPACEBAR to hit the zone — hit to gain mana, miss to lose mana!"
+                       style="-fx-text-fill: #444466; -fx-font-size: 12px;"/>
+                <Label text="Most mana after 15 seconds goes first!"
+                       style="-fx-text-fill: #444466; -fx-font-size: 12px;"/>
+            </VBox>
+        </bottom>
+
+    </BorderPane>
+
+</StackPane>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.rst.outspelled.ui.ConnectController"
+      alignment="CENTER"
+      spacing="20"
+      style="-fx-background-color: #1a1a2e;"
+      prefWidth="500"
+      prefHeight="420">
+
+    <padding>
+        <Insets top="40" bottom="40" left="50" right="50"/>
+    </padding>
+
+    <Label text="🌐 LAN / Online"
+           style="-fx-font-size: 26px; -fx-font-weight: bold;
+                  -fx-text-fill: #e2b96f; -fx-font-family: 'Georgia';"/>
+
+    <Label text="Your name (shown to opponent)"
+           style="-fx-text-fill: #a0a0c0; -fx-font-size: 12px;"/>
+    <TextField fx:id="nameField" promptText="Your name..."
+               maxWidth="280"
+               style="-fx-background-color: #2a2a4a; -fx-text-fill: white;
+                      -fx-prompt-text-fill: #666688; -fx-padding: 8;"/>
+
+    <Label text="Server IP (for Join; leave blank when Hosting)"
+           style="-fx-text-fill: #a0a0c0; -fx-font-size: 12px;"/>
+    <TextField fx:id="hostField" promptText="e.g. 192.168.1.100 or localhost"
+               maxWidth="280"
+               style="-fx-background-color: #2a2a4a; -fx-text-fill: white;
+                      -fx-prompt-text-fill: #666688; -fx-padding: 8;"/>
+
+    <HBox alignment="CENTER" spacing="20">
+        <Button fx:id="hostButton" text="Host Game"
+                onAction="#onHostClicked"
+                style="-fx-background-color: #4caf50; -fx-text-fill: white;
+                       -fx-padding: 12 24 12 24; -fx-cursor: hand;"/>
+        <Button fx:id="joinButton" text="Join Game"
+                onAction="#onJoinClicked"
+                style="-fx-background-color: #2196f3; -fx-text-fill: white;
+                       -fx-padding: 12 24 12 24; -fx-cursor: hand;"/>
+    </HBox>
+
+    <Button text="← Back to Menu" onAction="#onBackClicked"
+            style="-fx-background-color: transparent; -fx-text-fill: #a0a0c0;
+                   -fx-padding: 8 20 8 20; -fx-cursor: hand;"/>
+
+    <Label fx:id="statusLabel" text=""
+           wrapText="true" maxWidth="350"
+           style="-fx-text-fill: #ff6b6b; -fx-font-size: 12px;"/>
+
+</VBox>

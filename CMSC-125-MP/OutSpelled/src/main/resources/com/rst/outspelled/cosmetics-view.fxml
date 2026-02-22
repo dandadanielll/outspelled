@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.rst.outspelled.ui.CosmeticsController"
+      alignment="CENTER"
+      spacing="20"
+      style="-fx-background-color: #1a1a2e;"
+      prefWidth="500"
+      prefHeight="450">
+
+    <padding>
+        <Insets top="30" bottom="30" left="40" right="40"/>
+    </padding>
+
+    <Label text="⚙ Cosmetics"
+           style="-fx-font-size: 28px; -fx-font-weight: bold;
+                  -fx-text-fill: #e2b96f; -fx-font-family: 'Georgia';"/>
+
+    <Label text="Choose wizard skins and arena (used when starting a new game)"
+           style="-fx-font-size: 12px; -fx-text-fill: #a0a0c0;"/>
+
+    <VBox spacing="12" alignment="CENTER_LEFT" style="-fx-padding: 10;">
+        <Label text="Player 1 wizard skin"
+               style="-fx-text-fill: #e2b96f; -fx-font-size: 13px;"/>
+        <ComboBox fx:id="player1SkinCombo" maxWidth="280"
+                  style="-fx-background-color: #2a2a4a; -fx-text-fill: white;"/>
+
+        <Label text="Player 2 wizard skin"
+               style="-fx-text-fill: #7eb8e2; -fx-font-size: 13px;"/>
+        <ComboBox fx:id="player2SkinCombo" maxWidth="280"
+                  style="-fx-background-color: #2a2a4a; -fx-text-fill: white;"/>
+
+        <Label text="Arena background"
+               style="-fx-text-fill: #a0a0c0; -fx-font-size: 13px;"/>
+        <ComboBox fx:id="arenaCombo" maxWidth="280"
+                  style="-fx-background-color: #2a2a4a; -fx-text-fill: white;"/>
+    </VBox>
+
+    <Button fx:id="backButton"
+            text="← Back to Menu"
+            onAction="#onBackClicked"
+            style="-fx-background-color: transparent;
+                   -fx-text-fill: #e2b96f;
+                   -fx-font-size: 14px;
+                   -fx-border-color: #e2b96f;
+                   -fx-border-radius: 5;
+                   -fx-padding: 10 24 10 24;
+                   -fx-cursor: hand;"/>
+
+</VBox>

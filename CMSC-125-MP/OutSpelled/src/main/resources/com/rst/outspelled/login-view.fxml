@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.rst.outspelled.ui.LoginController"
+      alignment="CENTER"
+      spacing="16"
+      style="-fx-background-color: #1a1a2e;"
+      prefWidth="500"
+      prefHeight="560">
+
+    <padding><Insets top="40" bottom="40" left="50" right="50"/></padding>
+
+    <Label text="OutSpelled"
+           style="-fx-font-size: 38px; -fx-font-weight: bold; -fx-text-fill: #e2b96f; -fx-font-family: 'Georgia';"/>
+    <Label text="Create or sign in to your wizard"
+           style="-fx-font-size: 14px; -fx-text-fill: #a0a0c0;"/>
+
+    <TitledPane fx:id="signInPane" text="Sign In" expanded="true"
+                style="-fx-background-color: #252540; -fx-border-color: #444466; -fx-border-radius: 8;"
+                VBox.vgrow="NEVER">
+        <content>
+            <VBox spacing="10" style="-fx-padding: 15;">
+                <Label text="Username" style="-fx-text-fill: #e2b96f; -fx-font-size: 12px;"/>
+                <TextField fx:id="signInUsername" promptText="Username" maxWidth="280"
+                           style="-fx-background-color: #2a2a4a; -fx-text-fill: white; -fx-prompt-text-fill: #666688; -fx-border-color: #e2b96f; -fx-background-radius: 5; -fx-padding: 8;"/>
+                <Label text="Password" style="-fx-text-fill: #e2b96f; -fx-font-size: 12px;"/>
+                <PasswordField fx:id="signInPassword" promptText="Password" maxWidth="280"
+                                style="-fx-background-color: #2a2a4a; -fx-text-fill: white; -fx-prompt-text-fill: #666688; -fx-border-color: #e2b96f; -fx-background-radius: 5; -fx-padding: 8;"/>
+                <Button text="Sign In" onAction="#onSignInClicked"
+                        style="-fx-background-color: #e2b96f; -fx-text-fill: #1a1a2e; -fx-font-weight: bold; -fx-padding: 10 24; -fx-background-radius: 6; -fx-cursor: hand;"/>
+            </VBox>
+        </content>
+    </TitledPane>
+
+    <TitledPane fx:id="signUpPane" text="Sign Up (Create Wizard)" expanded="false"
+                style="-fx-background-color: #252540; -fx-border-color: #444466; -fx-border-radius: 8;"
+                VBox.vgrow="NEVER">
+        <content>
+            <VBox spacing="10" style="-fx-padding: 15;">
+                <Label text="Username" style="-fx-text-fill: #e2b96f; -fx-font-size: 12px;"/>
+                <TextField fx:id="signUpUsername" promptText="Choose username" maxWidth="280"
+                           style="-fx-background-color: #2a2a4a; -fx-text-fill: white; -fx-prompt-text-fill: #666688; -fx-border-color: #e2b96f; -fx-background-radius: 5; -fx-padding: 8;"/>
+                <Label text="Password" style="-fx-text-fill: #e2b96f; -fx-font-size: 12px;"/>
+                <PasswordField fx:id="signUpPassword" promptText="Password" maxWidth="280"
+                               style="-fx-background-color: #2a2a4a; -fx-text-fill: white; -fx-prompt-text-fill: #666688; -fx-border-color: #e2b96f; -fx-background-radius: 5; -fx-padding: 8;"/>
+                <Label text="Confirm Password" style="-fx-text-fill: #e2b96f; -fx-font-size: 12px;"/>
+                <PasswordField fx:id="signUpConfirm" promptText="Confirm password" maxWidth="280"
+                               style="-fx-background-color: #2a2a4a; -fx-text-fill: white; -fx-prompt-text-fill: #666688; -fx-border-color: #e2b96f; -fx-background-radius: 5; -fx-padding: 8;"/>
+                <Button text="Sign Up" onAction="#onSignUpClicked"
+                        style="-fx-background-color: #4a7c59; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 24; -fx-background-radius: 6; -fx-cursor: hand;"/>
+            </VBox>
+        </content>
+    </TitledPane>
+
+    <Label fx:id="loginErrorLabel" text="" style="-fx-text-fill: #ff6b6b; -fx-font-size: 12px;"/>
+</VBox>
