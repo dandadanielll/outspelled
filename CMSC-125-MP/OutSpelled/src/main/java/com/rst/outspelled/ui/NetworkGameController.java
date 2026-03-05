@@ -51,6 +51,7 @@ public class NetworkGameController {
     @FXML private Label lastStandTimerLabel;
     @FXML private TextField lastStandInput;
     @FXML private Label lastStandFeedbackLabel;
+    @FXML private ListView<String> battleLog;
 
     private static GameClient client;
     private static int myPlayerId;
@@ -559,6 +560,11 @@ public class NetworkGameController {
                 return;
             }
             client.sendWord(word);
+            if (battleLog != null) {
+                battleLog.getItems().add(0, "⚔ " + (myPlayerId == 1
+                        ? wizard1.getName() : wizard2.getName())
+                        + " cast: " + word.toUpperCase());
+            }
             renderGrid();
             updateSelectedWordDisplay();
             feedbackLabel.setText("Casting...");

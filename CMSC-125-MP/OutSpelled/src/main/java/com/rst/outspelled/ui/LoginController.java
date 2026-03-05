@@ -16,8 +16,7 @@ public class LoginController {
     @FXML private PasswordField signUpPassword;
     @FXML private PasswordField signUpConfirm;
     @FXML private Label loginErrorLabel;
-    @FXML private TitledPane signInPane;
-    @FXML private TitledPane signUpPane;
+    @FXML private TabPane loginTabPane;
 
     @FXML
     private void onSignInClicked() {

@@ -2,80 +2,204 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.*?>
 
 <StackPane xmlns="http://javafx.com/javafx"
            xmlns:fx="http://javafx.com/fxml"
            fx:controller="com.rst.outspelled.ui.NetworkGameController"
-           prefWidth="900" prefHeight="650">
+           prefWidth="1000" prefHeight="700">
 
     <BorderPane style="-fx-background-color: #1a1a2e;">
+
+        <!-- TOP: Names + Hearts + Timer -->
         <top>
-            <HBox alignment="CENTER" spacing="20" style="-fx-background-color: #12122a; -fx-padding: 12;">
-                <VBox alignment="CENTER_LEFT" spacing="4" HBox.hgrow="ALWAYS">
-                    <Label fx:id="player1NameLabel" text="Player 1" style="-fx-text-fill: #e2b96f; -fx-font-size: 14px;"/>
-                    <HBox fx:id="player1Hearts" spacing="2" alignment="CENTER_LEFT"/>
+            <HBox alignment="CENTER" spacing="20"
+                  style="-fx-background-color: #12122a; -fx-padding: 14;">
+
+                <!-- Player 1 -->
+                <VBox alignment="CENTER_LEFT" spacing="6" HBox.hgrow="ALWAYS">
+                    <Label fx:id="player1NameLabel" text="Player 1"
+                           style="-fx-text-fill: #e2b96f;
+                                  -fx-font-size: 16px;
+                                  -fx-font-weight: bold;
+                                  -fx-font-family: 'Georgia';"/>
+                    <HBox fx:id="player1Hearts" spacing="3" alignment="CENTER_LEFT"/>
                 </VBox>
-                <VBox alignment="CENTER" spacing="2" minWidth="100">
-                    <Label fx:id="timerLabel" text="30" style="-fx-text-fill: #e2b96f; -fx-font-size: 30px; -fx-font-weight: bold;"/>
-                    <Label fx:id="turnLabel" text="Player 1's Turn" style="-fx-text-fill: #a0a0c0; -fx-font-size: 10px;"/>
+
+                <!-- Timer -->
+                <VBox alignment="CENTER" spacing="2" minWidth="110">
+                    <Label text="⏳" style="-fx-font-size: 14px;"/>
+                    <Label fx:id="timerLabel" text="30"
+                           style="-fx-text-fill: #e2b96f;
+                                  -fx-font-size: 34px;
+                                  -fx-font-weight: bold;"/>
+                    <Label fx:id="turnLabel" text="Player 1's Turn"
+                           style="-fx-text-fill: #a0a0c0; -fx-font-size: 11px;"/>
                 </VBox>
-                <VBox alignment="CENTER_RIGHT" spacing="4" HBox.hgrow="ALWAYS">
-                    <Label fx:id="player2NameLabel" text="Player 2" style="-fx-text-fill: #7eb8e2; -fx-font-size: 14px;"/>
-                    <HBox fx:id="player2Hearts" spacing="2" alignment="CENTER_RIGHT"/>
+
+                <!-- Player 2 -->
+                <VBox alignment="CENTER_RIGHT" spacing="6" HBox.hgrow="ALWAYS">
+                    <Label fx:id="player2NameLabel" text="Player 2"
+                           style="-fx-text-fill: #7eb8e2;
+                                  -fx-font-size: 16px;
+                                  -fx-font-weight: bold;
+                                  -fx-font-family: 'Georgia';"/>
+                    <HBox fx:id="player2Hearts" spacing="3" alignment="CENTER_RIGHT"/>
                 </VBox>
+
             </HBox>
         </top>
 
+        <!-- CENTER: Arena -->
         <center>
-            <HBox alignment="CENTER" spacing="16" style="-fx-padding: 10;">
-                <!-- Left: portrait + shuffle -->
-                <VBox alignment="BOTTOM_CENTER" spacing="8" prefWidth="140">
-                    <Rectangle fx:id="wizard1Portrait" width="100" height="130" arcWidth="10" arcHeight="10"
-                               fill="#2a1a4a" stroke="#444466" strokeWidth="1.5"/>
-                    <Label fx:id="wizard1Label" text="Wizard 1" style="-fx-text-fill: #e2b96f; -fx-font-size: 12px;"/>
-                    <Button fx:id="shuffleButton" text="🔀 Shuffle (Space)" onAction="#onShuffleClicked"
-                            style="-fx-background-color: transparent; -fx-text-fill: #a0a0c0; -fx-font-size: 12px;
-                                   -fx-border-color: #a0a0c0; -fx-border-radius: 5; -fx-padding: 8 16; -fx-cursor: hand;"/>
+            <HBox alignment="CENTER" spacing="12" style="-fx-padding: 12;">
+
+                <!-- Left: Portrait + Shuffle -->
+                <VBox alignment="CENTER" spacing="10" prefWidth="160">
+                    <Rectangle fx:id="wizard1Portrait"
+                               width="130" height="175"
+                               arcWidth="12" arcHeight="12"
+                               fill="#2a1a4a" stroke="#444466" strokeWidth="2"/>
+                    <Label fx:id="wizard1Label" text="Wizard 1"
+                           style="-fx-text-fill: #e2b96f;
+                                  -fx-font-size: 13px;
+                                  -fx-font-family: 'Georgia';"/>
+                    <Button fx:id="shuffleButton" text="🔀 Shuffle"
+                            onAction="#onShuffleClicked"
+                            style="-fx-background-color: transparent;
+                                   -fx-text-fill: #a0a0c0;
+                                   -fx-font-size: 12px;
+                                   -fx-border-color: #444466;
+                                   -fx-border-radius: 5;
+                                   -fx-padding: 7 14;
+                                   -fx-cursor: hand;"/>
+                    <Label text="(Space to shuffle)"
+                           style="-fx-text-fill: #444466; -fx-font-size: 10px;"/>
                 </VBox>
 
-                <!-- Center: floating letters + grid + cast -->
-                <VBox alignment="CENTER" spacing="10" HBox.hgrow="ALWAYS">
-                    <Label fx:id="skillCheckStatusLabel" text="" style="-fx-text-fill: #ff6b6b; -fx-font-size: 13px; -fx-font-weight: bold;"/>
-                    <HBox fx:id="floatingLettersPane" alignment="CENTER" spacing="4" minHeight="52"/>
-                    <GridPane fx:id="letterGridPane" alignment="CENTER" hgap="6" vgap="6">
-                        <padding><Insets top="5" bottom="5" left="5" right="5"/></padding>
+                <!-- Center: Grid + Word + Buttons + Log -->
+                <VBox alignment="CENTER" spacing="8" HBox.hgrow="ALWAYS">
+
+                    <!-- Skill check banner -->
+                    <Label fx:id="skillCheckStatusLabel" text=""
+                           style="-fx-text-fill: #ff6b6b;
+                                  -fx-font-size: 14px;
+                                  -fx-font-weight: bold;"/>
+
+                    <!-- Floating letters -->
+                    <HBox fx:id="floatingLettersPane"
+                          alignment="CENTER" spacing="4" minHeight="56"/>
+
+                    <!-- Letter Grid -->
+                    <GridPane fx:id="letterGridPane"
+                              alignment="CENTER"
+                              hgap="6" vgap="6">
+                        <padding>
+                            <Insets top="4" bottom="4" left="4" right="4"/>
+                        </padding>
                     </GridPane>
-                    <Label fx:id="feedbackLabel" text="" style="-fx-text-fill: #a0a0c0; -fx-font-size: 12px;"/>
-                    <Button fx:id="castButton" text="✨ Cast!" onAction="#onCastClicked"
-                            style="-fx-background-color: #4caf50; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;
-                                   -fx-padding: 12 40 12 40; -fx-background-radius: 8; -fx-cursor: hand;"/>
+
+                    <!-- Feedback -->
+                    <Label fx:id="feedbackLabel" text=""
+                           style="-fx-text-fill: #a0a0c0;
+                                  -fx-font-size: 14px;
+                                  -fx-font-weight: bold;"/>
+
+                    <!-- Buttons row -->
+                    <HBox alignment="CENTER" spacing="12">
+                        <Button fx:id="castButton" text="✨ Cast!"
+                                onAction="#onCastClicked"
+                                style="-fx-background-color: #e2b96f;
+                                       -fx-text-fill: #1a1a2e;
+                                       -fx-font-size: 16px;
+                                       -fx-font-weight: bold;
+                                       -fx-padding: 12 40;
+                                       -fx-background-radius: 8;
+                                       -fx-cursor: hand;"/>
+                        <Button text="↺ Clear"
+                                onAction="#onClearClicked"
+                                style="-fx-background-color: transparent;
+                                       -fx-text-fill: #a0a0c0;
+                                       -fx-font-size: 13px;
+                                       -fx-border-color: #444466;
+                                       -fx-border-radius: 5;
+                                       -fx-padding: 10 18;
+                                       -fx-cursor: hand;"/>
+                        <Button fx:id="menuButton" text="⛶ Menu"
+                                onAction="#onMenuClicked"
+                                style="-fx-background-color: transparent;
+                                       -fx-text-fill: #666688;
+                                       -fx-font-size: 12px;
+                                       -fx-border-color: #333355;
+                                       -fx-border-radius: 5;
+                                       -fx-padding: 10 14;
+                                       -fx-cursor: hand;"/>
+                    </HBox>
+
+                    <!-- Battle Log -->
+                    <ListView fx:id="battleLog"
+                              prefHeight="130" prefWidth="420"
+                              style="-fx-background-color: #12122a;
+                                     -fx-border-color: #2a2a4a;
+                                     -fx-border-radius: 5;
+                                     -fx-font-size: 12px;"/>
+
                 </VBox>
 
-                <!-- Right: portrait + menu -->
-                <VBox alignment="BOTTOM_CENTER" spacing="8" prefWidth="140">
-                    <Rectangle fx:id="wizard2Portrait" width="100" height="130" arcWidth="10" arcHeight="10"
-                               fill="#1a2a4a" stroke="#444466" strokeWidth="1.5"/>
-                    <Label fx:id="wizard2Label" text="Wizard 2" style="-fx-text-fill: #7eb8e2; -fx-font-size: 12px;"/>
-                    <Button fx:id="menuButton" text="Menu" onAction="#onMenuClicked"
-                            style="-fx-background-color: transparent; -fx-text-fill: #a0a0c0; -fx-font-size: 12px;
-                                   -fx-border-color: #a0a0c0; -fx-border-radius: 5; -fx-padding: 8 16; -fx-cursor: hand;"/>
+                <!-- Right: Portrait + spacer -->
+                <VBox alignment="CENTER" spacing="10" prefWidth="160">
+                    <Rectangle fx:id="wizard2Portrait"
+                               width="130" height="175"
+                               arcWidth="12" arcHeight="12"
+                               fill="#1a2a4a" stroke="#444466" strokeWidth="2"/>
+                    <Label fx:id="wizard2Label" text="Wizard 2"
+                           style="-fx-text-fill: #7eb8e2;
+                                  -fx-font-size: 13px;
+                                  -fx-font-family: 'Georgia';"/>
                 </VBox>
+
             </HBox>
         </center>
+
     </BorderPane>
 
-    <StackPane fx:id="lastStandOverlay" visible="false" style="-fx-background-color: #000000;" opacity="0.88">
-        <VBox alignment="CENTER" spacing="20" style="-fx-padding: 40;">
-            <Label text="⚠ LAST STAND ⚠" style="-fx-text-fill: #ff6b6b; -fx-font-size: 32px; -fx-font-weight: bold; -fx-font-family: 'Georgia';"/>
-            <Label text="Unscramble the word to survive!" style="-fx-text-fill: #a0a0c0; -fx-font-size: 14px;"/>
-            <Label fx:id="scrambledWordLabel" text="??????" style="-fx-text-fill: #e2b96f; -fx-font-size: 48px; -fx-font-weight: bold; -fx-font-family: 'Georgia';"/>
-            <Label fx:id="lastStandTimerLabel" text="15" style="-fx-text-fill: #ff6b6b; -fx-font-size: 28px; -fx-font-weight: bold;"/>
-            <TextField fx:id="lastStandInput" promptText="Type the unscrambled word..." prefWidth="320"
-                       style="-fx-background-color: #2a2a4a; -fx-text-fill: white; -fx-prompt-text-fill: #666688; -fx-border-color: #e2b96f; -fx-border-radius: 5; -fx-background-radius: 5; -fx-font-size: 20px; -fx-padding: 10;"/>
-            <Label fx:id="lastStandFeedbackLabel" text="" style="-fx-font-size: 13px; -fx-text-fill: #a0a0c0;"/>
+    <!-- Last Stand Overlay -->
+    <StackPane fx:id="lastStandOverlay"
+               visible="false"
+               style="-fx-background-color: #0d0d1a;"
+               opacity="0.97">
+        <VBox alignment="CENTER" spacing="22" style="-fx-padding: 50;">
+            <Label text="⚠ LAST STAND ⚠"
+                   style="-fx-text-fill: #ff6b6b;
+                          -fx-font-size: 34px;
+                          -fx-font-weight: bold;
+                          -fx-font-family: 'Georgia';"/>
+            <Label text="Unscramble the word to survive!"
+                   style="-fx-text-fill: #a0a0c0; -fx-font-size: 15px;"/>
+            <Label fx:id="scrambledWordLabel" text="??????"
+                   style="-fx-text-fill: #e2b96f;
+                          -fx-font-size: 52px;
+                          -fx-font-weight: bold;
+                          -fx-font-family: 'Georgia';"/>
+            <Label fx:id="lastStandTimerLabel" text="15"
+                   style="-fx-text-fill: #ff6b6b;
+                          -fx-font-size: 30px;
+                          -fx-font-weight: bold;"/>
+            <TextField fx:id="lastStandInput"
+                       promptText="Type the unscrambled word and press Enter..."
+                       prefWidth="360"
+                       style="-fx-background-color: #1a1a3a;
+                              -fx-text-fill: white;
+                              -fx-prompt-text-fill: #555577;
+                              -fx-border-color: #e2b96f;
+                              -fx-border-radius: 6;
+                              -fx-background-radius: 6;
+                              -fx-font-size: 22px;
+                              -fx-padding: 12;"/>
+            <Label fx:id="lastStandFeedbackLabel" text=""
+                   style="-fx-font-size: 14px; -fx-text-fill: #a0a0c0;"/>
         </VBox>
     </StackPane>
+
 </StackPane>

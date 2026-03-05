@@ -56,9 +56,12 @@ public class Main extends Application {
 
     public static void navigateTo(String fxmlFile) {
         try {
-            FXMLLoader loader = new FXMLLoader(
-                    Main.class.getResource(fxmlFile)
-            );
+            String path = fxmlFile.startsWith("/") ? fxmlFile : "/com/rst/outspelled/" + fxmlFile;
+            java.net.URL location = Main.class.getResource(path);
+            if (location == null) {
+                throw new IOException("FXML resource not found: " + path);
+            }
+            FXMLLoader loader = new FXMLLoader(location);
             Scene scene = new Scene(loader.load());
             primaryStage.setScene(scene);
         } catch (IOException e) {

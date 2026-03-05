@@ -3,54 +3,103 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.scene.shape.*?>
 
-<VBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.rst.outspelled.ui.CosmeticsController"
-      alignment="CENTER"
-      spacing="20"
-      style="-fx-background-color: #1a1a2e;"
-      prefWidth="500"
-      prefHeight="450">
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.rst.outspelled.ui.CosmeticsController"
+            style="-fx-background-color: #1a1a2e;"
+            prefWidth="600"
+            prefHeight="500">
 
-    <padding>
-        <Insets top="30" bottom="30" left="40" right="40"/>
-    </padding>
+    <!-- Header -->
+    <top>
+        <VBox alignment="CENTER"
+              style="-fx-background-color: #12122a; -fx-padding: 20;">
+            <Label text="⚙ Cosmetics"
+                   style="-fx-font-size: 28px;
+                          -fx-font-weight: bold;
+                          -fx-text-fill: #e2b96f;
+                          -fx-font-family: 'Georgia';"/>
+            <Label text="Customize your wizard before battle"
+                   style="-fx-font-size: 12px; -fx-text-fill: #666688;"/>
+        </VBox>
+    </top>
 
-    <Label text="⚙ Cosmetics"
-           style="-fx-font-size: 28px; -fx-font-weight: bold;
-                  -fx-text-fill: #e2b96f; -fx-font-family: 'Georgia';"/>
+    <!-- Center: Options -->
+    <center>
+        <VBox alignment="CENTER" spacing="24"
+              style="-fx-padding: 40;">
 
-    <Label text="Choose wizard skins and arena (used when starting a new game)"
-           style="-fx-font-size: 12px; -fx-text-fill: #a0a0c0;"/>
+            <!-- Player 1 Skin -->
+            <VBox spacing="8">
+                <Label text="🔴  Player 1 — Wizard Skin"
+                       style="-fx-text-fill: #e2b96f;
+                              -fx-font-size: 14px;
+                              -fx-font-weight: bold;"/>
+                <ComboBox fx:id="player1SkinCombo"
+                          prefWidth="320"
+                          style="-fx-background-color: #2a2a4a;
+                                 -fx-text-fill: white;
+                                 -fx-border-color: #444466;
+                                 -fx-border-radius: 5;
+                                 -fx-background-radius: 5;"/>
+            </VBox>
 
-    <VBox spacing="12" alignment="CENTER_LEFT" style="-fx-padding: 10;">
-        <Label text="Player 1 wizard skin"
-               style="-fx-text-fill: #e2b96f; -fx-font-size: 13px;"/>
-        <ComboBox fx:id="player1SkinCombo" maxWidth="280"
-                  style="-fx-background-color: #2a2a4a; -fx-text-fill: white;"/>
+            <!-- Separator -->
+            <Rectangle height="1" prefWidth="320" fill="#2a2a4a"/>
 
-        <Label text="Player 2 wizard skin"
-               style="-fx-text-fill: #7eb8e2; -fx-font-size: 13px;"/>
-        <ComboBox fx:id="player2SkinCombo" maxWidth="280"
-                  style="-fx-background-color: #2a2a4a; -fx-text-fill: white;"/>
+            <!-- Player 2 Skin -->
+            <VBox spacing="8">
+                <Label text="🔵  Player 2 — Wizard Skin"
+                       style="-fx-text-fill: #7eb8e2;
+                              -fx-font-size: 14px;
+                              -fx-font-weight: bold;"/>
+                <ComboBox fx:id="player2SkinCombo"
+                          prefWidth="320"
+                          style="-fx-background-color: #2a2a4a;
+                                 -fx-text-fill: white;
+                                 -fx-border-color: #444466;
+                                 -fx-border-radius: 5;
+                                 -fx-background-radius: 5;"/>
+            </VBox>
 
-        <Label text="Arena background"
-               style="-fx-text-fill: #a0a0c0; -fx-font-size: 13px;"/>
-        <ComboBox fx:id="arenaCombo" maxWidth="280"
-                  style="-fx-background-color: #2a2a4a; -fx-text-fill: white;"/>
-    </VBox>
+            <!-- Separator -->
+            <Rectangle height="1" prefWidth="320" fill="#2a2a4a"/>
 
-    <Button fx:id="backButton"
-            text="← Back to Menu"
-            onAction="#onBackClicked"
-            style="-fx-background-color: transparent;
-                   -fx-text-fill: #e2b96f;
-                   -fx-font-size: 14px;
-                   -fx-border-color: #e2b96f;
-                   -fx-border-radius: 5;
-                   -fx-padding: 10 24 10 24;
-                   -fx-cursor: hand;"/>
+            <!-- Arena -->
+            <VBox spacing="8">
+                <Label text="🏟  Arena Background"
+                       style="-fx-text-fill: #a0a0c0;
+                              -fx-font-size: 14px;
+                              -fx-font-weight: bold;"/>
+                <ComboBox fx:id="arenaCombo"
+                          prefWidth="320"
+                          style="-fx-background-color: #2a2a4a;
+                                 -fx-text-fill: white;
+                                 -fx-border-color: #444466;
+                                 -fx-border-radius: 5;
+                                 -fx-background-radius: 5;"/>
+            </VBox>
 
-</VBox>
+        </VBox>
+    </center>
+
+    <!-- Footer: Back button -->
+    <bottom>
+        <HBox alignment="CENTER"
+              style="-fx-background-color: #12122a; -fx-padding: 20;">
+            <Button fx:id="backButton"
+                    text="← Back to Menu"
+                    onAction="#onBackClicked"
+                    style="-fx-background-color: transparent;
+                           -fx-text-fill: #e2b96f;
+                           -fx-font-size: 14px;
+                           -fx-border-color: #e2b96f;
+                           -fx-border-radius: 5;
+                           -fx-padding: 10 28;
+                           -fx-cursor: hand;"/>
+        </HBox>
+    </bottom>
+
+</BorderPane>
