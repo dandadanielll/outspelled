@@ -23,7 +23,7 @@ public class Main extends Application {
         stage.setResizable(true);
         stage.setMinWidth(WINDOWED_WIDTH);
         stage.setMinHeight(WINDOWED_HEIGHT);
-        navigateTo("login-view.fxml");
+        navigateTo("profile-view.fxml");
         applyWindowMode();
         stage.show();
     }

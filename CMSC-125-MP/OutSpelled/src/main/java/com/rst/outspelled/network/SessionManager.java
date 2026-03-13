@@ -29,13 +29,25 @@ public final class SessionManager {
     public static void setListener(GameClient.Listener l) { listener = l; }
     public static GameClient.Listener getListener() { return listener; }
 
+    private static int activeProfileSlot = -1;
+    private static Wizard activeWizard = null;
+
     public static void clear() {
         if (client != null) client.disconnect();
         client = null;
         player1Name = "";
         player2Name = "";
         listener = null;
+        activeProfileSlot = -1;
+        activeWizard = null;
     }
+
+    public static void setActiveProfile(int slot, Wizard w) {
+        activeProfileSlot = slot;
+        activeWizard = w;
+    }
+    public static Wizard getActiveWizard() { return activeWizard; }
+    public static int getActiveProfileSlot() { return activeProfileSlot; }
 
     private SessionManager() {}
 }

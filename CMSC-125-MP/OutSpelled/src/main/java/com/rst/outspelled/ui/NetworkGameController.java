@@ -315,7 +315,18 @@ public class NetworkGameController {
                 instance.turnLabel.setText(instance.currentTurnName() + "'s Turn");
                 instance.updateInputEnabled();
                 instance.updatePortraitHighlight();
-                instance.updateDamagePreview(instance.letterGrid != null ? instance.letterGrid.getSelectedWord() : "");
+                instance.updateDamagePreview(
+                        instance.letterGrid != null ? instance.letterGrid.getSelectedWord() : "");
+
+                if (instance.battleLog != null
+                        && lastSpellDesc != null
+                        && !lastSpellDesc.isBlank()) {
+                    String entry = "⚔ " + lastSpellDesc;
+                    if (instance.battleLog.getItems().isEmpty()
+                            || !instance.battleLog.getItems().get(0).equals(entry)) {
+                        instance.battleLog.getItems().add(0, entry);
+                    }
+                }
             }
         });
     }
@@ -452,6 +463,9 @@ public class NetworkGameController {
                     instance.skillCheckStatusLabel.setText("⚔ " + summary);
                     instance.skillCheckStatusLabel.setStyle("-fx-text-fill: #e2b96f;");
                 }
+                if (instance.battleLog != null) {
+                    instance.battleLog.getItems().add(0, "⚔ Half HP Challenge: " + summary);
+                }
                 instance.updateInputEnabled();
             }
         });
@@ -517,6 +531,9 @@ public class NetworkGameController {
                     instance.skillCheckStatusLabel.setText(summary);
                     instance.skillCheckStatusLabel.setStyle("-fx-text-fill: #e2b96f;");
                 }
+                if (instance.battleLog != null) {
+                    instance.battleLog.getItems().add(0, "🛡 Last Stand: " + summary);
+                }
             }
         });
     }
@@ -560,11 +577,7 @@ public class NetworkGameController {
                 return;
             }
             client.sendWord(word);
-            if (battleLog != null) {
-                battleLog.getItems().add(0, "⚔ " + (myPlayerId == 1
-                        ? wizard1.getName() : wizard2.getName())
-                        + " cast: " + word.toUpperCase());
-            }
+
             renderGrid();
             updateSelectedWordDisplay();
             feedbackLabel.setText("Casting...");

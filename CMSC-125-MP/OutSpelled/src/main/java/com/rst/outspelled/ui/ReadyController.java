@@ -44,8 +44,14 @@ public class ReadyController {
     public void initialize() {
         instance = this;
         if (isNetworkMode) {
-            player1NameLabel.setText(SessionManager.getPlayer1Name().isEmpty() ? "Player 1..." : SessionManager.getPlayer1Name());
-            player2NameLabel.setText(SessionManager.getPlayer2Name().isEmpty() ? "Player 2..." : SessionManager.getPlayer2Name());
+            player1NameLabel.setText("Player 1");
+            player2NameLabel.setText("Player 2");
+
+            String n1 = SessionManager.getPlayer1Name();
+            String n2 = SessionManager.getPlayer2Name();
+            if (!n1.isEmpty()) player1NameLabel.setText(n1);
+            if (!n2.isEmpty()) player2NameLabel.setText(n2);
+
             player1ReadyButton.setVisible(SessionManager.getMyPlayerId() == 1);
             player2ReadyButton.setVisible(SessionManager.getMyPlayerId() == 2);
             statusLabel.setText("Click Ready when you're set. Waiting for both players...");

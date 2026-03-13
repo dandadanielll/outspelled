@@ -34,7 +34,7 @@ public class ConnectController {
 
     @FXML
     private void onHostClicked() {
-        String name = "Player"; // Placeholder name
+        String name = SessionManager.getMyName();
         statusLabel.setText("Starting server...");
         statusLabel.setStyle("-fx-text-fill: #a0a0c0;");
         new Thread(() -> {
@@ -55,7 +55,7 @@ public class ConnectController {
 
     @FXML
     private void onJoinClicked() {
-        String name = "Player"; // Placeholder name
+        String name = SessionManager.getMyName();
         String host = hostField.getText().trim();
         if (host.isEmpty()) {
             statusLabel.setText("Enter server IP to join.");
@@ -91,9 +91,6 @@ public class ConnectController {
                     if (playerId == 1) SessionManager.setPlayer1Name(playerName);
                     else SessionManager.setPlayer2Name(playerName);
                     ReadyController.updatePlayerName(playerId, playerName);
-                    if (ReadyController.instance != null) {
-                        ReadyController.instance.initialize();
-                    }
                 });
             }
 
