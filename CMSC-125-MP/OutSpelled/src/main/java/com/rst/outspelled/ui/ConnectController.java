@@ -4,6 +4,10 @@ import com.rst.outspelled.Main;
 import com.rst.outspelled.model.Wizard;
 import com.rst.outspelled.model.Wizard.ArenaBackground;
 import com.rst.outspelled.model.Wizard.WizardSkin;
+import com.rst.outspelled.Main;
+import com.rst.outspelled.model.Wizard;
+import com.rst.outspelled.model.Wizard.ArenaBackground;
+import com.rst.outspelled.model.Wizard.WizardSkin;
 import com.rst.outspelled.network.GameClient;
 import com.rst.outspelled.network.GameServer;
 import com.rst.outspelled.network.Protocol;
@@ -13,11 +17,17 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
+
 public class ConnectController {
 
     @FXML private TextField nameField;
     @FXML private TextField hostField;
     @FXML private Label statusLabel;
+    @FXML private Label localIpLabel;
 
     private static GameServer server;
 
@@ -27,6 +37,7 @@ public class ConnectController {
         if (nameField != null && SessionManager.getMyName() != null && !SessionManager.getMyName().isEmpty()) {
             nameField.setText(SessionManager.getMyName());
         }
+        displayLocalIp();
     }
 
     @FXML
@@ -250,5 +261,28 @@ public class ConnectController {
             server = null;
         }
         Main.navigateTo("menu-view.fxml");
+    }
+
+    private void displayLocalIp() {
+        try {
+            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+            while (interfaces.hasMoreElements()) {
+                NetworkInterface iface = interfaces.nextElement();
+                if (iface.isLoopback() || !iface.isUp()) continue;
+
+                Enumeration<InetAddress> addresses = iface.getInetAddresses();
+                while(addresses.hasMoreElements()) {
+                    InetAddress addr = addresses.nextElement();
+                    // Check for IPv4 and non-loopback
+                    if (addr.isSiteLocalAddress()) {
+                        localIpLabel.setText("Your IP for hosting: " + addr.getHostAddress());
+                        return;
+                    }
+                }
+            }
+            localIpLabel.setText("Your IP for hosting: Not found");
+        } catch (SocketException e) {
+            localIpLabel.setText("Could not determine local IP.");
+        }
     }
 }
