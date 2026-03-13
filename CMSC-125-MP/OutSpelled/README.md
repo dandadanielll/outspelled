@@ -12,7 +12,7 @@ OutSpelled is a 1-on-1, competitive word-finding game with a fantasy wizard them
 
 ## Requirements
 
-- Java Development Kit (JDK) 21 or newer.
+- Java Development Kit (JDK) 17 or newer.
 - Apache Maven.
 
 ## Building and Running
