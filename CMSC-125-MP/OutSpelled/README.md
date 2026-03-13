@@ -38,12 +38,10 @@ OutSpelled is a 1-on-1, competitive word-finding game with a fantasy wizard them
 1.  **Launch the game** on both players' computers.
 2.  **The Host:**
     - On the main menu, click `Play`.
-    - Enter a name.
     - The screen will display **"Your IP for hosting: ..."**. Share this IP address with the other player.
     - Click `Host Game`.
 3.  **The Player Joining:**
     - On the main menu, click `Play`.
-    - Enter a name.
     - In the "Server IP" box, type the IP address the host gave you.
     - Click `Join Game`.
 4.  Once connected, both players will see a "Ready" screen. Click `Ready` to begin the match.
