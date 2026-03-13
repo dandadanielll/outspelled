@@ -21,13 +21,6 @@
            style="-fx-font-size: 26px; -fx-font-weight: bold;
                   -fx-text-fill: #e2b96f; -fx-font-family: 'Georgia';"/>
 
-    <Label text="Your name (shown to opponent)"
-           style="-fx-text-fill: #a0a0c0; -fx-font-size: 12px;"/>
-    <TextField fx:id="nameField" promptText="Your name..."
-               maxWidth="280"
-               style="-fx-background-color: #2a2a4a; -fx-text-fill: white;
-                      -fx-prompt-text-fill: #666688; -fx-padding: 8;"/>
-
     <Label text="Server IP (for Join; leave blank when Hosting)"
            style="-fx-text-fill: #a0a0c0; -fx-font-size: 12px;"/>
     <TextField fx:id="hostField" promptText="e.g. 192.168.1.100 or localhost"

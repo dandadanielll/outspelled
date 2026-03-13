@@ -20,7 +20,6 @@ import java.util.Enumeration;
 
 public class ConnectController {
 
-    @FXML private TextField nameField;
     @FXML private TextField hostField;
     @FXML private Label statusLabel;
     @FXML private Label localIpLabel;
@@ -30,19 +29,12 @@ public class ConnectController {
     @FXML
     public void initialize() {
         statusLabel.setText("");
-        if (nameField != null && SessionManager.getMyName() != null && !SessionManager.getMyName().isEmpty()) {
-            nameField.setText(SessionManager.getMyName());
-        }
         displayLocalIp();
     }
 
     @FXML
     private void onHostClicked() {
-        String name = nameField.getText().trim();
-        if (name.isEmpty()) {
-            statusLabel.setText("Enter your name.");
-            return;
-        }
+        String name = "Player"; // Placeholder name
         statusLabel.setText("Starting server...");
         statusLabel.setStyle("-fx-text-fill: #a0a0c0;");
         new Thread(() -> {
@@ -63,12 +55,8 @@ public class ConnectController {
 
     @FXML
     private void onJoinClicked() {
-        String name = nameField.getText().trim();
+        String name = "Player"; // Placeholder name
         String host = hostField.getText().trim();
-        if (name.isEmpty()) {
-            statusLabel.setText("Enter your name.");
-            return;
-        }
         if (host.isEmpty()) {
             statusLabel.setText("Enter server IP to join.");
             return;
