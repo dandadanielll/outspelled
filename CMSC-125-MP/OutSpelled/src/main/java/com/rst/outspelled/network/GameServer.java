@@ -33,6 +33,7 @@ public class GameServer {
     private ScheduledExecutorService turnTimer;
     private ScheduledFuture<?> turnTask;
     private volatile int currentTurn = 1; // 1 or 2
+    private volatile int turnSecondsLeft = TURN_SECONDS;
     private volatile int p1Hp = 200;
     private volatile int p2Hp = 200;
     private static final int MAX_HP = 200;
@@ -182,11 +183,11 @@ public class GameServer {
     }
 
     private void scheduleTurnTick() {
-        final int[] secondsLeft = { TURN_SECONDS };
+        turnSecondsLeft = TURN_SECONDS;
         turnTask = turnTimer.scheduleAtFixedRate(() -> {
-            secondsLeft[0]--;
-            broadcast(client1, client2, Protocol.TURN_TICK + " " + secondsLeft[0]);
-            if (secondsLeft[0] <= 0) {
+            turnSecondsLeft--;
+            broadcast(client1, client2, Protocol.TURN_TICK + " " + turnSecondsLeft);
+            if (turnSecondsLeft <= 0) {
                 turnTask.cancel(false);
                 currentTurn = currentTurn == 1 ? 2 : 1;
                 broadcast(client1, client2, Protocol.TURN_EXPIRED);
@@ -201,20 +202,19 @@ public class GameServer {
     public void onWord(int playerId, String word) {
         if (playerId != currentTurn) return;
         if (halfHpActive || lastStandActive) return;
+
+        word = word != null ? word.trim().toLowerCase() : "";
+
+        // Validate BEFORE touching the timer — invalid words must not reset the clock.
+        if (word.length() < 3 || !DictionaryLoader.getWords().contains(word)) {
+            sendTo(client(playerId), Protocol.INVALID_WORD + " " + Protocol.quote(word));
+            return; // Timer keeps counting; no exploit possible.
+        }
+
+        // Word is valid — only now do we stop the running timer.
         if (turnTask != null) {
             turnTask.cancel(false);
             turnTask = null;
-        }
-        word = word != null ? word.trim().toLowerCase() : "";
-        if (word.length() < 3) {
-            sendTo(client(playerId), Protocol.INVALID_WORD + " " + Protocol.quote(word));
-            scheduleTurnTick();
-            return;
-        }
-        if (!DictionaryLoader.getWords().contains(word)) {
-            sendTo(client(playerId), Protocol.INVALID_WORD + " " + Protocol.quote(word));
-            scheduleTurnTick();
-            return;
         }
         String casterName = playerId == 1 ? p1Name : p2Name;
         Spell spell = new Spell(word, casterName);
