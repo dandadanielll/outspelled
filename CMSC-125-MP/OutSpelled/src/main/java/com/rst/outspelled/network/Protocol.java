@@ -15,6 +15,7 @@ public final class Protocol {
     public static final String WHEEL_MANA = "WHEEL_MANA";
     public static final String WORD = "WORD";
     public static final String SHUFFLE = "SHUFFLE";
+    public static final String DISCONNECT = "DISCONNECT"; // voluntary leave during a game
 
     // Server -> Client(s)
     public static final String JOIN_OK = "JOIN_OK";

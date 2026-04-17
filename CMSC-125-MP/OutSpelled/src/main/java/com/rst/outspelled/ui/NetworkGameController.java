@@ -598,11 +598,9 @@ public class NetworkGameController {
     @FXML
     private void onShuffleClicked() {
         if (shuffleButton != null && shuffleButton.isDisabled()) return;
-        if (!letterGrid.getSelectedWord().isEmpty()) {
-            letterGrid.shuffleIdleTilesOnly();
-        } else {
-            letterGrid.shuffleGrid();
-        }
+        // Always deselect before shuffling — preserving selected tiles caused a
+        // letter-duplication exploit when the server broadcast the layout back.
+        letterGrid.shuffleGrid();
         if (client != null) {
             client.sendShuffle(letterGrid.getLettersAsString());
         }
@@ -614,6 +612,9 @@ public class NetworkGameController {
 
     @FXML
     private void onMenuClicked() {
+        if (client != null) {
+            client.sendDisconnect(); // Notify server so opponent gets a proper game-over.
+        }
         SessionManager.clear();
         Main.navigateTo("menu-view.fxml");
     }

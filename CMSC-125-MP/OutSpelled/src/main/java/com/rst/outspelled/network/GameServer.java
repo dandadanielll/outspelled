@@ -470,6 +470,19 @@ public class GameServer {
         if (turnTimer != null) turnTimer.shutdown();
     }
 
+    /**
+     * Handles a player disconnecting — either voluntarily (DISCONNECT message)
+     * or unexpectedly (socket closed/error). Awards the win to the remaining player.
+     * Synchronized and guarded by turnTimer state to prevent double-broadcasting.
+     */
+    private synchronized void onDisconnect(int disconnectedPlayerId) {
+        // If the game hasn't started or has already ended, there's nothing to do.
+        if (turnTimer == null || turnTimer.isShutdown()) return;
+        turnTimer.shutdownNow();
+        int winnerId = disconnectedPlayerId == 1 ? 2 : 1;
+        broadcast(client1, client2, Protocol.GAME_OVER + " " + winnerId);
+    }
+
     // --- ClientHandler ---
     static class ClientHandler {
         private final int id;
@@ -502,8 +515,11 @@ public class GameServer {
                 while ((line = in.readLine()) != null) {
                     handle(line);
                 }
+                // readLine() returns null on a clean (EOF) disconnect.
+                server.onDisconnect(id);
             } catch (IOException e) {
                 if (!socket.isClosed()) System.err.println("Client " + id + " read error: " + e.getMessage());
+                server.onDisconnect(id);
             } finally {
                 close();
             }
@@ -549,6 +565,9 @@ public class GameServer {
                     break;
                 case Protocol.LAST_STAND_WORD:
                     server.onLastStandWord(id, Protocol.unquote(arg));
+                    break;
+                case Protocol.DISCONNECT:
+                    server.onDisconnect(id);
                     break;
                 default:
                     break;

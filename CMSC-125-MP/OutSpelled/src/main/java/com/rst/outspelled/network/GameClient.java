@@ -116,6 +116,10 @@ public class GameClient {
         send(Protocol.LAST_STAND_WORD + " " + Protocol.quote(word != null ? word : ""));
     }
 
+    public void sendDisconnect() {
+        send(Protocol.DISCONNECT);
+    }
+
     private void send(String line) {
         try {
             if (out != null && socket != null && !socket.isClosed()) {
