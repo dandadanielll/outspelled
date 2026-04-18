@@ -247,6 +247,9 @@ public class NetworkGameController {
         String word = letterGrid.getSelectedWord();
         updateFloatingLetters(word);
         updateDamagePreview(word);
+        if (client != null && currentTurn == myPlayerId && !halfHpChallengeActive) {
+            client.sendTyping(word);
+        }
     }
 
     private void updateFloatingLetters(String word) {
@@ -584,6 +587,7 @@ public class NetworkGameController {
             feedbackLabel.setStyle("-fx-text-fill: #a0a0c0;");
             castButton.setDisable(true);
             letterGridPane.setDisable(true);
+            client.sendTyping(""); // Clear opponent's typing view
         }
     }
 
@@ -593,6 +597,18 @@ public class NetworkGameController {
         renderGrid();
         updateSelectedWordDisplay();
         feedbackLabel.setText("");
+    }
+
+    public static void onOpponentTyping(String word) {
+        if (instance != null && currentTurn != myPlayerId && !instance.halfHpChallengeActive) {
+            if (word == null || word.isEmpty()) {
+                instance.feedbackLabel.setText("Waiting for opponent...");
+                instance.feedbackLabel.setStyle("-fx-text-fill: #a0a0c0;");
+            } else {
+                instance.feedbackLabel.setText("Opponent is typing: " + word.toUpperCase());
+                instance.feedbackLabel.setStyle("-fx-text-fill: #e2b96f;");
+            }
+        }
     }
 
     @FXML

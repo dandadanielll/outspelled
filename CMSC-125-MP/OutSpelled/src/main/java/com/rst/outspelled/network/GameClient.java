@@ -32,6 +32,7 @@ public class GameClient {
         void onTurnTick(int secondsLeft);
         void onTurnExpired();
         void onGameOver(int winnerId);
+        void onOpponentTyping(String word);
         void onError(String message);
         void onHalfHpPrompt(int playerId);
         void onHalfHpStart(long gridSeed);
@@ -94,6 +95,10 @@ public class GameClient {
 
     public void sendWord(String word) {
         send(Protocol.WORD + " " + Protocol.quote(word != null ? word : ""));
+    }
+
+    public void sendTyping(String word) {
+        send(Protocol.TYPING + " " + Protocol.quote(word != null ? word : ""));
     }
 
     public void sendShuffle(String letters) {
@@ -235,9 +240,13 @@ public class GameClient {
                 break;
             case Protocol.GAME_OVER:
                 try {
-                    int winner = Integer.parseInt(arg.trim());
-                    Platform.runLater(() -> L.onGameOver(winner));
+                    int id = Integer.parseInt(arg.trim());
+                    Platform.runLater(() -> L.onGameOver(id));
                 } catch (NumberFormatException ignored) {}
+                break;
+            case Protocol.OPPONENT_TYPING:
+                String typedWord = Protocol.unquote(arg);
+                Platform.runLater(() -> L.onOpponentTyping(typedWord));
                 break;
             case Protocol.ERROR:
                 Platform.runLater(() -> L.onError(Protocol.unquote(arg)));

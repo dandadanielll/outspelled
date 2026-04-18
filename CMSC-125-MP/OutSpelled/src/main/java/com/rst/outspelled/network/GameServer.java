@@ -409,21 +409,28 @@ public class GameServer {
         String initiatorWord = initiator == 1 ? halfHpWord1 : halfHpWord2;
 
         int damageOrHeal;
-        if (initiatorScore >= opponentScore) {
+        int initiatorWon = 0;
+        if (initiatorScore > opponentScore) {
             // Initiator wins: opponent drops to initiator's HP
             int initiatorHp = initiator == 1 ? p1Hp : p2Hp;
             int opponentHp = opponent == 1 ? p1Hp : p2Hp;
             damageOrHeal = Math.max(0, opponentHp - initiatorHp);
             if (opponent == 1) p1Hp = Math.max(0, p1Hp - damageOrHeal);
             else p2Hp = Math.max(0, p2Hp - damageOrHeal);
-        } else {
+            initiatorWon = 1;
+        } else if (opponentScore > initiatorScore) {
             // Initiator loses: takes word damage
             damageOrHeal = LetterValues.getWordValue(initiatorWord) + initiatorWord.length();
             if (initiator == 1) p1Hp = Math.max(0, p1Hp - damageOrHeal);
             else p2Hp = Math.max(0, p2Hp - damageOrHeal);
+            initiatorWon = 0;
+        } else {
+            // Tie!
+            damageOrHeal = 0;
+            initiatorWon = 2;
         }
 
-        broadcast(client1, client2, Protocol.HALF_HP_RESULT + " " + (initiatorScore >= opponentScore ? 1 : 0) + " " + damageOrHeal + " " + p1Hp + " " + p2Hp);
+        broadcast(client1, client2, Protocol.HALF_HP_RESULT + " " + initiatorWon + " " + damageOrHeal + " " + p1Hp + " " + p2Hp);
         if (p1Hp <= 0 || p2Hp <= 0) {
             int winner = p1Hp <= 0 ? 2 : 1;
             broadcast(client1, client2, Protocol.GAME_OVER + " " + winner);
@@ -443,6 +450,12 @@ public class GameServer {
         if (halfHpActive || lastStandActive) return;
         if (letters == null || letters.length() < 16) return;
         broadcast(client1, client2, Protocol.SHUFFLE_GRID + " " + letters.substring(0, 16));
+    }
+
+    public void onTyping(int playerId, String word) {
+        if (halfHpActive || lastStandActive) return;
+        ClientHandler opponent = playerId == 1 ? client2 : client1;
+        sendTo(opponent, Protocol.OPPONENT_TYPING + " " + Protocol.quote(word));
     }
 
     private void broadcastState() {
@@ -553,6 +566,9 @@ public class GameServer {
                     break;
                 case Protocol.SHUFFLE:
                     server.onShuffle(id, arg != null ? arg.replaceAll("\\s+", "") : "");
+                    break;
+                case Protocol.TYPING:
+                    server.onTyping(id, Protocol.unquote(arg));
                     break;
                 case Protocol.HALF_HP_INITIATE:
                     if (arg.isEmpty()) server.onHalfHpInitiate(id);

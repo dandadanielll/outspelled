@@ -219,6 +219,11 @@ public class ConnectController {
             }
 
             @Override
+            public void onOpponentTyping(String word) {
+                Platform.runLater(() -> NetworkGameController.onOpponentTyping(word));
+            }
+
+            @Override
             public void onError(String message) {
                 Platform.runLater(() -> {
                     statusLabel.setText(message);
