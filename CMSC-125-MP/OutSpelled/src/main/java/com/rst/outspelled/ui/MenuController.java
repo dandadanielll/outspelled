@@ -53,11 +53,13 @@ public class MenuController {
     @FXML
     private void onPlayVsAiClicked() {
         SoundManager.playClick();
-        // Create wizards and a standard AI opponent, then jump straight into the game
         Wizard player = new Wizard("Player", 200, Wizard.WizardSkin.EMBER_MAGE, Wizard.ArenaBackground.DARK_TOWER);
         Wizard ai = new Wizard("AI", 200, Wizard.WizardSkin.SHADOW_SCRIBE, Wizard.ArenaBackground.DARK_TOWER);
-        SoloGameController.setup(player, ai, new AiOpponent(new StandardAi()));
-        Main.navigateTo("solo-game-view.fxml");
+        // Set up the wheel in solo mode — the wheel result decides who goes first,
+        // then WheelController routes to solo-game-view.fxml automatically
+        WheelController.setWizards(player, ai);
+        WheelController.setSoloMode(new AiOpponent(new StandardAi()));
+        Main.navigateTo("wheel-view.fxml");
     }
 
     @FXML
