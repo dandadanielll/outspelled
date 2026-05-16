@@ -33,6 +33,11 @@
                 style="-fx-background-color: #e2b96f; -fx-text-fill: #1a1a2e; -fx-font-size: 18px; -fx-font-weight: bold;
                        -fx-padding: 14 40 14 40; -fx-background-radius: 8; -fx-cursor: hand; -fx-min-width: 220;"/>
 
+        <Button text="🤖 Play vs AI"
+                onAction="#onPlayVsAiClicked"
+                style="-fx-background-color: #7b68ee; -fx-text-fill: #ffffff; -fx-font-size: 18px; -fx-font-weight: bold;
+                       -fx-padding: 14 40 14 40; -fx-background-radius: 8; -fx-cursor: hand; -fx-min-width: 220;"/>
+
         <Button fx:id="optionsButton" text="⚙ Options"
                 onAction="#onOptionsClicked"
                 style="-fx-background-color: transparent; -fx-text-fill: #a0a0c0; -fx-font-size: 14px;
