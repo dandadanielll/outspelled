@@ -45,6 +45,7 @@ class StandardAi implements AiBrain {
 
         if (current.length() >= maxLen) return; //stop going deeper once max length reached
 
+        //recursive backtracking by building words letter by letter, if the word is valid it gets used, if not then it gets deleted and tries something new again
         for (int r = 0; r < 4; r++) {
             for (int c = 0; c < 4; c++) {
                 int idx = r * 4 + c;
