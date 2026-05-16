@@ -1,6 +1,9 @@
 package com.rst.outspelled.ui;
 
 import com.rst.outspelled.Main;
+import com.rst.outspelled.ai.AiOpponent;
+import com.rst.outspelled.ai.StandardAi;
+import com.rst.outspelled.model.Wizard;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -42,6 +45,15 @@ public class MenuController {
     @FXML
     private void onStartGameClicked() {
         Main.navigateTo("connect-view.fxml");
+    }
+
+    @FXML
+    private void onPlayVsAiClicked() {
+        // Create wizards and a standard AI opponent, then jump straight into the game
+        Wizard player = new Wizard("Player", 200, Wizard.WizardSkin.EMBER_MAGE, Wizard.ArenaBackground.DARK_TOWER);
+        Wizard ai = new Wizard("AI", 200, Wizard.WizardSkin.SHADOW_SCRIBE, Wizard.ArenaBackground.DARK_TOWER);
+        SoloGameController.setup(player, ai, new AiOpponent(new StandardAi()));
+        Main.navigateTo("solo-game-view.fxml");
     }
 
     @FXML

@@ -33,6 +33,7 @@ public class GameServer {
     private ScheduledExecutorService turnTimer;
     private ScheduledFuture<?> turnTask;
     private volatile int currentTurn = 1; // 1 or 2
+    private volatile int turnSecondsLeft = TURN_SECONDS;
     private volatile int p1Hp = 200;
     private volatile int p2Hp = 200;
     private static final int MAX_HP = 200;
@@ -182,11 +183,11 @@ public class GameServer {
     }
 
     private void scheduleTurnTick() {
-        final int[] secondsLeft = { TURN_SECONDS };
+        turnSecondsLeft = TURN_SECONDS;
         turnTask = turnTimer.scheduleAtFixedRate(() -> {
-            secondsLeft[0]--;
-            broadcast(client1, client2, Protocol.TURN_TICK + " " + secondsLeft[0]);
-            if (secondsLeft[0] <= 0) {
+            turnSecondsLeft--;
+            broadcast(client1, client2, Protocol.TURN_TICK + " " + turnSecondsLeft);
+            if (turnSecondsLeft <= 0) {
                 turnTask.cancel(false);
                 currentTurn = currentTurn == 1 ? 2 : 1;
                 broadcast(client1, client2, Protocol.TURN_EXPIRED);
@@ -201,20 +202,19 @@ public class GameServer {
     public void onWord(int playerId, String word) {
         if (playerId != currentTurn) return;
         if (halfHpActive || lastStandActive) return;
+
+        word = word != null ? word.trim().toLowerCase() : "";
+
+        // Validate BEFORE touching the timer — invalid words must not reset the clock.
+        if (word.length() < 3 || !DictionaryLoader.getWords().contains(word)) {
+            sendTo(client(playerId), Protocol.INVALID_WORD + " " + Protocol.quote(word));
+            return; // Timer keeps counting; no exploit possible.
+        }
+
+        // Word is valid — only now do we stop the running timer.
         if (turnTask != null) {
             turnTask.cancel(false);
             turnTask = null;
-        }
-        word = word != null ? word.trim().toLowerCase() : "";
-        if (word.length() < 3) {
-            sendTo(client(playerId), Protocol.INVALID_WORD + " " + Protocol.quote(word));
-            scheduleTurnTick();
-            return;
-        }
-        if (!DictionaryLoader.getWords().contains(word)) {
-            sendTo(client(playerId), Protocol.INVALID_WORD + " " + Protocol.quote(word));
-            scheduleTurnTick();
-            return;
         }
         String casterName = playerId == 1 ? p1Name : p2Name;
         Spell spell = new Spell(word, casterName);
@@ -409,21 +409,28 @@ public class GameServer {
         String initiatorWord = initiator == 1 ? halfHpWord1 : halfHpWord2;
 
         int damageOrHeal;
-        if (initiatorScore >= opponentScore) {
+        int initiatorWon = 0;
+        if (initiatorScore > opponentScore) {
             // Initiator wins: opponent drops to initiator's HP
             int initiatorHp = initiator == 1 ? p1Hp : p2Hp;
             int opponentHp = opponent == 1 ? p1Hp : p2Hp;
             damageOrHeal = Math.max(0, opponentHp - initiatorHp);
             if (opponent == 1) p1Hp = Math.max(0, p1Hp - damageOrHeal);
             else p2Hp = Math.max(0, p2Hp - damageOrHeal);
-        } else {
+            initiatorWon = 1;
+        } else if (opponentScore > initiatorScore) {
             // Initiator loses: takes word damage
             damageOrHeal = LetterValues.getWordValue(initiatorWord) + initiatorWord.length();
             if (initiator == 1) p1Hp = Math.max(0, p1Hp - damageOrHeal);
             else p2Hp = Math.max(0, p2Hp - damageOrHeal);
+            initiatorWon = 0;
+        } else {
+            // Tie!
+            damageOrHeal = 0;
+            initiatorWon = 2;
         }
 
-        broadcast(client1, client2, Protocol.HALF_HP_RESULT + " " + (initiatorScore >= opponentScore ? 1 : 0) + " " + damageOrHeal + " " + p1Hp + " " + p2Hp);
+        broadcast(client1, client2, Protocol.HALF_HP_RESULT + " " + initiatorWon + " " + damageOrHeal + " " + p1Hp + " " + p2Hp);
         if (p1Hp <= 0 || p2Hp <= 0) {
             int winner = p1Hp <= 0 ? 2 : 1;
             broadcast(client1, client2, Protocol.GAME_OVER + " " + winner);
@@ -443,6 +450,12 @@ public class GameServer {
         if (halfHpActive || lastStandActive) return;
         if (letters == null || letters.length() < 16) return;
         broadcast(client1, client2, Protocol.SHUFFLE_GRID + " " + letters.substring(0, 16));
+    }
+
+    public void onTyping(int playerId, String word) {
+        if (halfHpActive || lastStandActive) return;
+        ClientHandler opponent = playerId == 1 ? client2 : client1;
+        sendTo(opponent, Protocol.OPPONENT_TYPING + " " + Protocol.quote(word));
     }
 
     private void broadcastState() {
@@ -468,6 +481,19 @@ public class GameServer {
         if (client1 != null) client1.close();
         if (client2 != null) client2.close();
         if (turnTimer != null) turnTimer.shutdown();
+    }
+
+    /**
+     * Handles a player disconnecting — either voluntarily (DISCONNECT message)
+     * or unexpectedly (socket closed/error). Awards the win to the remaining player.
+     * Synchronized and guarded by turnTimer state to prevent double-broadcasting.
+     */
+    private synchronized void onDisconnect(int disconnectedPlayerId) {
+        // If the game hasn't started or has already ended, there's nothing to do.
+        if (turnTimer == null || turnTimer.isShutdown()) return;
+        turnTimer.shutdownNow();
+        int winnerId = disconnectedPlayerId == 1 ? 2 : 1;
+        broadcast(client1, client2, Protocol.GAME_OVER + " " + winnerId);
     }
 
     // --- ClientHandler ---
@@ -502,8 +528,11 @@ public class GameServer {
                 while ((line = in.readLine()) != null) {
                     handle(line);
                 }
+                // readLine() returns null on a clean (EOF) disconnect.
+                server.onDisconnect(id);
             } catch (IOException e) {
                 if (!socket.isClosed()) System.err.println("Client " + id + " read error: " + e.getMessage());
+                server.onDisconnect(id);
             } finally {
                 close();
             }
@@ -538,6 +567,9 @@ public class GameServer {
                 case Protocol.SHUFFLE:
                     server.onShuffle(id, arg != null ? arg.replaceAll("\\s+", "") : "");
                     break;
+                case Protocol.TYPING:
+                    server.onTyping(id, Protocol.unquote(arg));
+                    break;
                 case Protocol.HALF_HP_INITIATE:
                     if (arg.isEmpty()) server.onHalfHpInitiate(id);
                     break;
@@ -549,6 +581,9 @@ public class GameServer {
                     break;
                 case Protocol.LAST_STAND_WORD:
                     server.onLastStandWord(id, Protocol.unquote(arg));
+                    break;
+                case Protocol.DISCONNECT:
+                    server.onDisconnect(id);
                     break;
                 default:
                     break;

@@ -247,6 +247,9 @@ public class NetworkGameController {
         String word = letterGrid.getSelectedWord();
         updateFloatingLetters(word);
         updateDamagePreview(word);
+        if (client != null && currentTurn == myPlayerId && !halfHpChallengeActive) {
+            client.sendTyping(word);
+        }
     }
 
     private void updateFloatingLetters(String word) {
@@ -584,6 +587,7 @@ public class NetworkGameController {
             feedbackLabel.setStyle("-fx-text-fill: #a0a0c0;");
             castButton.setDisable(true);
             letterGridPane.setDisable(true);
+            client.sendTyping(""); // Clear opponent's typing view
         }
     }
 
@@ -595,14 +599,24 @@ public class NetworkGameController {
         feedbackLabel.setText("");
     }
 
+    public static void onOpponentTyping(String word) {
+        if (instance != null && currentTurn != myPlayerId && !instance.halfHpChallengeActive) {
+            if (word == null || word.isEmpty()) {
+                instance.feedbackLabel.setText("Waiting for opponent...");
+                instance.feedbackLabel.setStyle("-fx-text-fill: #a0a0c0;");
+            } else {
+                instance.feedbackLabel.setText("Opponent is typing: " + word.toUpperCase());
+                instance.feedbackLabel.setStyle("-fx-text-fill: #e2b96f;");
+            }
+        }
+    }
+
     @FXML
     private void onShuffleClicked() {
         if (shuffleButton != null && shuffleButton.isDisabled()) return;
-        if (!letterGrid.getSelectedWord().isEmpty()) {
-            letterGrid.shuffleIdleTilesOnly();
-        } else {
-            letterGrid.shuffleGrid();
-        }
+        // Always deselect before shuffling — preserving selected tiles caused a
+        // letter-duplication exploit when the server broadcast the layout back.
+        letterGrid.shuffleGrid();
         if (client != null) {
             client.sendShuffle(letterGrid.getLettersAsString());
         }
@@ -614,6 +628,9 @@ public class NetworkGameController {
 
     @FXML
     private void onMenuClicked() {
+        if (client != null) {
+            client.sendDisconnect(); // Notify server so opponent gets a proper game-over.
+        }
         SessionManager.clear();
         Main.navigateTo("menu-view.fxml");
     }

@@ -147,6 +147,7 @@ public class LetterGrid {
     /** Apply 16 letters in row-major order (from network). */
     public void applyLayout(String letters) {
         if (letters == null || letters.length() < 16) return;
+        deselectAll(); // Clear stale selection before overwriting tile states.
         List<Character> list = new ArrayList<>();
         for (int i = 0; i < 16; i++) {
             list.add(Character.toUpperCase(letters.charAt(i)));

@@ -15,6 +15,8 @@ public final class Protocol {
     public static final String WHEEL_MANA = "WHEEL_MANA";
     public static final String WORD = "WORD";
     public static final String SHUFFLE = "SHUFFLE";
+    public static final String DISCONNECT = "DISCONNECT"; // voluntary leave during a game
+    public static final String TYPING = "TYPING";
 
     // Server -> Client(s)
     public static final String JOIN_OK = "JOIN_OK";
@@ -34,6 +36,7 @@ public final class Protocol {
     public static final String TURN_EXPIRED = "TURN_EXPIRED";
     public static final String GAME_OVER = "GAME_OVER";
     public static final String ERROR = "ERROR";
+    public static final String OPPONENT_TYPING = "OPPONENT_TYPING";
 
     // Skill checks (client -> server)
     public static final String HALF_HP_INITIATE = "HALF_HP_INITIATE";

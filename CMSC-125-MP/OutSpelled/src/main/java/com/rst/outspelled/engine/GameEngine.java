@@ -52,6 +52,7 @@ public class GameEngine {
     private boolean roundPlayer1Went = false;
     private boolean roundPlayer2Went = false;
 
+    //constructor
     public GameEngine(Wizard player1, Wizard player2, GameListener listener) {
         this.player1 = player1;
         this.player2 = player2;
