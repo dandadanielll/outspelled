@@ -22,7 +22,7 @@ public class StandardAi implements AiBrain {
         LetterTile[][] tiles = grid.getGrid(); //gets the raw 4x4 2D array of tiles
         boolean[] used = new boolean[16]; // tracks which of the 16 tiles are already in the current word
 
-        findWords(tiles, used, new StringBuilder(), validWords, 3, 6); //hard coded to only use up to 6 letter words for now
+        findWords(tiles, used, new StringBuilder(), validWords, 3, 5); //hard coded to only use up to 5 letter words for now
 
         if (validWords.isEmpty()) return ""; //returns empty string if no valid words found
 
