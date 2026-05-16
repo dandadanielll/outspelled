@@ -49,7 +49,16 @@ public class AiOpponent {
      */
     public void takeTurn(LetterGrid grid, TurnCallback callback) {
         executor.schedule(() -> {
-            String word = brain.findBestWord(grid); //passes the current grid to the ai (runs on background threadthread)
+            String word = brain.findBestWord(grid); //passes the current grid to the ai (runs on background thread)
+
+            // Select the matching tiles on the actual grid so that grid.confirmWord()(called inside GameEngine) correctly marks them as used and replaces them.
+            if (word != null && !word.isBlank()) {
+                grid.deselectAll(); // clear any previously selected tiles from its grid
+                for (char c : word.toCharArray()) {
+                    grid.selectFirstMatchingTile(c);
+                }
+            }
+
             Platform.runLater(() -> callback.onWordChosen(word, grid)); //schedules the callback (next step to do) to run on the fx thread
         }, brain.getThinkingDelayMs(), TimeUnit.MILLISECONDS);
     }
