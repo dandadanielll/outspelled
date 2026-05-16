@@ -1,5 +1,6 @@
 package com.rst.outspelled;
 
+import com.rst.outspelled.util.SoundManager;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -27,6 +28,9 @@ public class Main extends Application {
         //the window's size cant be smaller than the default size
         stage.setMinWidth(WINDOWED_WIDTH);
         stage.setMinHeight(WINDOWED_HEIGHT);
+
+        //preload all SFX clips before any screen is shown
+        SoundManager.initialize();
 
         //calls method to open landing page of the app, the profile selection screen
         navigateTo("profile-view.fxml");
