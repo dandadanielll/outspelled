@@ -12,7 +12,7 @@ import java.util.Random;
 /* Standard difficulty AI (dagdag pako ng ez and hard pa mamaya) 
    Searches for words up to 6 letters, picks the highest scoring one,
    and waits 1.5-2.5 seconds before submitting to simulate thinking */
-class StandardAi implements AiBrain {
+public class StandardAi implements AiBrain {
 
     private final Random random = new Random();
 
