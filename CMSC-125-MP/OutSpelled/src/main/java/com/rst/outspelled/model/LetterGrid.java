@@ -148,11 +148,27 @@ public class LetterGrid {
     public void applyLayout(String letters) {
         if (letters == null || letters.length() < 16) return;
         deselectAll(); // Clear stale selection before overwriting tile states.
-        List<Character> list = new ArrayList<>();
-        for (int i = 0; i < 16; i++) {
-            list.add(Character.toUpperCase(letters.charAt(i)));
+        int idx = 0;
+        for (int r = 0; r < ROWS; r++) {
+            for (int c = 0; c < COLS; c++) {
+                grid[r][c].reset(letters.charAt(idx));
+                idx++;
+            }
         }
-        applyLayout(list);
+    }
+
+    /** Apply layout to idle tiles only, preserving selected tiles. */
+    public void applyLayoutIdleOnly(String letters) {
+        if (letters == null || letters.length() < 16) return;
+        int idx = 0;
+        for (int r = 0; r < ROWS; r++) {
+            for (int c = 0; c < COLS; c++) {
+                if (grid[r][c].isIdle()) {
+                    grid[r][c].reset(letters.charAt(idx));
+                }
+                idx++;
+            }
+        }
     }
 
     private void applyLayout(List<Character> letters) {

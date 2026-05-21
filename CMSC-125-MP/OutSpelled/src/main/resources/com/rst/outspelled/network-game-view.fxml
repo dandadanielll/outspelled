@@ -69,10 +69,11 @@
                     <VBox alignment="CENTER" spacing="4">
                         <Label text="HP" style="-fx-text-fill: #a0a0c0;
                                                -fx-font-size: 11px;"/>
-                        <HBox fx:id="player1Hearts"
+                        <VBox fx:id="player1Hearts"
                               alignment="CENTER"
-                              spacing="2" maxWidth="160">
-                        </HBox>
+                              spacing="2">
+                        </VBox>
+                        <Label fx:id="player1HpLabel" text="200 / 200" style="-fx-text-fill: #a0a0c0; -fx-font-size: 11px;"/>
                     </VBox>
 
                     <!-- Shuffle -->
@@ -180,10 +181,11 @@
                     <VBox alignment="CENTER" spacing="4">
                         <Label text="HP" style="-fx-text-fill: #a0a0c0;
                                                -fx-font-size: 11px;"/>
-                        <HBox fx:id="player2Hearts"
+                        <VBox fx:id="player2Hearts"
                               alignment="CENTER"
-                              spacing="2" maxWidth="160">
-                        </HBox>
+                              spacing="2">
+                        </VBox>
+                        <Label fx:id="player2HpLabel" text="200 / 200" style="-fx-text-fill: #a0a0c0; -fx-font-size: 11px;"/>
                     </VBox>
 
                     <!-- Menu button -->

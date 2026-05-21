@@ -25,7 +25,7 @@ public class GameClient {
         void onWheelResult(int firstPlayerId);
         void onGameStart(String name1, String name2, int firstPlayerId, long gridSeed);
         void onGridSeed(long seed);
-        void onShuffleGrid(String letters);
+        void onShuffleGrid(int shufflerId, String letters);
         void onState(int p1Hp, int p2Hp, int currentTurn, String lastSpellDesc);
         void onInvalidWord(String word);
         void onTurnStart(int currentTurn);
@@ -212,9 +212,17 @@ public class GameClient {
                 } catch (NumberFormatException ignored) {}
                 break;
             case Protocol.SHUFFLE_GRID:
-                String letters = arg != null ? arg.replaceAll("\\s+", "") : "";
-                if (letters.length() >= 16) {
-                    Platform.runLater(() -> L.onShuffleGrid(letters.substring(0, 16)));
+                if (arg != null) {
+                    String[] shuffParts = arg.split(" ", 2);
+                    if (shuffParts.length == 2) {
+                        try {
+                            int shufflerId = Integer.parseInt(shuffParts[0]);
+                            String lts = shuffParts[1].replaceAll("\\s+", "");
+                            if (lts.length() >= 16) {
+                                Platform.runLater(() -> L.onShuffleGrid(shufflerId, lts.substring(0, 16)));
+                            }
+                        } catch (NumberFormatException ignored) {}
+                    }
                 }
                 break;
             case Protocol.STATE:

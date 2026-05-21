@@ -450,7 +450,7 @@ public class GameServer {
         if (playerId != currentTurn) return;
         if (halfHpActive || lastStandActive) return;
         if (letters == null || letters.length() < 16) return;
-        broadcast(client1, client2, Protocol.SHUFFLE_GRID + " " + letters.substring(0, 16));
+        broadcast(client1, client2, Protocol.SHUFFLE_GRID + " " + playerId + " " + letters.substring(0, 16));
     }
 
     public void onTyping(int playerId, String word) {

@@ -14,12 +14,15 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -31,8 +34,10 @@ public class NetworkGameController {
 
     @FXML private Label player1NameLabel;
     @FXML private Label player2NameLabel;
-    @FXML private HBox player1Hearts;
-    @FXML private HBox player2Hearts;
+    @FXML private javafx.scene.layout.VBox player1Hearts;
+    @FXML private javafx.scene.layout.VBox player2Hearts;
+    @FXML private Label player1HpLabel;
+    @FXML private Label player2HpLabel;
     @FXML private Label timerLabel;
     @FXML private Label turnLabel;
     @FXML private HBox floatingLettersPane;
@@ -59,8 +64,8 @@ public class NetworkGameController {
     private static Wizard wizard2;
     private static int currentTurn = 1;
     private static final int MAX_HP = 200;
-    private static final int HEARTS_COUNT = 10;
-    private static final int HP_PER_HEART = MAX_HP / HEARTS_COUNT;
+    private static final int HEARTS_COUNT = 20;
+    private static final int HP_PER_HEART = 10;
     private static final int SKILL_CHECK_SEC = 15;
 
     private LetterGrid letterGrid;
@@ -69,6 +74,7 @@ public class NetworkGameController {
     private boolean halfHpChallengeActive = false;
     private ScheduledExecutorService skillCheckTimer;
     private volatile int lastStandSecondsLeft = SKILL_CHECK_SEC;
+    private String opponentTypingWord = "";
 
     public static void setSession(GameClient c, int myId, Wizard w1, Wizard w2, long gridSeed) {
         client = c;
@@ -105,14 +111,22 @@ public class NetworkGameController {
         if (lastStandOverlay != null) lastStandOverlay.setVisible(false);
     }
 
-    public static void applyShuffleGrid(String letters) {
+    public static void applyShuffleGrid(int shufflerId, String letters) {
         Platform.runLater(() -> {
             if (instance != null && instance.letterGrid != null && letters != null && letters.length() >= 16) {
-                instance.letterGrid.applyLayout(letters);
-                instance.renderGrid();
-                instance.updateSelectedWordDisplay();
-                instance.feedbackLabel.setText("Grid shuffled!");
-                instance.feedbackLabel.setStyle("-fx-text-fill: #a0a0c0;");
+                if (shufflerId == myPlayerId) {
+                    instance.letterGrid.applyLayoutIdleOnly(letters);
+                    instance.renderGrid();
+                    instance.updateSelectedWordDisplay();
+                    instance.feedbackLabel.setText("Grid shuffled!");
+                    instance.feedbackLabel.setStyle("-fx-text-fill: #a0a0c0;");
+                } else {
+                    instance.letterGrid.applyLayout(letters);
+                    instance.renderGrid();
+                    instance.updateSelectedWordDisplay();
+                    instance.feedbackLabel.setText("Opponent shuffled grid!");
+                    instance.feedbackLabel.setStyle("-fx-text-fill: #a0a0c0;");
+                }
             }
         });
     }
@@ -176,24 +190,45 @@ public class NetworkGameController {
 
     private void renderGrid() {
         letterGridPane.getChildren().clear();
+        
+        Map<Character, Integer> opponentLetters = new HashMap<>();
+        if (!opponentTypingWord.isEmpty()) {
+            for (char c : opponentTypingWord.toCharArray()) {
+                opponentLetters.put(c, opponentLetters.getOrDefault(c, 0) + 1);
+            }
+        }
+
         for (int r = 0; r < letterGrid.getRows(); r++) {
             for (int c = 0; c < letterGrid.getCols(); c++) {
                 LetterTile tile = letterGrid.getTile(r, c);
-                Button btn = createTileButton(tile, r, c);
+                boolean isOpponentSelected = false;
+                
+                if (!opponentTypingWord.isEmpty() && opponentLetters.getOrDefault(tile.getLetter(), 0) > 0) {
+                    isOpponentSelected = true;
+                    opponentLetters.put(tile.getLetter(), opponentLetters.get(tile.getLetter()) - 1);
+                }
+                
+                Button btn = createTileButton(tile, r, c, isOpponentSelected);
                 letterGridPane.add(btn, c, r);
             }
         }
     }
 
-    private Button createTileButton(LetterTile tile, int row, int col) {
+    private Button createTileButton(LetterTile tile, int row, int col, boolean isOpponentSelected) {
         Button btn = new Button(String.valueOf(tile.getLetter()) + "\n" + tile.getValue());
         btn.setPrefSize(62, 62);
-        btn.setStyle(tile.isSelected() ? getSelectedStyle() : getIdleStyle());
+        if (tile.isSelected()) {
+            btn.setStyle(getSelectedStyle());
+        } else if (isOpponentSelected) {
+            btn.setStyle(getOpponentSelectedStyle());
+        } else {
+            btn.setStyle(getIdleStyle());
+        }
         btn.setOnAction(e -> {
             if (tile.isSelected()) {
                 letterGrid.deselectTile(row, col);
                 btn.setStyle(getIdleStyle());
-            } else if (tile.isIdle()) {
+            } else if (tile.isIdle() && !isOpponentSelected) {
                 letterGrid.selectTile(row, col);
                 btn.setStyle(getSelectedStyle());
             }
@@ -212,22 +247,37 @@ public class NetworkGameController {
                 + " -fx-border-color: #ffffff; -fx-border-radius: 6; -fx-background-radius: 6; -fx-cursor: hand;";
     }
 
+    private static String getOpponentSelectedStyle() {
+        return "-fx-background-color: #4a2a6a; -fx-text-fill: #a0a0c0; -fx-font-size: 14px; -fx-font-weight: bold;"
+                + " -fx-border-color: #664488; -fx-border-radius: 6; -fx-background-radius: 6; -fx-cursor: default;";
+    }
+
     private void buildHearts() {
         if (player1Hearts == null || player2Hearts == null) return;
         player1Hearts.getChildren().clear();
         player2Hearts.getChildren().clear();
         player1HeartLabels.clear();
         player2HeartLabels.clear();
+        
+        HBox p1Row1 = new HBox(2); p1Row1.setAlignment(javafx.geometry.Pos.CENTER);
+        HBox p1Row2 = new HBox(2); p1Row2.setAlignment(javafx.geometry.Pos.CENTER);
+        HBox p2Row1 = new HBox(2); p2Row1.setAlignment(javafx.geometry.Pos.CENTER);
+        HBox p2Row2 = new HBox(2); p2Row2.setAlignment(javafx.geometry.Pos.CENTER);
+
         for (int i = 0; i < HEARTS_COUNT; i++) {
             Label h1 = new Label("♥");
             h1.setStyle("-fx-text-fill: #e24a4a; -fx-font-size: 18px;");
-            player1Hearts.getChildren().add(h1);
+            (i < 10 ? p1Row1 : p1Row2).getChildren().add(h1);
             player1HeartLabels.add(h1);
+            
             Label h2 = new Label("♥");
             h2.setStyle("-fx-text-fill: #e24a4a; -fx-font-size: 18px;");
-            player2Hearts.getChildren().add(h2);
+            (i < 10 ? p2Row1 : p2Row2).getChildren().add(h2);
             player2HeartLabels.add(h2);
         }
+        
+        player1Hearts.getChildren().addAll(p1Row1, p1Row2);
+        player2Hearts.getChildren().addAll(p2Row1, p2Row2);
     }
 
     private void updateHearts(int p1Hp, int p2Hp) {
@@ -241,6 +291,8 @@ public class NetworkGameController {
                 player2HeartLabels.get(i).setStyle(full ? "-fx-text-fill: #e24a4a; -fx-font-size: 18px;" : "-fx-text-fill: #442020; -fx-font-size: 18px;");
             }
         }
+        if (player1HpLabel != null) player1HpLabel.setText(p1Hp + " / " + MAX_HP);
+        if (player2HpLabel != null) player2HpLabel.setText(p2Hp + " / " + MAX_HP);
     }
 
     private void updateSelectedWordDisplay() {
@@ -286,21 +338,29 @@ public class NetworkGameController {
         updateHearts(currentP1Hp, currentP2Hp);
         if (word == null || word.length() < 3 || currentTurn != myPlayerId || halfHpChallengeActive) return;
         int damage = new Spell(word, "").getTotalDamage();
-        int heartsToBlink = Math.min(HEARTS_COUNT, (int) Math.ceil(damage / (double) HP_PER_HEART));
+        
+        int oppHp = myPlayerId == 1 ? currentP2Hp : currentP1Hp;
+        int oppFullHearts = (int) Math.ceil(oppHp / (double) HP_PER_HEART);
+        int heartsToBlink = (int) Math.ceil(damage / (double) HP_PER_HEART);
+        
+        int startIdx = Math.max(0, oppFullHearts - heartsToBlink);
+        int endIdx = oppFullHearts; // Only blink up to what they actually have
+        
         List<Label> toBlink = (myPlayerId == 1) ? player2HeartLabels : player1HeartLabels;
-        int startIdx = HEARTS_COUNT - heartsToBlink;
-        if (startIdx < 0) startIdx = 0;
-        final int start = startIdx;
-        int oppFullHearts = Math.min(HEARTS_COUNT, (myPlayerId == 1 ? currentP2Hp : currentP1Hp) / HP_PER_HEART);
+        
         final String fullStyle = "-fx-text-fill: #e24a4a; -fx-font-size: 18px;";
         final String dimStyle = "-fx-text-fill: #442020; -fx-font-size: 18px;";
+        
         blinkTimeline = new javafx.animation.Timeline(
                 new javafx.animation.KeyFrame(Duration.millis(0), e -> {
-                    for (int i = start; i < toBlink.size(); i++) toBlink.get(i).setStyle("-fx-text-fill: #ff8888; -fx-font-size: 18px;");
+                    for (int i = startIdx; i < endIdx; i++) {
+                        if (i < toBlink.size()) toBlink.get(i).setStyle("-fx-text-fill: #ff8888; -fx-font-size: 18px;");
+                    }
                 }),
                 new javafx.animation.KeyFrame(Duration.millis(400), e -> {
-                    for (int i = start; i < toBlink.size(); i++)
-                        toBlink.get(i).setStyle(i < oppFullHearts ? fullStyle : dimStyle);
+                    for (int i = startIdx; i < endIdx; i++) {
+                        if (i < toBlink.size()) toBlink.get(i).setStyle(i < oppFullHearts ? fullStyle : dimStyle);
+                    }
                 })
         );
         blinkTimeline.setCycleCount(javafx.animation.Animation.INDEFINITE);
@@ -382,6 +442,12 @@ public class NetworkGameController {
         currentTurn = turn;
         Platform.runLater(() -> {
             if (instance != null) {
+                instance.opponentTypingWord = "";
+                instance.updateFloatingLetters("");
+                instance.renderGrid();
+                if (instance.feedbackLabel != null) {
+                    instance.feedbackLabel.setText("");
+                }
                 instance.turnLabel.setText(instance.currentTurnName() + "'s Turn");
                 instance.updateInputEnabled();
                 instance.updatePortraitHighlight();
@@ -610,6 +676,7 @@ public class NetworkGameController {
 
     public static void onOpponentTyping(String word) {
         if (instance != null && currentTurn != myPlayerId && !instance.halfHpChallengeActive) {
+            instance.opponentTypingWord = word != null ? word.toUpperCase() : "";
             if (word == null || word.isEmpty()) {
                 instance.feedbackLabel.setText("Waiting for opponent...");
                 instance.feedbackLabel.setStyle("-fx-text-fill: #a0a0c0;");
@@ -617,15 +684,15 @@ public class NetworkGameController {
                 instance.feedbackLabel.setText("Opponent is typing: " + word.toUpperCase());
                 instance.feedbackLabel.setStyle("-fx-text-fill: #e2b96f;");
             }
+            instance.updateFloatingLetters(instance.opponentTypingWord);
+            instance.renderGrid();
         }
     }
 
     @FXML
     private void onShuffleClicked() {
         if (shuffleButton != null && shuffleButton.isDisabled()) return;
-        // Always deselect before shuffling — preserving selected tiles caused a
-        // letter-duplication exploit when the server broadcast the layout back.
-        letterGrid.shuffleGrid();
+        letterGrid.shuffleIdleTilesOnly();
         if (client != null) {
             client.sendShuffle(letterGrid.getLettersAsString());
         }
