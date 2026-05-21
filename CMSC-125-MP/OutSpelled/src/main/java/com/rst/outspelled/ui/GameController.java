@@ -7,6 +7,7 @@ import com.rst.outspelled.model.LetterGrid;
 import com.rst.outspelled.model.LetterTile;
 import com.rst.outspelled.model.Spell;
 import com.rst.outspelled.model.Wizard;
+import com.rst.outspelled.util.SoundManager;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -21,40 +22,40 @@ import java.util.concurrent.TimeUnit;
 
 public class GameController implements GameEngine.GameListener {
 
-    @FXML private Label player1NameLabel;
-    @FXML private Label player2NameLabel;
-    @FXML private ProgressBar player1HpBar;
-    @FXML private ProgressBar player2HpBar;
-    @FXML private Label player1HpLabel;
-    @FXML private Label player2HpLabel;
-    @FXML private Label timerLabel;
-    @FXML private Label turnLabel;
-    @FXML private ListView<String> battleLog;
-    @FXML private GridPane letterGridPane;
-    @FXML private Label selectedWordLabel;
-    @FXML private Label feedbackLabel;
-    @FXML private Button castButton;
-    @FXML private Label skillCheckStatusLabel;
-    @FXML private Rectangle wizard1Portrait;
-    @FXML private Rectangle wizard2Portrait;
+    @FXML protected Label player1NameLabel;
+    @FXML protected Label player2NameLabel;
+    @FXML protected ProgressBar player1HpBar;
+    @FXML protected ProgressBar player2HpBar;
+    @FXML protected Label player1HpLabel;
+    @FXML protected Label player2HpLabel;
+    @FXML protected Label timerLabel;
+    @FXML protected Label turnLabel;
+    @FXML protected ListView<String> battleLog;
+    @FXML protected GridPane letterGridPane;
+    @FXML protected Label selectedWordLabel;
+    @FXML protected Label feedbackLabel;
+    @FXML protected Button castButton;
+    @FXML protected Label skillCheckStatusLabel;
+    @FXML protected Rectangle wizard1Portrait;
+    @FXML protected Rectangle wizard2Portrait;
 
     // Last Stand overlay fields
-    @FXML private StackPane lastStandOverlay;
-    @FXML private Label scrambledWordLabel;
-    @FXML private Label lastStandTimerLabel;
-    @FXML private TextField lastStandInput;
-    @FXML private Label lastStandFeedbackLabel;
+    @FXML protected StackPane lastStandOverlay;
+    @FXML protected Label scrambledWordLabel;
+    @FXML protected Label lastStandTimerLabel;
+    @FXML protected TextField lastStandInput;
+    @FXML protected Label lastStandFeedbackLabel;
 
-    private static Wizard wizard1;
-    private static Wizard wizard2;
-    private GameEngine engine;
+    protected static Wizard wizard1;
+    protected static Wizard wizard2;
+    protected GameEngine engine;
 
-    private ScheduledExecutorService skillCheckTimerExecutor;
-    private int skillCheckSecondsRemaining;
+    protected ScheduledExecutorService skillCheckTimerExecutor;
+    protected int skillCheckSecondsRemaining;
 
     // tracks whether we are in half hp challenge mode
-    private boolean halfHpChallengeActive = false;
-    private LetterGrid currentSharedGrid = null;
+    protected boolean halfHpChallengeActive = false;
+    protected LetterGrid currentSharedGrid = null;
 
     public static void setWizards(Wizard w1, Wizard w2) {
         wizard1 = w1;
@@ -121,6 +122,7 @@ public class GameController implements GameEngine.GameListener {
         btn.setStyle(tile.isSelected() ? getSelectedStyle() : getIdleStyle());
 
         btn.setOnAction(e -> {
+            SoundManager.playKeyTap(); // tile click sound
             if (tile.isSelected()) {
                 grid.deselectTile(row, col);
                 btn.setStyle(getIdleStyle());
@@ -173,6 +175,7 @@ public class GameController implements GameEngine.GameListener {
         }
 
         setInputEnabled(false);
+        SoundManager.playClick();
         feedbackLabel.setText("Validating spell...");
         feedbackLabel.setStyle("-fx-text-fill: #a0a0c0;");
         engine.submitWord(word, grid);
@@ -180,6 +183,7 @@ public class GameController implements GameEngine.GameListener {
 
     @FXML
     private void onClearClicked() {
+        SoundManager.playClick();
         LetterGrid grid = halfHpChallengeActive && currentSharedGrid != null
                 ? currentSharedGrid
                 : engine.getCurrentGrid();
@@ -191,6 +195,7 @@ public class GameController implements GameEngine.GameListener {
 
     @FXML
     private void onShuffleClicked() {
+        SoundManager.playClick();
         if (halfHpChallengeActive) {
             feedbackLabel.setText("Can't shuffle during a skill check!");
             feedbackLabel.setStyle("-fx-text-fill: #ff6b6b;");
@@ -226,6 +231,7 @@ public class GameController implements GameEngine.GameListener {
 
     @Override
     public void onSpellCast(Spell spell, Wizard caster, Wizard target) {
+        SoundManager.playCast();
         String entry = getSpellEmoji(spell) + " " + spell.getSpellDescription();
         battleLog.getItems().add(0, entry);
         updateHpDisplay();
@@ -252,6 +258,8 @@ public class GameController implements GameEngine.GameListener {
 
     @Override
     public void onPlayerDefeated(Wizard loser, Wizard winner) {
+        SoundManager.stopBgm();
+        SoundManager.playVictory();
         stopSkillCheckTimer();
         setInputEnabled(false);
         feedbackLabel.setText(winner.getName() + " wins the duel!");
@@ -458,7 +466,7 @@ public class GameController implements GameEngine.GameListener {
         }, 1, 1, TimeUnit.SECONDS);
     }
 
-    private void stopSkillCheckTimer() {
+    protected void stopSkillCheckTimer() {
         if (skillCheckTimerExecutor != null) {
             skillCheckTimerExecutor.shutdown();
             skillCheckTimerExecutor = null;
@@ -466,7 +474,7 @@ public class GameController implements GameEngine.GameListener {
     }
 
     // --- Helpers ---
-    private void updatePortraitHighlight(Wizard currentPlayer) {
+    protected void updatePortraitHighlight(Wizard currentPlayer) {
         if (wizard1Portrait == null || wizard2Portrait == null) return;
 
         final double activeStrokeWidth = 6;
@@ -487,14 +495,14 @@ public class GameController implements GameEngine.GameListener {
         }
     }
 
-    private void updateHpDisplay() {
+    protected void updateHpDisplay() {
         player1HpBar.setProgress(wizard1.getHpPercentage());
         player2HpBar.setProgress(wizard2.getHpPercentage());
         player1HpLabel.setText(wizard1.getHp() + " / " + wizard1.getMaxHp());
         player2HpLabel.setText(wizard2.getHp() + " / " + wizard2.getMaxHp());
     }
 
-    private void updateHpBarColor(ProgressBar bar, double percentage) {
+    protected void updateHpBarColor(ProgressBar bar, double percentage) {
         if (percentage > 0.5) {
             bar.setStyle("-fx-accent: #4caf50;");
         } else if (percentage > 0.25) {
@@ -504,12 +512,12 @@ public class GameController implements GameEngine.GameListener {
         }
     }
 
-    private void setInputEnabled(boolean enabled) {
+    protected void setInputEnabled(boolean enabled) {
         castButton.setDisable(!enabled);
         letterGridPane.setDisable(!enabled);
     }
 
-    private String getIdleStyle() {
+    protected String getIdleStyle() {
         return "-fx-background-color: #2a2a4a;" +
                 "-fx-text-fill: #e2b96f;" +
                 "-fx-font-size: 14px;" +
@@ -520,7 +528,7 @@ public class GameController implements GameEngine.GameListener {
                 "-fx-cursor: hand;";
     }
 
-    private String getSelectedStyle() {
+    protected String getSelectedStyle() {
         return "-fx-background-color: #e2b96f;" +
                 "-fx-text-fill: #1a1a2e;" +
                 "-fx-font-size: 14px;" +
@@ -531,7 +539,7 @@ public class GameController implements GameEngine.GameListener {
                 "-fx-cursor: hand;";
     }
 
-    private String getSpellEmoji(Spell spell) {
+    protected String getSpellEmoji(Spell spell) {
         return switch (spell.getPower()) {
             case WEAK -> "🔹";
             case MODERATE -> "🔷";
@@ -540,7 +548,7 @@ public class GameController implements GameEngine.GameListener {
         };
     }
 
-    private void showGameOverDialog(Wizard winner, Wizard loser) {
+    protected void showGameOverDialog(Wizard winner, Wizard loser) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Duel Over!");
         alert.setHeaderText(winner.getName() + " wins!");
@@ -567,7 +575,7 @@ public class GameController implements GameEngine.GameListener {
         });
     }
 
-    private void handleKeyInput(javafx.scene.input.KeyEvent event) {
+    protected void handleKeyInput(javafx.scene.input.KeyEvent event) {
         String key = event.getText();
         javafx.scene.input.KeyCode code = event.getCode();
 
@@ -604,6 +612,7 @@ public class GameController implements GameEngine.GameListener {
         if (key != null && key.length() == 1 && Character.isLetter(key.charAt(0))) {
             LetterTile matched = grid.selectFirstMatchingTile(key.charAt(0));
             if (matched != null) {
+                SoundManager.playKeyTap(); // keyboard tile select sound
                 renderGrid();
                 updateSelectedWordDisplay();
             } else {
