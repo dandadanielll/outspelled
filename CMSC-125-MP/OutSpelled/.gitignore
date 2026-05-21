@@ -41,3 +41,6 @@ build/
 ### OS ###
 .DS_Store
 Thumbs.db
+
+### UI assets (managed on teammate's branch) ###
+src/main/resources/com/rst/outspelled/fonts/
