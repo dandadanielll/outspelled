@@ -74,7 +74,7 @@ public class ProfileController {
 
             // --- DEFINE THE ANIMATION TIMING FOR A HORIZONTAL SHEET ---
             int totalFrames = 2;
-            int columns = 2; // Fixed to 2 for your side-by-side frames!
+            int columns = 2; //2 since my export on piskel is 2 columns
             double FRAME_WIDTH = 128.0;
             double FRAME_HEIGHT = 128.0;
 
@@ -88,7 +88,7 @@ public class ProfileController {
             );
 
             animation.setCycleCount(Transition.INDEFINITE);
-            animation.play(); // Let it roll!
+            animation.play(); // Play idle
         }
 
         StackPane iconPane = new StackPane(icon);

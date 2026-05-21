@@ -33,7 +33,7 @@ public class Main extends Application {
         SoundManager.initialize();
 
         //calls method to open landing page of the app, the profile selection screen
-        navigateTo("profile-view.fxml");
+        navigateTo("landing-view.fxml");
 
         //calls method that applies the set window mode state
         applyWindowMode();
