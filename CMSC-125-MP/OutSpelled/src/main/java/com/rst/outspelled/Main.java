@@ -15,7 +15,7 @@ public class Main extends Application {
 
     //Sets the startup screen (default is windowed at 900x650 res)
     private static Stage primaryStage; //Static so stage shared to any object instance
-    private static WindowMode currentMode = WindowMode.WINDOWED;
+    private static WindowMode currentMode = WindowMode.WINDOWED_FULLSCREEN;
     private static final int WINDOWED_WIDTH = 900;
     private static final int WINDOWED_HEIGHT = 650;
 

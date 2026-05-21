@@ -385,6 +385,9 @@ public class NetworkGameController {
                 instance.turnLabel.setText(instance.currentTurnName() + "'s Turn");
                 instance.updateInputEnabled();
                 instance.updatePortraitHighlight();
+                if (instance.skillCheckStatusLabel != null) {
+                    instance.skillCheckStatusLabel.setText(""); // clear previous challenge result
+                }
             }
         });
     }
@@ -460,8 +463,14 @@ public class NetworkGameController {
                 instance.currentP1Hp = p1Hp;
                 instance.currentP2Hp = p2Hp;
                 instance.updateHearts(p1Hp, p2Hp);
-                String summary = initiatorWon == 1 ? "Initiator wins! Opponent takes damage."
-                        : "Initiator loses! They take " + damageOrHeal + " damage.";
+                String summary;
+                if (initiatorWon == 1) {
+                    summary = "Skill check: Initiator wins! Opponent takes damage.";
+                } else if (initiatorWon == 2) {
+                    summary = "Skill check: It's a tie! No damage dealt.";
+                } else {
+                    summary = "Skill check: Initiator loses! They take " + damageOrHeal + " damage.";
+                }
                 if (instance.skillCheckStatusLabel != null) {
                     instance.skillCheckStatusLabel.setText("⚔ " + summary);
                     instance.skillCheckStatusLabel.setStyle("-fx-text-fill: #e2b96f;");
