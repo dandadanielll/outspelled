@@ -15,6 +15,8 @@
 
     <Region style="-fx-background-color: radial-gradient(center 55% 42%, radius 80%, transparent 25%, #0c0f12 95%);" mouseTransparent="true" />
 
+    <Pane fx:id="weatherPane" mouseTransparent="true" />
+
     <HBox alignment="CENTER_LEFT" spacing="0" mouseTransparent="false">
         
         <VBox alignment="CENTER_LEFT" spacing="45" prefWidth="550" style="-fx-padding: 0 0 0 80;">
@@ -24,27 +26,25 @@
                        style="-fx-font-size: 76px;
                               -fx-font-weight: bold;
                               -fx-text-fill: #e2b96f;
-                              -fx-font-family: 'Georgia';
+                              -fx-font-family: 'Pixelify Sans', 'Georgia';
                               -fx-effect: dropshadow(three-pass-box, #000000, 12, 0.8, 0, 0);" />
                 
                 <Label text="A Wizard Dueling Word Game"
                        style="-fx-font-size: 20px;
                               -fx-text-fill: #99aab8;
-                              -fx-font-family: 'Georgia';
+                              -fx-font-family: 'Pixelify Sans', 'Georgia';
                               -fx-font-style: italic;
                               -fx-effect: dropshadow(three-pass-box, #000000, 6, 0.8, 0, 2);" />
             </VBox>
 
             <VBox alignment="CENTER_LEFT" spacing="16">
-                <Button fx:id="enterButton"
-                        text="ENTER JOURNEY"
-                        onAction="#onEnterClicked" />
+                <Button fx:id="enterButton" text="ENTER JOURNEY" onAction="#onEnterClicked" />
 
                 <Label text="[ Press SPACEBAR or Click to Continue ]"
                        style="-fx-font-size: 13px;
                               -fx-text-fill: #506275;
                               -fx-font-weight: bold;
-                              -fx-font-family: 'Consolas', 'Courier New';" />
+                              -fx-font-family: 'Pixelify Sans', 'Consolas', 'Courier New';" />
             </VBox>
             
         </VBox>
