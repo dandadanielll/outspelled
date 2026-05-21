@@ -4,12 +4,17 @@ import com.rst.outspelled.Main;
 import com.rst.outspelled.model.Wizard;
 import com.rst.outspelled.network.SessionManager;
 import com.rst.outspelled.util.ProfileManager;
+import javafx.animation.Transition;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.util.Duration;
 
 import java.util.List;
 import java.util.Optional;
@@ -56,10 +61,44 @@ public class ProfileController {
         icon.setStroke(Color.web("#e2b96f"));
         icon.setStrokeWidth(2);
 
-        Label emoji = new Label("🧙");
-        emoji.setStyle("-fx-font-size: 36px;");
+        //First try in importing gandalf wizard spritesheet
+        ImageView playerView = new ImageView();
+        java.net.URL imgUrl = ProfileController.class.getResource("/assets/Gandalf.png");
+        if (imgUrl != null) {
+            Image img = new Image(imgUrl.toExternalForm());
+            playerView.setImage(img);
+            playerView.setFitWidth(80);
+            playerView.setFitHeight(90);
+            playerView.setPreserveRatio(true);
+            playerView.setViewport(new Rectangle2D(0, 0, 128, 128));
 
-        StackPane iconPane = new StackPane(icon, emoji);
+            // --- DEFINE THE ANIMATION TIMING FOR A HORIZONTAL SHEET ---
+            int totalFrames = 2;
+            int columns = 2; // Fixed to 2 for your side-by-side frames!
+            double FRAME_WIDTH = 128.0;
+            double FRAME_HEIGHT = 128.0;
+
+            CustomSpriteTransition animation = new CustomSpriteTransition(
+                    playerView, 
+                    Duration.millis(800), // Loops through both frames every 800ms
+                    totalFrames, 
+                    columns, 
+                    FRAME_WIDTH, 
+                    FRAME_HEIGHT
+            );
+
+            animation.setCycleCount(Transition.INDEFINITE);
+            animation.play(); // Let it roll!
+        }
+
+        StackPane iconPane = new StackPane(icon);
+        if (imgUrl != null) {
+            iconPane.getChildren().add(playerView);
+        } else {
+            Label emoji = new Label("🧙");
+            emoji.setStyle("-fx-font-size: 36px;");
+            iconPane.getChildren().add(emoji);
+        }
 
         Label nameLabel = new Label(wizard.getName());
         nameLabel.setStyle("-fx-text-fill: #e2b96f; -fx-font-size: 15px;" +
