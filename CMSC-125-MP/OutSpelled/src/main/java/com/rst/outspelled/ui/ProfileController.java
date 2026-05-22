@@ -344,11 +344,13 @@ public class ProfileController {
     // Selects a slot and highlights it
     private void selectSlot(int slot, StackPane card) {
         // deselect previous
-        renderSlots();
-        // re-find the card and highlight it
+        if (selectedSlot >= 0 && selectedSlot < profileSlotsBox.getChildren().size()) {
+            StackPane previous = (StackPane) profileSlotsBox.getChildren().get(selectedSlot);
+            previous.setStyle(idleCardStyle());
+        }
+        // select new
         selectedSlot = slot;
-        StackPane selected = (StackPane) profileSlotsBox.getChildren().get(slot);
-        selected.setStyle(selectedCardStyle());
+        card.setStyle(selectedCardStyle());
         statusLabel.setText("Playing as " + profiles.get(slot).getName()
                 + " — press Play!");
         statusLabel.setStyle("-fx-text-fill: #4caf50; -fx-font-size: 13px;");
