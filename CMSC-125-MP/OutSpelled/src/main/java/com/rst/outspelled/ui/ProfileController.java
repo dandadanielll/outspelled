@@ -12,8 +12,6 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 import java.util.List;
@@ -47,87 +45,175 @@ public class ProfileController {
 
     private StackPane buildProfileSlot(int slot, Wizard wizard) {
         StackPane card = new StackPane();
-        card.setPrefSize(180, 220);
+        card.setPrefSize(210, 330);
+        card.setMinSize(210, 330);
+        card.setMaxSize(210, 330);
         card.setStyle(idleCardStyle());
 
-        VBox content = new VBox(12);
+        // Dynamic theme colors based on Wizard Skin for premium in-game card feel
+        String classColor = "#506275";
+        String classBg = "#1a1e29";
+        String classGlow = "rgba(80, 98, 117, 0.5)";
+        switch (wizard.getSkin()) {
+            case EMBER_MAGE:
+                classColor = "#ff8a8a";
+                classBg = "#3d1313";
+                classGlow = "rgba(255, 80, 80, 0.4)";
+                break;
+            case FROST_WITCH:
+                classColor = "#8ad6ff";
+                classBg = "#13233d";
+                classGlow = "rgba(100, 180, 255, 0.4)";
+                break;
+            case STORM_SAGE:
+                classColor = "#ffe68a";
+                classBg = "#3d3613";
+                classGlow = "rgba(255, 210, 80, 0.4)";
+                break;
+            case SHADOW_SCRIBE:
+                classColor = "#d18aff";
+                classBg = "#2d133d";
+                classGlow = "rgba(180, 80, 255, 0.4)";
+                break;
+        }
+
+        VBox content = new VBox(10);
         content.setAlignment(Pos.CENTER);
-        content.setStyle("-fx-padding: 16;");
+        content.setStyle("-fx-padding: 16 14;");
 
-        // Wizard icon placeholder
-        Rectangle icon = new Rectangle(80, 90);
-        icon.setArcWidth(12); icon.setArcHeight(12);
-        icon.setFill(Color.web("#2a1a4a"));
-        icon.setStroke(Color.web("#e2b96f"));
-        icon.setStrokeWidth(2);
+        // --- 1. NAME ---
+        Label nameLabel = new Label(wizard.getName());
+        nameLabel.getStyleClass().add("pixel-font");
+        nameLabel.setStyle(
+            "-fx-text-fill: #e2b96f; " +
+            "-fx-font-size: 20px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-effect: dropshadow(one-pass-box, #000000, 0, 0.0, 2, 2);"
+        );
 
-        //First try in importing gandalf wizard spritesheet
+        // --- 2. PORTRAIT PEDESTAL WITH RADIAL SHINE + CLASS GLOW BORDER ---
+        StackPane iconPane = new StackPane();
+        iconPane.setPrefSize(110, 110);
+        iconPane.setMaxSize(110, 110);
+        String iconPaneStyle = String.format(
+            "-fx-border-color: %s; " +
+            "-fx-border-width: 3px; " +
+            "-fx-border-radius: 0; " +
+            "-fx-background-radius: 0; " +
+            "-fx-background-color: radial-gradient(center 50%% 50%%, radius 75%%, %s 0%%, #0d0f14 100%%);",
+            classColor, classBg
+        );
+        iconPane.setStyle(iconPaneStyle);
+
+        // Outer glow wrapper around portrait
+        StackPane glowPane = new StackPane(iconPane);
+        glowPane.setStyle(String.format(
+            "-fx-effect: dropshadow(three-pass-box, %s, 16, 0.5, 0, 0);",
+            classGlow
+        ));
+
+        // Wizard sprite
         ImageView playerView = new ImageView();
         java.net.URL imgUrl = ProfileController.class.getResource("/assets/Gandalf.png");
         if (imgUrl != null) {
             Image img = new Image(imgUrl.toExternalForm());
             playerView.setImage(img);
-            playerView.setFitWidth(80);
+            playerView.setFitWidth(90);
             playerView.setFitHeight(90);
             playerView.setPreserveRatio(true);
+            playerView.setSmooth(false);
             playerView.setViewport(new Rectangle2D(0, 0, 128, 128));
 
-            // --- DEFINE THE ANIMATION TIMING FOR A HORIZONTAL SHEET ---
             int totalFrames = 2;
-            int columns = 2; //2 since my export on piskel is 2 columns
+            int columns = 2;
             double FRAME_WIDTH = 128.0;
             double FRAME_HEIGHT = 128.0;
-
             CustomSpriteTransition animation = new CustomSpriteTransition(
-                    playerView, 
-                    Duration.millis(800), // Loops through both frames every 800ms
-                    totalFrames, 
-                    columns, 
-                    FRAME_WIDTH, 
-                    FRAME_HEIGHT
-            );
-
+                    playerView, Duration.millis(800), totalFrames, columns, FRAME_WIDTH, FRAME_HEIGHT);
             animation.setCycleCount(Transition.INDEFINITE);
-            animation.play(); // Play idle
+            animation.play();
         }
 
-        StackPane iconPane = new StackPane(icon);
         if (imgUrl != null) {
             iconPane.getChildren().add(playerView);
         } else {
             Label emoji = new Label("🧙");
-            emoji.setStyle("-fx-font-size: 36px;");
+            emoji.setStyle("-fx-font-size: 46px;");
             iconPane.getChildren().add(emoji);
         }
 
-        Label nameLabel = new Label(wizard.getName());
-        nameLabel.setStyle("-fx-text-fill: #e2b96f; -fx-font-size: 15px;" +
-                " -fx-font-weight: bold; -fx-font-family: 'Georgia';");
+        // --- 3. CLASS RIBBON ---
+        Label skinLabel = new Label("✦  " + wizard.getSkin().getDisplayName().toUpperCase() + "  ✦");
+        skinLabel.getStyleClass().add("pixel-font");
+        String skinLabelStyle = String.format(
+            "-fx-text-fill: %s; " +
+            "-fx-background-color: %s; " +
+            "-fx-font-size: 11px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-padding: 3 14; " +
+            "-fx-background-radius: 0; " +
+            "-fx-border-color: %s; " +
+            "-fx-border-width: 1px;",
+            classColor, classBg, classColor
+        );
+        skinLabel.setStyle(skinLabelStyle);
 
-        Label recordLabel = new Label(wizard.getWinLossRecord());
-        recordLabel.setStyle("-fx-text-fill: #a0a0c0; -fx-font-size: 12px;");
+        // --- 4. STATS DIVIDER ---
+        Region divider = new Region();
+        divider.setPrefHeight(1);
+        divider.setPrefWidth(150);
+        divider.setStyle("-fx-background-color: #2a3040;");
 
-        Label skinLabel = new Label(wizard.getSkin().getDisplayName());
-        skinLabel.setStyle("-fx-text-fill: #666688; -fx-font-size: 11px;");
+        // --- 5. WIN / LOSS BADGES ---
+        HBox statsBox = new HBox(20);
+        statsBox.setAlignment(Pos.CENTER);
 
-        // Delete button (small, top-right)
+        VBox winBox = new VBox(2);
+        winBox.setAlignment(Pos.CENTER);
+        Label winNum = new Label(String.valueOf(wizard.getWins()));
+        winNum.getStyleClass().add("pixel-font");
+        winNum.setStyle("-fx-text-fill: #4caf50; -fx-font-size: 22px; -fx-font-weight: bold;");
+        Label winTxt = new Label("WINS");
+        winTxt.getStyleClass().add("pixel-font");
+        winTxt.setStyle("-fx-text-fill: #3a6e40; -fx-font-size: 9px;");
+        winBox.getChildren().addAll(winNum, winTxt);
+
+        Label sep = new Label("|");
+        sep.setStyle("-fx-text-fill: #2a3040; -fx-font-size: 20px;");
+
+        VBox lossBox = new VBox(2);
+        lossBox.setAlignment(Pos.CENTER);
+        Label lossNum = new Label(String.valueOf(wizard.getLosses()));
+        lossNum.getStyleClass().add("pixel-font");
+        lossNum.setStyle("-fx-text-fill: #ff6b6b; -fx-font-size: 22px; -fx-font-weight: bold;");
+        Label lossTxt = new Label("LOSSES");
+        lossTxt.getStyleClass().add("pixel-font");
+        lossTxt.setStyle("-fx-text-fill: #6e3a3a; -fx-font-size: 9px;");
+        lossBox.getChildren().addAll(lossNum, lossTxt);
+
+        statsBox.getChildren().addAll(winBox, sep, lossBox);
+
+        // Delete button
         Button deleteBtn = new Button("✕");
+        deleteBtn.getStyleClass().add("pixel-font");
         deleteBtn.setStyle(
                 "-fx-background-color: transparent;" +
-                        "-fx-text-fill: #666688; -fx-font-size: 11px;" +
-                        "-fx-padding: 2 6; -fx-cursor: hand;");
+                        "-fx-text-fill: #555577; -fx-font-size: 12px;" +
+                        "-fx-padding: 4 8; -fx-cursor: hand;");
         deleteBtn.setOnAction(e -> onDeleteSlot(slot));
         StackPane.setAlignment(deleteBtn, Pos.TOP_RIGHT);
 
-        content.getChildren().addAll(iconPane, nameLabel, recordLabel, skinLabel);
+        content.getChildren().addAll(nameLabel, glowPane, skinLabel, divider, statsBox);
         card.getChildren().addAll(content, deleteBtn);
 
         card.setOnMouseClicked(e -> selectSlot(slot, card));
         card.setOnMouseEntered(e -> {
+            card.setTranslateY(-8);
             if (selectedSlot != slot)
                 card.setStyle(hoverCardStyle());
         });
         card.setOnMouseExited(e -> {
+            card.setTranslateY(0);
             if (selectedSlot != slot)
                 card.setStyle(idleCardStyle());
         });
@@ -137,26 +223,34 @@ public class ProfileController {
 
     private StackPane buildEmptySlot(int slot) {
         StackPane card = new StackPane();
-        card.setPrefSize(180, 220);
+        card.setPrefSize(210, 330);
+        card.setMinSize(210, 330);
+        card.setMaxSize(210, 330);
         card.setStyle(emptyCardStyle());
 
-        VBox content = new VBox(10);
+        VBox content = new VBox(12);
         content.setAlignment(Pos.CENTER);
 
         Label plus = new Label("+");
-        plus.setStyle("-fx-font-size: 48px; -fx-text-fill: #444466;");
+        plus.getStyleClass().add("pixel-font");
+        plus.setStyle("-fx-font-size: 56px; -fx-text-fill: #333355;");
 
         Label hint = new Label("New Wizard");
-        hint.setStyle("-fx-font-size: 13px; -fx-text-fill: #444466;");
+        hint.getStyleClass().add("pixel-font");
+        hint.setStyle("-fx-font-size: 13px; -fx-text-fill: #3a3a5a;");
 
         content.getChildren().addAll(plus, hint);
         card.getChildren().add(content);
 
         card.setOnMouseClicked(e -> onCreateProfile(slot));
-        card.setOnMouseEntered(e ->
-                card.setStyle(emptyHoverCardStyle()));
-        card.setOnMouseExited(e ->
-                card.setStyle(emptyCardStyle()));
+        card.setOnMouseEntered(e -> {
+            card.setTranslateY(-8);
+            card.setStyle(emptyHoverCardStyle());
+        });
+        card.setOnMouseExited(e -> {
+            card.setTranslateY(0);
+            card.setStyle(emptyCardStyle());
+        });
 
         return card;
     }
@@ -242,46 +336,50 @@ public class ProfileController {
     }
 
     private String idleCardStyle() {
-        return "-fx-background-color: #12122a;" +
-                "-fx-border-color: #2a2a4a;" +
-                "-fx-border-width: 2;" +
-                "-fx-border-radius: 12;" +
-                "-fx-background-radius: 12;" +
+        return "-fx-background-color: #12151e;" +
+                "-fx-background-radius: 0;" +
+                "-fx-border-color: #4a5a70;" +
+                "-fx-border-width: 4;" +
+                "-fx-border-radius: 0;" +
+                "-fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.6), 0, 0.0, 6, 6);" +
                 "-fx-cursor: hand;";
     }
     private String hoverCardStyle() {
-        return "-fx-background-color: #1a1a3a;" +
+        return "-fx-background-color: #12151e;" +
+                "-fx-background-radius: 0;" +
                 "-fx-border-color: #e2b96f;" +
-                "-fx-border-width: 2;" +
-                "-fx-border-radius: 12;" +
-                "-fx-background-radius: 12;" +
+                "-fx-border-width: 4;" +
+                "-fx-border-radius: 0;" +
+                "-fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.6), 0, 0.0, 6, 6);" +
                 "-fx-cursor: hand;";
     }
     private String selectedCardStyle() {
-        return "-fx-background-color: #1a1a3a;" +
+        return "-fx-background-color: #12151e;" +
+                "-fx-background-radius: 0;" +
                 "-fx-border-color: #e2b96f;" +
-                "-fx-border-width: 3;" +
-                "-fx-border-radius: 12;" +
-                "-fx-background-radius: 12;" +
-                "-fx-effect: dropshadow(gaussian, #e2b96f, 12, 0.4, 0, 0);" +
+                "-fx-border-width: 4;" +
+                "-fx-border-radius: 0;" +
+                "-fx-effect: dropshadow(one-pass-box, #e2b96f, 0, 0.0, 6, 6);" +
                 "-fx-cursor: hand;";
     }
     private String emptyCardStyle() {
-        return "-fx-background-color: #0d0d1a;" +
-                "-fx-border-color: #222244;" +
-                "-fx-border-width: 2;" +
+        return "-fx-background-color: #0b0c10;" +
+                "-fx-background-radius: 0;" +
+                "-fx-border-color: #22252e;" +
+                "-fx-border-width: 4;" +
                 "-fx-border-style: dashed;" +
-                "-fx-border-radius: 12;" +
-                "-fx-background-radius: 12;" +
+                "-fx-border-radius: 0;" +
+                "-fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.4), 0, 0.0, 6, 6);" +
                 "-fx-cursor: hand;";
     }
     private String emptyHoverCardStyle() {
-        return "-fx-background-color: #12122a;" +
-                "-fx-border-color: #444466;" +
-                "-fx-border-width: 2;" +
+        return "-fx-background-color: #12151e;" +
+                "-fx-background-radius: 0;" +
+                "-fx-border-color: #4a5a70;" +
+                "-fx-border-width: 4;" +
                 "-fx-border-style: dashed;" +
-                "-fx-border-radius: 12;" +
-                "-fx-background-radius: 12;" +
+                "-fx-border-radius: 0;" +
+                "-fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.6), 0, 0.0, 6, 6);" +
                 "-fx-cursor: hand;";
     }
 }
