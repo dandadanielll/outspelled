@@ -4,6 +4,7 @@ import com.rst.outspelled.Main;
 import com.rst.outspelled.model.Wizard;
 import com.rst.outspelled.network.SessionManager;
 import com.rst.outspelled.util.ProfileManager;
+import com.rst.outspelled.util.SoundManager;
 import javafx.animation.Transition;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -33,6 +34,7 @@ public class ProfileController {
     }
 
     private void renderSlots() {
+        int previousSelect = selectedSlot;
         profileSlotsBox.getChildren().clear();
         selectedSlot = -1;
 
@@ -40,6 +42,33 @@ public class ProfileController {
             Wizard w = profiles.get(i);
             StackPane card = w == null ? buildEmptySlot(i) : buildProfileSlot(i, w);
             profileSlotsBox.getChildren().add(card);
+        }
+
+        if (previousSelect >= 0 && previousSelect < profiles.size() && profiles.get(previousSelect) != null) {
+            selectedSlot = previousSelect;
+            StackPane selected = (StackPane) profileSlotsBox.getChildren().get(selectedSlot);
+            selected.setStyle(selectedCardStyle());
+            statusLabel.setText("Playing as " + profiles.get(selectedSlot).getName()
+                    + " — press Play!");
+            statusLabel.setStyle("-fx-text-fill: #4caf50; -fx-font-size: 13px;");
+        }
+    }
+
+    private void cycleSkin(int slot, Wizard wizard, int direction) {
+        Wizard.WizardSkin[] skins = Wizard.WizardSkin.values();
+        int currentIdx = -1;
+        for (int i = 0; i < skins.length; i++) {
+            if (skins[i] == wizard.getSkin()) {
+                currentIdx = i;
+                break;
+            }
+        }
+        if (currentIdx != -1) {
+            int nextIdx = (currentIdx + direction + skins.length) % skins.length;
+            wizard.setSkin(skins[nextIdx]);
+            ProfileManager.saveSlot(slot, wizard);
+            renderSlots();
+            SoundManager.playClick();
         }
     }
 
@@ -55,25 +84,25 @@ public class ProfileController {
         String classBg = "#1a1e29";
         String classGlow = "rgba(80, 98, 117, 0.5)";
         switch (wizard.getSkin()) {
+            case ARCANE_WIZARD:
+                classColor = "#a38aff"; // Arcane purple
+                classBg = "#1a133d";
+                classGlow = "rgba(163, 138, 255, 0.4)";
+                break;
             case EMBER_MAGE:
-                classColor = "#ff8a8a";
+                classColor = "#ff8a8a"; // Fire red
                 classBg = "#3d1313";
                 classGlow = "rgba(255, 80, 80, 0.4)";
                 break;
-            case FROST_WITCH:
-                classColor = "#8ad6ff";
-                classBg = "#13233d";
-                classGlow = "rgba(100, 180, 255, 0.4)";
-                break;
-            case STORM_SAGE:
-                classColor = "#ffe68a";
+            case PRISM_SAGE:
+                classColor = "#ffe68a"; // Prism yellow
                 classBg = "#3d3613";
                 classGlow = "rgba(255, 210, 80, 0.4)";
                 break;
-            case SHADOW_SCRIBE:
-                classColor = "#d18aff";
-                classBg = "#2d133d";
-                classGlow = "rgba(180, 80, 255, 0.4)";
+            case GROVE_MAGUS:
+                classColor = "#8aff8a"; // Grove green
+                classBg = "#133d13";
+                classGlow = "rgba(80, 255, 80, 0.4)";
                 break;
         }
 
@@ -112,9 +141,9 @@ public class ProfileController {
             classGlow
         ));
 
-        // Wizard sprite
+        // Wizard sprite loaded from skin's imagePath
         ImageView playerView = new ImageView();
-        java.net.URL imgUrl = ProfileController.class.getResource("/assets/Gandalf.png");
+        java.net.URL imgUrl = ProfileController.class.getResource("/assets/" + wizard.getSkin().getImagePath());
         if (imgUrl != null) {
             Image img = new Image(imgUrl.toExternalForm());
             playerView.setImage(img);
@@ -141,6 +170,55 @@ public class ProfileController {
             emoji.setStyle("-fx-font-size: 46px;");
             iconPane.getChildren().add(emoji);
         }
+
+        // Clickable left/right arrows around the pedestal box
+        Button leftArrow = new Button("◀");
+        leftArrow.getStyleClass().add("pixel-font");
+        leftArrow.setStyle(
+            "-fx-background-color: transparent; " +
+            "-fx-text-fill: #e2b96f; " +
+            "-fx-font-size: 18px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-cursor: hand; " +
+            "-fx-padding: 0 6 0 0;"
+        );
+        leftArrow.setOnMouseEntered(ev -> leftArrow.setStyle(
+            "-fx-background-color: transparent; -fx-text-fill: #ffffff; -fx-font-size: 18px; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 0 6 0 0;"
+        ));
+        leftArrow.setOnMouseExited(ev -> leftArrow.setStyle(
+            "-fx-background-color: transparent; -fx-text-fill: #e2b96f; -fx-font-size: 18px; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 0 6 0 0;"
+        ));
+        leftArrow.setOnMouseClicked(ev -> ev.consume());
+        leftArrow.setOnAction(ev -> {
+            ev.consume();
+            cycleSkin(slot, wizard, -1);
+        });
+
+        Button rightArrow = new Button("▶");
+        rightArrow.getStyleClass().add("pixel-font");
+        rightArrow.setStyle(
+            "-fx-background-color: transparent; " +
+            "-fx-text-fill: #e2b96f; " +
+            "-fx-font-size: 18px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-cursor: hand; " +
+            "-fx-padding: 0 0 0 6;"
+        );
+        rightArrow.setOnMouseEntered(ev -> rightArrow.setStyle(
+            "-fx-background-color: transparent; -fx-text-fill: #ffffff; -fx-font-size: 18px; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 0 0 0 6;"
+        ));
+        rightArrow.setOnMouseExited(ev -> rightArrow.setStyle(
+            "-fx-background-color: transparent; -fx-text-fill: #e2b96f; -fx-font-size: 18px; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 0 0 0 6;"
+        ));
+        rightArrow.setOnMouseClicked(ev -> ev.consume());
+        rightArrow.setOnAction(ev -> {
+            ev.consume();
+            cycleSkin(slot, wizard, 1);
+        });
+
+        HBox portraitContainer = new HBox(4);
+        portraitContainer.setAlignment(Pos.CENTER);
+        portraitContainer.getChildren().addAll(leftArrow, glowPane, rightArrow);
 
         // --- 3. CLASS RIBBON ---
         Label skinLabel = new Label("✦  " + wizard.getSkin().getDisplayName().toUpperCase() + "  ✦");
@@ -203,7 +281,7 @@ public class ProfileController {
         deleteBtn.setOnAction(e -> onDeleteSlot(slot));
         StackPane.setAlignment(deleteBtn, Pos.TOP_RIGHT);
 
-        content.getChildren().addAll(nameLabel, glowPane, skinLabel, divider, statsBox);
+        content.getChildren().addAll(nameLabel, portraitContainer, skinLabel, divider, statsBox);
         card.getChildren().addAll(content, deleteBtn);
 
         card.setOnMouseClicked(e -> selectSlot(slot, card));

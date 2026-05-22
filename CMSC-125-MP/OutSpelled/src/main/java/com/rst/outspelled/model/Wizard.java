@@ -2,10 +2,10 @@ package com.rst.outspelled.model;
 
 public class Wizard extends Player {
     public enum WizardSkin {
-        EMBER_MAGE("Ember Mage", "ember_mage.png"),
-        FROST_WITCH("Frost Witch", "frost_witch.png"),
-        STORM_SAGE("Storm Sage", "storm_sage.png"),
-        SHADOW_SCRIBE("Shadow Scribe", "shadow_scribe.png");
+        ARCANE_WIZARD("Arcane Wizard", "Gandalf.png"),
+        EMBER_MAGE("Ember Mage", "Alice.png"),
+        PRISM_SAGE("Prism Sage", "EK.png"),
+        GROVE_MAGUS("Grove Magus", "Peter.png");
 
         private final String displayName;
         private final String imagePath;
