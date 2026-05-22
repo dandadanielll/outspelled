@@ -33,7 +33,7 @@ public class Main extends Application {
         SoundManager.initialize();
 
         //calls method to open landing page of the app, the profile selection screen
-        navigateTo("profile-view.fxml");
+        navigateTo("landing-view.fxml");
 
         //calls method that applies the set window mode state
         applyWindowMode();
@@ -102,6 +102,62 @@ public class Main extends Application {
             }
         } catch (IOException e) {
             System.err.println("Failed to load " + fxmlFile + ": " + e.getMessage()); //formatted error code pag wala yung file
+        }
+    }
+
+    // navigates to the next screen with a slide-up transition for both the current and new screen
+    public static void navigateWithSlideUpTransition(String fxmlFile) {
+        try {
+            String path = fxmlFile.startsWith("/") ? fxmlFile : "/com/rst/outspelled/" + fxmlFile;
+            java.net.URL location = Main.class.getResource(path);
+
+            if (location == null) {
+                throw new IOException("FXML resource not found: " + path);
+            }
+
+            FXMLLoader loader = new FXMLLoader(location);
+            javafx.scene.Parent newRoot = loader.load();
+
+            Scene currentScene = primaryStage.getScene();
+            if (currentScene != null && currentScene.getRoot() != null) {
+                javafx.scene.Parent currentRoot = currentScene.getRoot();
+                
+                // Temporary container to hold both scenes during the transition
+                javafx.scene.layout.StackPane transitionContainer = new javafx.scene.layout.StackPane();
+                transitionContainer.getChildren().addAll(currentRoot, newRoot);
+                
+                double sceneHeight = currentScene.getHeight() > 0 ? currentScene.getHeight() : WINDOWED_HEIGHT;
+                
+                // Start the new scene exactly at the bottom of the current screen
+                newRoot.setTranslateY(sceneHeight);
+                
+                // Replace the scene's root with our transition container
+                currentScene.setRoot(transitionContainer);
+                
+                // Animate old screen moving up
+                javafx.animation.TranslateTransition slideOut = new javafx.animation.TranslateTransition(javafx.util.Duration.millis(1500), currentRoot);
+                slideOut.setByY(-sceneHeight);
+                slideOut.setInterpolator(javafx.animation.Interpolator.EASE_OUT);
+                
+                // Animate new screen moving up
+                javafx.animation.TranslateTransition slideIn = new javafx.animation.TranslateTransition(javafx.util.Duration.millis(1500), newRoot);
+                slideIn.setByY(-sceneHeight);
+                slideIn.setInterpolator(javafx.animation.Interpolator.EASE_OUT);
+                
+                slideIn.setOnFinished(e -> {
+                    // Reset properties and lock in the new scene
+                    newRoot.setTranslateY(0);
+                    currentScene.setRoot(newRoot);
+                });
+                
+                slideOut.play();
+                slideIn.play();
+            } else {
+                Scene scene = new Scene(newRoot);
+                primaryStage.setScene(scene);
+            }
+        } catch (IOException e) {
+            System.err.println("Failed to load " + fxmlFile + ": " + e.getMessage());
         }
     }
 
