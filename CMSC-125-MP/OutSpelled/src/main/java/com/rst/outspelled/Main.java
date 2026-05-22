@@ -132,12 +132,12 @@ public class Main extends Application {
                 currentScene.setRoot(transitionContainer);
                 
                 // Animate old screen moving up
-                javafx.animation.TranslateTransition slideOut = new javafx.animation.TranslateTransition(javafx.util.Duration.millis(1000), currentRoot);
+                javafx.animation.TranslateTransition slideOut = new javafx.animation.TranslateTransition(javafx.util.Duration.millis(1500), currentRoot);
                 slideOut.setByY(-sceneHeight);
                 slideOut.setInterpolator(javafx.animation.Interpolator.EASE_OUT);
                 
                 // Animate new screen moving up
-                javafx.animation.TranslateTransition slideIn = new javafx.animation.TranslateTransition(javafx.util.Duration.millis(1000), newRoot);
+                javafx.animation.TranslateTransition slideIn = new javafx.animation.TranslateTransition(javafx.util.Duration.millis(1500), newRoot);
                 slideIn.setByY(-sceneHeight);
                 slideIn.setInterpolator(javafx.animation.Interpolator.EASE_OUT);
                 
