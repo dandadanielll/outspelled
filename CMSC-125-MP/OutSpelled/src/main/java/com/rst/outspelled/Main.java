@@ -31,6 +31,7 @@ public class Main extends Application {
 
         //preload all SFX clips before any screen is shown
         SoundManager.initialize();
+        javafx.scene.text.Font.loadFont(Main.class.getResourceAsStream("/assets/fonts/PixelifySans-VariableFont_wght.ttf"), 14);
 
         //calls method to open landing page of the app, the profile selection screen
         navigateTo("landing-view.fxml");
