@@ -8,52 +8,61 @@
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.rst.outspelled.ui.ProfileController"
-      alignment="CENTER"
-      spacing="28"
+      alignment="TOP_CENTER"
+      spacing="0"
       styleClass="profile-root"
-      prefWidth="700"
-      prefHeight="520">
+      prefWidth="900"
+      prefHeight="650">
 
     <stylesheets>
         <URL value="@../../../assets/style.css" />
     </stylesheets>
 
-    <padding>
-        <Insets top="50" bottom="40" left="50" right="50"/>
-    </padding>
-
-    <!-- Title -->
-    <VBox alignment="CENTER" spacing="6">
+    <!-- TOP TITLE -->
+    <VBox alignment="CENTER" spacing="4" style="-fx-padding: 28 0 20 0;">
         <Label text="OutSpelled"
-               style="-fx-font-size: 44px;
+               styleClass="pixel-font"
+               style="-fx-font-size: 72px;
                       -fx-font-weight: bold;
                       -fx-text-fill: #e2b96f;
-                      -fx-font-family: 'Georgia';"/>
-        <Label text="Choose Your Wizard"
-               style="-fx-font-size: 16px;
-                      -fx-text-fill: #a0a0c0;
-                      -fx-font-family: 'Georgia';"/>
+                      -fx-effect: dropshadow(three-pass-box, #000000, 14, 0.9, 0, 3);" />
+        <Label text="— Choose Your Wizard —"
+               styleClass="pixel-font"
+               style="-fx-font-size: 20px;
+                      -fx-text-fill: #8899aa;
+                      -fx-effect: dropshadow(three-pass-box, #000000, 6, 0.8, 0, 2);" />
     </VBox>
+
+    <!-- SPACER -->
+    <Region prefHeight="20" />
 
     <!-- Profile Cards -->
     <HBox fx:id="profileSlotsBox"
           alignment="CENTER"
-          spacing="24"/>
+          spacing="30"
+          VBox.vgrow="ALWAYS" />
 
     <!-- Status -->
     <Label fx:id="statusLabel" text=""
-           style="-fx-font-size: 13px; -fx-text-fill: #a0a0c0;"/>
+           styleClass="pixel-font"
+           style="-fx-font-size: 13px; -fx-text-fill: #a0a0c0; -fx-padding: 10 0 0 0;" />
 
     <!-- Play Button -->
-    <Button text="▶  Play!"
-            onAction="#onPlayClicked"
-            style="-fx-background-color: #e2b96f;
-                   -fx-text-fill: #1a1a2e;
-                   -fx-font-size: 18px;
-                   -fx-font-weight: bold;
-                   -fx-font-family: 'Georgia';
-                   -fx-padding: 14 50;
-                   -fx-background-radius: 8;
-                   -fx-cursor: hand;"/>
+    <VBox alignment="CENTER" style="-fx-padding: 12 0 28 0;">
+        <Button text="▶  Play!"
+                onAction="#onPlayClicked"
+                styleClass="pixel-font"
+                style="-fx-background-color: #e2b96f;
+                       -fx-text-fill: #12151e;
+                       -fx-font-size: 18px;
+                       -fx-font-weight: bold;
+                       -fx-padding: 14 60;
+                       -fx-background-radius: 0;
+                       -fx-border-color: #c9a050;
+                       -fx-border-width: 2px;
+                       -fx-border-radius: 0;
+                       -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.6), 0, 0.0, 4, 4);
+                       -fx-cursor: hand;" />
+    </VBox>
 
 </VBox>

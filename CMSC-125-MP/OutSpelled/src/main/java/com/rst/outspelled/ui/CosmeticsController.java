@@ -12,7 +12,7 @@ public class CosmeticsController {
     @FXML private ComboBox<String> arenaCombo;
 
     private static Wizard.WizardSkin selectedPlayer1Skin = Wizard.WizardSkin.EMBER_MAGE;
-    private static Wizard.WizardSkin selectedPlayer2Skin = Wizard.WizardSkin.FROST_WITCH;
+    private static Wizard.WizardSkin selectedPlayer2Skin = Wizard.WizardSkin.ARCANE_WIZARD;
     private static Wizard.ArenaBackground selectedArena = Wizard.ArenaBackground.DARK_TOWER;
 
     @FXML

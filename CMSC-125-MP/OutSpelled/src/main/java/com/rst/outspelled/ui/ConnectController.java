@@ -112,7 +112,7 @@ public class ConnectController {
                     if (n1.isEmpty()) n1 = "Player 1";
                     if (n2.isEmpty()) n2 = "Player 2";
                     Wizard w1 = new Wizard(n1, 200, WizardSkin.EMBER_MAGE, ArenaBackground.DARK_TOWER);
-                    Wizard w2 = new Wizard(n2, 200, WizardSkin.FROST_WITCH, ArenaBackground.DARK_TOWER);
+                    Wizard w2 = new Wizard(n2, 200, WizardSkin.ARCANE_WIZARD, ArenaBackground.DARK_TOWER);
                     WheelController.setWizards(w1, w2);
                     WheelController.setNetworkMode(true);
                     Main.navigateTo("wheel-view.fxml");
@@ -144,7 +144,7 @@ public class ConnectController {
                     if (n1.isEmpty()) n1 = "Player 1";
                     if (n2.isEmpty()) n2 = "Player 2";
                     Wizard w1 = new Wizard(n1, 200, WizardSkin.EMBER_MAGE, ArenaBackground.DARK_TOWER);
-                    Wizard w2 = new Wizard(n2, 200, WizardSkin.FROST_WITCH, ArenaBackground.DARK_TOWER);
+                    Wizard w2 = new Wizard(n2, 200, WizardSkin.ARCANE_WIZARD, ArenaBackground.DARK_TOWER);
                     Wizard first = firstPlayerId == 1 ? w1 : w2;
                     Wizard second = firstPlayerId == 1 ? w2 : w1;
                     GameController.setWizards(first, second);
