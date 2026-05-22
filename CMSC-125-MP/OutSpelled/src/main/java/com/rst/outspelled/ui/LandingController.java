@@ -2,12 +2,11 @@ package com.rst.outspelled.ui;
 
 import com.rst.outspelled.Main;
 import com.rst.outspelled.util.SoundManager;
+import javafx.application.Platform;
 import javafx.animation.Animation;
 import javafx.animation.AnimationTimer;
 import javafx.animation.FadeTransition;
-import javafx.animation.ScaleTransition;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
@@ -17,6 +16,7 @@ import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.RadialGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Font;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
@@ -26,77 +26,35 @@ public class LandingController {
 
     @FXML private StackPane rootPane;
     @FXML private ImageView backgroundImageView;
-    @FXML private Button enterButton;
-    @FXML private Pane weatherPane; // Bound container layer from FXML
+    @FXML private Pane weatherPane;
 
-    // Star Tracking Parameters
     private final List<Circle> starCluster = new ArrayList<>();
     private long lastStarUpdate = 0;
+    private boolean isTransitioning = false; // Prevents double-triggering inputs
 
     @FXML
     public void initialize() {
-        // Maintain Native Audio System
+        // Load custom font first because JavaFX does not support @font-face in CSS natively
+        java.net.URL fontUrl = LandingController.class.getResource("/assets/fonts/PixelifySans-VariableFont_wght.ttf");
+        if (fontUrl != null) {
+            Font.loadFont(fontUrl.toExternalForm(), 12);
+        }
+
         SoundManager.startBgm("bgm.mp3");
 
-        // Load bg image
         java.net.URL imgUrl = LandingController.class.getResource("/assets/Landing-background.png");
         if (imgUrl != null) {
             backgroundImageView.setImage(new Image(imgUrl.toExternalForm()));
         }
 
-        // Prevents JavaFX from smoothing/blurring my pixel art
         backgroundImageView.setSmooth(false);
-
         backgroundImageView.fitWidthProperty().bind(rootPane.widthProperty());
         backgroundImageView.fitHeightProperty().bind(rootPane.heightProperty());
 
-        // Initialize atmospheric system layers
         setupAtmosphereEffects();
 
-        // Button styling
-        String idleStyle = "-fx-background-color: #e2b96f; " +
-                           "-fx-text-fill: #1a1a2e; " +
-                           "-fx-font-size: 18px; " +
-                           "-fx-font-weight: bold; " +
-                           "-fx-font-family: 'Pixelify Sans', 'Georgia'; " +
-                           "-fx-padding: 14 50; " +
-                           "-fx-background-radius: 0; " + 
-                           "-fx-border-radius: 0; " +
-                           "-fx-cursor: hand; " +
-                           "-fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.4), 10, 0.5, 0, 4);";
-
-        String hoverStyle = "-fx-background-color: #f7d69e; " +
-                            "-fx-text-fill: #1a1a2e; " +
-                            "-fx-font-size: 18px; " +
-                            "-fx-font-weight: bold; " +
-                            "-fx-font-family: 'Pixelify Sans', 'Georgia'; " +
-                            "-fx-padding: 14 50; " +
-                            "-fx-background-radius: 0; " + 
-                            "-fx-border-radius: 0; " +
-                            "-fx-cursor: hand; " +
-                            "-fx-effect: dropshadow(three-pass-box, rgba(226, 185, 111, 0.5), 15, 0.5, 0, 0);";
-
-        enterButton.setStyle(idleStyle);
-
-        enterButton.setOnMouseEntered(e -> {
-            enterButton.setStyle(hoverStyle);
-            ScaleTransition st = new ScaleTransition(Duration.millis(150), enterButton);
-            st.setToX(1.05);
-            st.setToY(1.05);
-            st.play();
-        });
-
-        enterButton.setOnMouseExited(e -> {
-            enterButton.setStyle(idleStyle);
-            ScaleTransition st = new ScaleTransition(Duration.millis(150), enterButton);
-            st.setToX(1.0);
-            st.setToY(1.0);
-            st.play();
-        });
-
-        // Global keyboard inputs
+        // Key Listeners
         rootPane.setFocusTraversable(true);
-        rootPane.requestFocus();
         rootPane.setOnKeyPressed(event -> {
             switch (event.getCode()) {
                 case ENTER:
@@ -107,19 +65,22 @@ public class LandingController {
                     break;
             }
         });
+
+        // FIX: Run later guarantees the stage is open and window focus context is stable
+        Platform.runLater(() -> {
+            rootPane.requestFocus();
+        });
     }
 
     private void setupAtmosphereEffects() {
-        // THE PULSING MOON GLOW MASK
+        // Moon Glow
         RadialGradient moonGlowGradient = new RadialGradient(
             0, 0, 0.5, 0.5, 0.5, true, CycleMethod.NO_CYCLE,
-            new Stop(0, Color.web("#fffdd0", 0.18)),
+            new Stop(0, Color.web("#fffdd0", 0.18)), 
             new Stop(1, Color.TRANSPARENT)
         );
 
         Circle moonGlow = new Circle(180, moonGlowGradient);
-        
-        // Pin mask coordinates relative to my composition's right-centered moon
         moonGlow.translateXProperty().bind(rootPane.widthProperty().multiply(0.06)); 
         moonGlow.translateYProperty().bind(rootPane.heightProperty().multiply(-0.22));
 
@@ -132,17 +93,15 @@ public class LandingController {
         
         weatherPane.getChildren().add(moonGlow);
 
-        // TWINKLING SKY CELESTIAL STARRY CLUSTER (80 for now, increase if too empty)
+        // 80 Stars
         generateStars(80);
 
-        // CORE GAME ENGINE TIMELINE LOOP
         AnimationTimer coreGameLoop = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                // Evaluate Star Twinkles (Fires every 120ms block to save system resources)
                 if (now - lastStarUpdate > 120_000_000) {
                     for (Circle star : starCluster) {
-                        if (Math.random() < 0.15) { // Random chance threshold to shift opacity scale
+                        if (Math.random() < 0.15) {
                             star.setOpacity(0.15 + Math.random() * 0.85);
                         }
                     }
@@ -155,14 +114,10 @@ public class LandingController {
 
     private void generateStars(int count) {
         for (int i = 0; i < count; i++) {
-            // Retro size profiles: Crisp 1.0px points, occasional 1.5px major bodies
             double radius = (Math.random() > 0.75) ? 1.5 : 1.0;
             Circle star = new Circle(radius, Color.web("#fffdd0", 0.75));
-
-            // Smart procedural positioning binds stars to the clear upper atmospheric quadrants
             star.layoutXProperty().bind(rootPane.widthProperty().multiply(Math.random()));
-            star.layoutYProperty().bind(rootPane.heightProperty().multiply(Math.random() * 0.38)); // Caps height within sky box limits
-
+            star.layoutYProperty().bind(rootPane.heightProperty().multiply(Math.random() * 0.38)); 
             weatherPane.getChildren().add(star);
             starCluster.add(star);
         }
@@ -170,6 +125,10 @@ public class LandingController {
 
     @FXML
     private void onEnterClicked() {
+        // Guard check ensures multiple fast keypresses don't crash the scene manager
+        if (isTransitioning) return;
+        isTransitioning = true;
+
         SoundManager.playClick();
         
         FadeTransition ft = new FadeTransition(Duration.millis(450), rootPane);

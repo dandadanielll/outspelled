@@ -1,0 +1,8 @@
+@font-face {
+    font-family: 'PixelFont';
+    src: url('fonts/PixelifySans-VariableFont_wght.ttf');
+}
+
+.pixel-font {
+    -fx-font-family: 'Pixelify Sans';
+}
