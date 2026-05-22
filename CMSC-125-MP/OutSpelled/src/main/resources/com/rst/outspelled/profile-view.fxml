@@ -3,15 +3,20 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import java.net.URL?>
 
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.rst.outspelled.ui.ProfileController"
       alignment="CENTER"
       spacing="28"
-      style="-fx-background-color: #1a1a2e;"
+      styleClass="profile-root"
       prefWidth="700"
       prefHeight="520">
+
+    <stylesheets>
+        <URL value="@../../../assets/style.css" />
+    </stylesheets>
 
     <padding>
         <Insets top="50" bottom="40" left="50" right="50"/>

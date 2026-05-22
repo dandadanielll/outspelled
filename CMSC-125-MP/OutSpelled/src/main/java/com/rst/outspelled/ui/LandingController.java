@@ -125,7 +125,7 @@ public class LandingController {
             Circle star = new Circle(radius, Color.web("#fffdd0", 0.75));
             //randomize x and y positions
             star.layoutXProperty().bind(rootPane.widthProperty().multiply(Math.random()));
-            //limit the stars to top 44% of the screen
+            //limit the stars to the top 44% of the screen
             star.layoutYProperty().bind(rootPane.heightProperty().multiply(Math.random() * 0.44)); 
             weatherPane.getChildren().add(star);
             starCluster.add(star);

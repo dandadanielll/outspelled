@@ -6,3 +6,10 @@
 .pixel-font {
     -fx-font-family: 'Pixelify Sans';
 }
+
+.profile-root {
+    -fx-background-image: url('dungeon-brick.png');
+    -fx-background-repeat: repeat;
+    -fx-background-size: auto;
+    -fx-background-color: #1a1a2e;
+}
