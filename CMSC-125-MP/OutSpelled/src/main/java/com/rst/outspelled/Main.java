@@ -15,7 +15,7 @@ public class Main extends Application {
 
     //Sets the startup screen (default is windowed at 900x650 res)
     private static Stage primaryStage; //Static so stage shared to any object instance
-    private static WindowMode currentMode = WindowMode.WINDOWED_FULLSCREEN;
+    private static WindowMode currentMode = WindowMode.FULLSCREEN;
     private static final int WINDOWED_WIDTH = 900;
     private static final int WINDOWED_HEIGHT = 650;
 
@@ -24,6 +24,9 @@ public class Main extends Application {
         primaryStage = stage; //stores the javafx created stage into static variable to be used by other classes
         stage.setTitle("OutSpelled");
         stage.setResizable(true);
+
+        // Hide the ugly "Press ESC to exit full-screen mode" overlay
+        stage.setFullScreenExitHint("");
 
         //the window's size cant be smaller than the default size
         stage.setMinWidth(WINDOWED_WIDTH);
