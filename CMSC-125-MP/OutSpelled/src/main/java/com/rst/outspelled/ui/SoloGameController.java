@@ -46,16 +46,20 @@ public class SoloGameController extends GameController {
     @Override
     public void onInvalidWord(String word) {
         super.onInvalidWord(word); // shows the feedback message and reenables input
-        // Base class reenables input after an invalid word, but not if it's the AI's turn
-        if (engine.getCurrentPlayer() == wizard2) setInputEnabled(false);
+        // Base class reenables input after an invalid word, but not if it's the AI's
+        // turn
+        if (engine.getCurrentPlayer() == wizard2)
+            setInputEnabled(false);
     }
 
     @Override
     public void onHalfHpPrompt(Wizard initiator) {
         if (initiator == wizard2) {
             // AI decides automatically based on its difficulty
-            if (aiOpponent.shouldInitiateHalfHp()) engine.initiateHalfHpChallenge(wizard2);
-            else engine.skipHalfHpChallenge();
+            if (aiOpponent.shouldInitiateHalfHp())
+                engine.initiateHalfHpChallenge(wizard2);
+            else
+                engine.skipHalfHpChallenge();
         } else {
             super.onHalfHpPrompt(initiator); // show confirmation dialog for human player
         }
@@ -66,14 +70,16 @@ public class SoloGameController extends GameController {
         super.onHalfHpChallengeStart(sharedGrid); // sets up shared grid UI + skill check timer
         // AI also picks a word from the shared grid after its thinking delay
         aiOpponent.takeTurn(sharedGrid, (word, grid) -> {
-            if (word != null && !word.isBlank()) engine.submitHalfHpWord(wizard2, word);
+            if (word != null && !word.isBlank())
+                engine.submitHalfHpWord(wizard2, word);
         });
     }
 
     @Override
     public void onLastStandStart(String scrambledWord) {
         super.onLastStandStart(scrambledWord); // shows overlay, starts human input + timer
-        // AI attempts to unscramble (difficulty determines if it actually succeeds in time)
+        // AI attempts to unscramble (difficulty determines if it actually succeeds in
+        // time)
         aiOpponent.attemptLastStand(
                 engine.getSkillCheckManager().getUnscrambledTarget(), engine, wizard2);
     }
@@ -86,7 +92,7 @@ public class SoloGameController extends GameController {
         alert.setContentText(winner.getName() + " defeated "
                 + loser.getName() + "!\n\nPlay again?");
         ButtonType playAgain = new ButtonType("Play Again");
-        ButtonType mainMenu  = new ButtonType("Main Menu");
+        ButtonType mainMenu = new ButtonType("Main Menu");
         alert.getButtonTypes().setAll(playAgain, mainMenu);
 
         alert.showAndWait().ifPresent(response -> {
@@ -94,10 +100,9 @@ public class SoloGameController extends GameController {
             aiOpponent.shutdown();
             if (response == playAgain) {
                 SoloGameController.setup(
-                        new Wizard(wizard1.getName(), 200, wizard1.getSkin(), wizard1.getPreferredArena()),
-                        new Wizard(wizard2.getName(), 200, wizard2.getSkin(), wizard2.getPreferredArena()),
-                        new AiOpponent(aiOpponent.getBrain())
-                );
+                        new Wizard(wizard1.getName(), 200, wizard1.getSkin()),
+                        new Wizard(wizard2.getName(), 200, wizard2.getSkin()),
+                        new AiOpponent(aiOpponent.getBrain()));
                 Main.navigateTo("solo-game-view.fxml");
             } else {
                 Main.navigateTo("menu-view.fxml");

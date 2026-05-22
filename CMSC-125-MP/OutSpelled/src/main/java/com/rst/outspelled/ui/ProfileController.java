@@ -20,8 +20,10 @@ import java.util.Optional;
 
 public class ProfileController {
 
-    @FXML private HBox profileSlotsBox;
-    @FXML private Label statusLabel;
+    @FXML
+    private HBox profileSlotsBox;
+    @FXML
+    private Label statusLabel;
 
     // which slot is currently selected (-1 = none)
     private int selectedSlot = -1;
@@ -33,17 +35,24 @@ public class ProfileController {
         renderSlots();
     }
 
+    // Drawing Tool: Clears the row and draws all the save cards (either filled
+    // or empty dashed ones)
     private void renderSlots() {
         int previousSelect = selectedSlot;
         profileSlotsBox.getChildren().clear();
         selectedSlot = -1;
 
+        // Loop through all possible save slots and build a card for each
         for (int i = 0; i < ProfileManager.getMaxSlots(); i++) {
             Wizard w = profiles.get(i);
+            // If slot is empty, make a "+" card. If it has a wizard, make a character card.
             StackPane card = w == null ? buildEmptySlot(i) : buildProfileSlot(i, w);
             profileSlotsBox.getChildren().add(card);
         }
 
+        // This ensures that when you return to the profile screen, the previously
+        // selected
+        // profile is still highlighted
         if (previousSelect >= 0 && previousSelect < profiles.size() && profiles.get(previousSelect) != null) {
             selectedSlot = previousSelect;
             StackPane selected = (StackPane) profileSlotsBox.getChildren().get(selectedSlot);
@@ -54,6 +63,8 @@ public class ProfileController {
         }
     }
 
+    // Changes the skin of the wizard based on the direction (+1 for next, -1 for
+    // previous)
     private void cycleSkin(int slot, Wizard wizard, int direction) {
         Wizard.WizardSkin[] skins = Wizard.WizardSkin.values();
         int currentIdx = -1;
@@ -72,6 +83,7 @@ public class ProfileController {
         }
     }
 
+    // Builds a single wizard card for a specific slot
     private StackPane buildProfileSlot(int slot, Wizard wizard) {
         StackPane card = new StackPane();
         card.setPrefSize(210, 330);
@@ -83,6 +95,7 @@ public class ProfileController {
         String classColor = "#506275";
         String classBg = "#1a1e29";
         String classGlow = "rgba(80, 98, 117, 0.5)";
+        // Sets the color of the card based on the wizard's class
         switch (wizard.getSkin()) {
             case ARCANE_WIZARD:
                 classColor = "#a38aff"; // Arcane purple
@@ -106,6 +119,7 @@ public class ProfileController {
                 break;
         }
 
+        // Main container for the card
         VBox content = new VBox(10);
         content.setAlignment(Pos.CENTER);
         content.setStyle("-fx-padding: 16 14;");
@@ -114,32 +128,29 @@ public class ProfileController {
         Label nameLabel = new Label(wizard.getName());
         nameLabel.getStyleClass().add("pixel-font");
         nameLabel.setStyle(
-            "-fx-text-fill: #e2b96f; " +
-            "-fx-font-size: 20px; " +
-            "-fx-font-weight: bold; " +
-            "-fx-effect: dropshadow(one-pass-box, #000000, 0, 0.0, 2, 2);"
-        );
+                "-fx-text-fill: #e2b96f; " +
+                        "-fx-font-size: 20px; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-effect: dropshadow(one-pass-box, #000000, 0, 0.0, 2, 2);");
 
         // --- 2. PORTRAIT PEDESTAL WITH RADIAL SHINE + CLASS GLOW BORDER ---
         StackPane iconPane = new StackPane();
         iconPane.setPrefSize(110, 110);
         iconPane.setMaxSize(110, 110);
         String iconPaneStyle = String.format(
-            "-fx-border-color: %s; " +
-            "-fx-border-width: 3px; " +
-            "-fx-border-radius: 0; " +
-            "-fx-background-radius: 0; " +
-            "-fx-background-color: radial-gradient(center 50%% 50%%, radius 75%%, %s 0%%, #0d0f14 100%%);",
-            classColor, classBg
-        );
+                "-fx-border-color: %s; " +
+                        "-fx-border-width: 3px; " +
+                        "-fx-border-radius: 0; " +
+                        "-fx-background-radius: 0; " +
+                        "-fx-background-color: radial-gradient(center 50%% 50%%, radius 75%%, %s 0%%, #0d0f14 100%%);",
+                classColor, classBg);
         iconPane.setStyle(iconPaneStyle);
 
         // Outer glow wrapper around portrait
         StackPane glowPane = new StackPane(iconPane);
         glowPane.setStyle(String.format(
-            "-fx-effect: dropshadow(three-pass-box, %s, 16, 0.5, 0, 0);",
-            classGlow
-        ));
+                "-fx-effect: dropshadow(three-pass-box, %s, 16, 0.5, 0, 0);",
+                classGlow));
 
         // Wizard sprite loaded from skin's imagePath
         ImageView playerView = new ImageView();
@@ -163,6 +174,7 @@ public class ProfileController {
             animation.play();
         }
 
+        // Fallback
         if (imgUrl != null) {
             iconPane.getChildren().add(playerView);
         } else {
@@ -175,19 +187,16 @@ public class ProfileController {
         Button leftArrow = new Button("◀");
         leftArrow.getStyleClass().add("pixel-font");
         leftArrow.setStyle(
-            "-fx-background-color: transparent; " +
-            "-fx-text-fill: #e2b96f; " +
-            "-fx-font-size: 18px; " +
-            "-fx-font-weight: bold; " +
-            "-fx-cursor: hand; " +
-            "-fx-padding: 0 6 0 0;"
-        );
+                "-fx-background-color: transparent; " +
+                        "-fx-text-fill: #e2b96f; " +
+                        "-fx-font-size: 18px; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-cursor: hand; " +
+                        "-fx-padding: 0 6 0 0;");
         leftArrow.setOnMouseEntered(ev -> leftArrow.setStyle(
-            "-fx-background-color: transparent; -fx-text-fill: #ffffff; -fx-font-size: 18px; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 0 6 0 0;"
-        ));
+                "-fx-background-color: transparent; -fx-text-fill: #ffffff; -fx-font-size: 18px; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 0 6 0 0;"));
         leftArrow.setOnMouseExited(ev -> leftArrow.setStyle(
-            "-fx-background-color: transparent; -fx-text-fill: #e2b96f; -fx-font-size: 18px; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 0 6 0 0;"
-        ));
+                "-fx-background-color: transparent; -fx-text-fill: #e2b96f; -fx-font-size: 18px; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 0 6 0 0;"));
         leftArrow.setOnMouseClicked(ev -> ev.consume());
         leftArrow.setOnAction(ev -> {
             ev.consume();
@@ -197,19 +206,16 @@ public class ProfileController {
         Button rightArrow = new Button("▶");
         rightArrow.getStyleClass().add("pixel-font");
         rightArrow.setStyle(
-            "-fx-background-color: transparent; " +
-            "-fx-text-fill: #e2b96f; " +
-            "-fx-font-size: 18px; " +
-            "-fx-font-weight: bold; " +
-            "-fx-cursor: hand; " +
-            "-fx-padding: 0 0 0 6;"
-        );
+                "-fx-background-color: transparent; " +
+                        "-fx-text-fill: #e2b96f; " +
+                        "-fx-font-size: 18px; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-cursor: hand; " +
+                        "-fx-padding: 0 0 0 6;");
         rightArrow.setOnMouseEntered(ev -> rightArrow.setStyle(
-            "-fx-background-color: transparent; -fx-text-fill: #ffffff; -fx-font-size: 18px; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 0 0 0 6;"
-        ));
+                "-fx-background-color: transparent; -fx-text-fill: #ffffff; -fx-font-size: 18px; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 0 0 0 6;"));
         rightArrow.setOnMouseExited(ev -> rightArrow.setStyle(
-            "-fx-background-color: transparent; -fx-text-fill: #e2b96f; -fx-font-size: 18px; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 0 0 0 6;"
-        ));
+                "-fx-background-color: transparent; -fx-text-fill: #e2b96f; -fx-font-size: 18px; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 0 0 0 6;"));
         rightArrow.setOnMouseClicked(ev -> ev.consume());
         rightArrow.setOnAction(ev -> {
             ev.consume();
@@ -224,16 +230,15 @@ public class ProfileController {
         Label skinLabel = new Label("✦  " + wizard.getSkin().getDisplayName().toUpperCase() + "  ✦");
         skinLabel.getStyleClass().add("pixel-font");
         String skinLabelStyle = String.format(
-            "-fx-text-fill: %s; " +
-            "-fx-background-color: %s; " +
-            "-fx-font-size: 11px; " +
-            "-fx-font-weight: bold; " +
-            "-fx-padding: 3 14; " +
-            "-fx-background-radius: 0; " +
-            "-fx-border-color: %s; " +
-            "-fx-border-width: 1px;",
-            classColor, classBg, classColor
-        );
+                "-fx-text-fill: %s; " +
+                        "-fx-background-color: %s; " +
+                        "-fx-font-size: 11px; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-padding: 3 14; " +
+                        "-fx-background-radius: 0; " +
+                        "-fx-border-color: %s; " +
+                        "-fx-border-width: 1px;",
+                classColor, classBg, classColor);
         skinLabel.setStyle(skinLabelStyle);
 
         // --- 4. STATS DIVIDER ---
@@ -281,9 +286,11 @@ public class ProfileController {
         deleteBtn.setOnAction(e -> onDeleteSlot(slot));
         StackPane.setAlignment(deleteBtn, Pos.TOP_RIGHT);
 
+        // Pack all the components together
         content.getChildren().addAll(nameLabel, portraitContainer, skinLabel, divider, statsBox);
         card.getChildren().addAll(content, deleteBtn);
 
+        // Add mouse event listeners
         card.setOnMouseClicked(e -> selectSlot(slot, card));
         card.setOnMouseEntered(e -> {
             card.setTranslateY(-8);
@@ -299,6 +306,7 @@ public class ProfileController {
         return card;
     }
 
+    // Builds an empty slot card for a specific slot
     private StackPane buildEmptySlot(int slot) {
         StackPane card = new StackPane();
         card.setPrefSize(210, 330);
@@ -333,6 +341,7 @@ public class ProfileController {
         return card;
     }
 
+    // Selects a slot and highlights it
     private void selectSlot(int slot, StackPane card) {
         // deselect previous
         renderSlots();
@@ -345,6 +354,8 @@ public class ProfileController {
         statusLabel.setStyle("-fx-text-fill: #4caf50; -fx-font-size: 13px;");
     }
 
+    // Play Action: Verifies selection, logs profile into the global session, and
+    // opens main menu
     @FXML
     private void onPlayClicked() {
         if (selectedSlot < 0 || profiles.get(selectedSlot) == null) {
@@ -358,6 +369,8 @@ public class ProfileController {
         Main.navigateTo("menu-view.fxml");
     }
 
+    // Creator Action: Pops up a text prompt box to name and create a brand-new
+    // Wizard save
     private void onCreateProfile(int slot) {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("New Wizard");
@@ -365,7 +378,9 @@ public class ProfileController {
         dialog.setContentText("Name:");
         styleDialog(dialog);
 
+        // Show the dialog and wait for user input
         Optional<String> result = dialog.showAndWait();
+        // Process the user's input
         result.ifPresent(name -> {
             name = name.trim();
             if (name.isEmpty()) {
@@ -378,9 +393,7 @@ public class ProfileController {
                 statusLabel.setStyle("-fx-text-fill: #ff6b6b;");
                 return;
             }
-            Wizard w = new Wizard(name, 200,
-                    Wizard.WizardSkin.EMBER_MAGE,
-                    Wizard.ArenaBackground.DARK_TOWER);
+            Wizard w = new Wizard(name, 200, Wizard.WizardSkin.ARCANE_WIZARD);
             profiles.set(slot, w);
             ProfileManager.saveSlot(slot, w);
             renderSlots();
@@ -389,6 +402,7 @@ public class ProfileController {
         });
     }
 
+    // Deletes a wizard from the specified slot
     private void onDeleteSlot(int slot) {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Delete Wizard");
@@ -396,6 +410,7 @@ public class ProfileController {
         confirm.setContentText("This will erase all progress. This cannot be undone.");
         styleDialog(confirm);
 
+        // Show the confirmation dialog and wait for user input
         confirm.showAndWait().ifPresent(btn -> {
             if (btn == ButtonType.OK) {
                 ProfileManager.deleteSlot(slot);
@@ -407,12 +422,14 @@ public class ProfileController {
         });
     }
 
+    // Styles the dialog box to match the game's theme
     private void styleDialog(Dialog<?> dialog) {
         dialog.getDialogPane().setStyle(
                 "-fx-background-color: #1a1a2e;" +
                         "-fx-font-family: 'Georgia';");
     }
 
+    // Returns the idle style for a wizard card
     private String idleCardStyle() {
         return "-fx-background-color: #12151e;" +
                 "-fx-background-radius: 0;" +
@@ -422,6 +439,8 @@ public class ProfileController {
                 "-fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.6), 0, 0.0, 6, 6);" +
                 "-fx-cursor: hand;";
     }
+
+    // Returns the hover style for a wizard card
     private String hoverCardStyle() {
         return "-fx-background-color: #12151e;" +
                 "-fx-background-radius: 0;" +
@@ -431,6 +450,8 @@ public class ProfileController {
                 "-fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.6), 0, 0.0, 6, 6);" +
                 "-fx-cursor: hand;";
     }
+
+    // Returns the selected style for a wizard card
     private String selectedCardStyle() {
         return "-fx-background-color: #12151e;" +
                 "-fx-background-radius: 0;" +
@@ -440,6 +461,8 @@ public class ProfileController {
                 "-fx-effect: dropshadow(one-pass-box, #e2b96f, 0, 0.0, 6, 6);" +
                 "-fx-cursor: hand;";
     }
+
+    // Returns the empty style for a wizard card
     private String emptyCardStyle() {
         return "-fx-background-color: #0b0c10;" +
                 "-fx-background-radius: 0;" +
@@ -450,6 +473,8 @@ public class ProfileController {
                 "-fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.4), 0, 0.0, 6, 6);" +
                 "-fx-cursor: hand;";
     }
+
+    // Returns the empty hover style for a wizard card
     private String emptyHoverCardStyle() {
         return "-fx-background-color: #12151e;" +
                 "-fx-background-radius: 0;" +

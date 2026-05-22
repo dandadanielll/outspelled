@@ -12,17 +12,25 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 /**
- * Main menu (wizard theme). LAN-only: Start Game → connect; Options, Shop, Tutorial, Quit.
+ * Main menu (wizard theme). LAN-only: Start Game → connect; Options, Shop,
+ * Tutorial, Quit.
  */
 public class MenuController {
 
-    @FXML private Button startGameButton;
-    @FXML private Button optionsButton;
-    @FXML private Button shopButton;
-    @FXML private Button tutorialButton;
-    @FXML private Button quitButton;
-    @FXML private Label errorLabel;
-    @FXML private ComboBox<String> windowModeCombo;
+    @FXML
+    private Button startGameButton;
+    @FXML
+    private Button optionsButton;
+    @FXML
+    private Button shopButton;
+    @FXML
+    private Button tutorialButton;
+    @FXML
+    private Button quitButton;
+    @FXML
+    private Label errorLabel;
+    @FXML
+    private ComboBox<String> windowModeCombo;
 
     @FXML
     public void initialize() {
@@ -31,15 +39,24 @@ public class MenuController {
             windowModeCombo.setItems(FXCollections.observableArrayList(
                     "Windowed", "Windowed Fullscreen", "Fullscreen"));
             switch (Main.getWindowMode()) {
-                case WINDOWED: windowModeCombo.getSelectionModel().select(0); break;
-                case WINDOWED_FULLSCREEN: windowModeCombo.getSelectionModel().select(1); break;
-                case FULLSCREEN: windowModeCombo.getSelectionModel().select(2); break;
+                case WINDOWED:
+                    windowModeCombo.getSelectionModel().select(0);
+                    break;
+                case WINDOWED_FULLSCREEN:
+                    windowModeCombo.getSelectionModel().select(1);
+                    break;
+                case FULLSCREEN:
+                    windowModeCombo.getSelectionModel().select(2);
+                    break;
             }
             windowModeCombo.setOnAction(e -> {
                 int idx = windowModeCombo.getSelectionModel().getSelectedIndex();
-                if (idx == 0) Main.setWindowMode(Main.WindowMode.WINDOWED);
-                else if (idx == 1) Main.setWindowMode(Main.WindowMode.WINDOWED_FULLSCREEN);
-                else if (idx == 2) Main.setWindowMode(Main.WindowMode.FULLSCREEN);
+                if (idx == 0)
+                    Main.setWindowMode(Main.WindowMode.WINDOWED);
+                else if (idx == 1)
+                    Main.setWindowMode(Main.WindowMode.WINDOWED_FULLSCREEN);
+                else if (idx == 2)
+                    Main.setWindowMode(Main.WindowMode.FULLSCREEN);
             });
         }
     }
@@ -54,8 +71,8 @@ public class MenuController {
     private void onPlayVsAiClicked() {
         SoundManager.playClick();
         // Create wizards and a standard AI opponent, then jump straight into the game
-        Wizard player = new Wizard("Player", 200, Wizard.WizardSkin.EMBER_MAGE, Wizard.ArenaBackground.DARK_TOWER);
-        Wizard ai = new Wizard("AI", 200, Wizard.WizardSkin.ARCANE_WIZARD, Wizard.ArenaBackground.DARK_TOWER);
+        Wizard player = new Wizard("Player", 200, Wizard.WizardSkin.EMBER_MAGE);
+        Wizard ai = new Wizard("AI", 200, Wizard.WizardSkin.ARCANE_WIZARD);
         SoloGameController.setup(player, ai, new AiOpponent(new StandardAi()));
         Main.navigateTo("solo-game-view.fxml");
     }
@@ -64,28 +81,32 @@ public class MenuController {
     private void onOptionsClicked() {
         SoundManager.playClick();
         // TODO: options/settings screen
-        if (errorLabel != null) errorLabel.setText("Options (placeholder)");
+        if (errorLabel != null)
+            errorLabel.setText("Options (placeholder)");
     }
 
     @FXML
     private void onShopClicked() {
         SoundManager.playClick();
         // Placeholder: no in-game currency yet
-        if (errorLabel != null) errorLabel.setText("Shop coming soon.");
+        if (errorLabel != null)
+            errorLabel.setText("Shop coming soon.");
     }
 
     @FXML
     private void onTutorialClicked() {
         SoundManager.playClick();
         // Placeholder
-        if (errorLabel != null) errorLabel.setText("Tutorial coming soon.");
+        if (errorLabel != null)
+            errorLabel.setText("Tutorial coming soon.");
     }
 
     @FXML
     private void onQuitClicked() {
         SoundManager.playClick();
         Stage stage = Main.getPrimaryStage();
-        if (stage != null) stage.close();
+        if (stage != null)
+            stage.close();
         Platform.exit();
     }
 }

@@ -22,29 +22,50 @@ import java.util.concurrent.TimeUnit;
 
 public class GameController implements GameEngine.GameListener {
 
-    @FXML protected Label player1NameLabel;
-    @FXML protected Label player2NameLabel;
-    @FXML protected ProgressBar player1HpBar;
-    @FXML protected ProgressBar player2HpBar;
-    @FXML protected Label player1HpLabel;
-    @FXML protected Label player2HpLabel;
-    @FXML protected Label timerLabel;
-    @FXML protected Label turnLabel;
-    @FXML protected ListView<String> battleLog;
-    @FXML protected GridPane letterGridPane;
-    @FXML protected Label selectedWordLabel;
-    @FXML protected Label feedbackLabel;
-    @FXML protected Button castButton;
-    @FXML protected Label skillCheckStatusLabel;
-    @FXML protected Rectangle wizard1Portrait;
-    @FXML protected Rectangle wizard2Portrait;
+    @FXML
+    protected Label player1NameLabel;
+    @FXML
+    protected Label player2NameLabel;
+    @FXML
+    protected ProgressBar player1HpBar;
+    @FXML
+    protected ProgressBar player2HpBar;
+    @FXML
+    protected Label player1HpLabel;
+    @FXML
+    protected Label player2HpLabel;
+    @FXML
+    protected Label timerLabel;
+    @FXML
+    protected Label turnLabel;
+    @FXML
+    protected ListView<String> battleLog;
+    @FXML
+    protected GridPane letterGridPane;
+    @FXML
+    protected Label selectedWordLabel;
+    @FXML
+    protected Label feedbackLabel;
+    @FXML
+    protected Button castButton;
+    @FXML
+    protected Label skillCheckStatusLabel;
+    @FXML
+    protected Rectangle wizard1Portrait;
+    @FXML
+    protected Rectangle wizard2Portrait;
 
     // Last Stand overlay fields
-    @FXML protected StackPane lastStandOverlay;
-    @FXML protected Label scrambledWordLabel;
-    @FXML protected Label lastStandTimerLabel;
-    @FXML protected TextField lastStandInput;
-    @FXML protected Label lastStandFeedbackLabel;
+    @FXML
+    protected StackPane lastStandOverlay;
+    @FXML
+    protected Label scrambledWordLabel;
+    @FXML
+    protected Label lastStandTimerLabel;
+    @FXML
+    protected TextField lastStandInput;
+    @FXML
+    protected Label lastStandFeedbackLabel;
 
     protected static Wizard wizard1;
     protected static Wizard wizard2;
@@ -114,10 +135,9 @@ public class GameController implements GameEngine.GameListener {
     }
 
     private Button createTileButton(LetterTile tile, int row, int col,
-                                    LetterGrid grid) {
+            LetterGrid grid) {
         Button btn = new Button(
-                String.valueOf(tile.getLetter()) + "\n" + tile.getValue()
-        );
+                String.valueOf(tile.getLetter()) + "\n" + tile.getValue());
         btn.setPrefSize(62, 62);
         btn.setStyle(tile.isSelected() ? getSelectedStyle() : getIdleStyle());
 
@@ -160,13 +180,15 @@ public class GameController implements GameEngine.GameListener {
         }
 
         if (halfHpChallengeActive) {
-            // Local: first Cast = player 1, second Cast = player 2 (grid stays enabled for both)
+            // Local: first Cast = player 1, second Cast = player 2 (grid stays enabled for
+            // both)
             Wizard toSubmit = engine.getSkillCheckManager().hasSubmittedHalfHp(wizard1) ? wizard2 : wizard1;
             engine.submitHalfHpWord(toSubmit, word);
             feedbackLabel.setText(toSubmit.getName() + " submitted. " +
-                    (engine.getSkillCheckManager().hasSubmittedHalfHp(wizard1) && engine.getSkillCheckManager().hasSubmittedHalfHp(wizard2)
-                            ? "Resolving..."
-                            : "Other player: select letters and Cast!"));
+                    (engine.getSkillCheckManager().hasSubmittedHalfHp(wizard1)
+                            && engine.getSkillCheckManager().hasSubmittedHalfHp(wizard2)
+                                    ? "Resolving..."
+                                    : "Other player: select letters and Cast!"));
             feedbackLabel.setStyle("-fx-text-fill: #a0a0c0;");
             grid.deselectAll();
             renderGrid();
@@ -225,8 +247,7 @@ public class GameController implements GameEngine.GameListener {
                         handleKeyInput(event);
                         event.consume();
                     }
-                }
-        );
+                });
     }
 
     @Override
@@ -243,8 +264,7 @@ public class GameController implements GameEngine.GameListener {
 
         updateHpBarColor(
                 caster == wizard1 ? player2HpBar : player1HpBar,
-                target.getHpPercentage()
-        );
+                target.getHpPercentage());
 
         selectedWordLabel.setText("_ _ _");
     }
@@ -320,8 +340,7 @@ public class GameController implements GameEngine.GameListener {
                         "Initiate the Half HP Challenge?\n" +
                         "Win → opponent drops to your HP level\n" +
                         "Lose → you take word damage\n\n" +
-                        "This can only be used once per match!"
-        );
+                        "This can only be used once per match!");
 
         ButtonType initiate = new ButtonType("⚔ Initiate!");
         ButtonType skip = new ButtonType("Skip");
@@ -438,8 +457,7 @@ public class GameController implements GameEngine.GameListener {
     // --- Skill Check Timer ---
 
     private void startSkillCheckTimer(Runnable onExpire) {
-        skillCheckSecondsRemaining =
-                engine.getSkillCheckManager().getSkillCheckDuration();
+        skillCheckSecondsRemaining = engine.getSkillCheckManager().getSkillCheckDuration();
 
         skillCheckTimerExecutor = Executors.newSingleThreadScheduledExecutor(r -> {
             Thread t = new Thread(r);
@@ -475,11 +493,12 @@ public class GameController implements GameEngine.GameListener {
 
     // --- Helpers ---
     protected void updatePortraitHighlight(Wizard currentPlayer) {
-        if (wizard1Portrait == null || wizard2Portrait == null) return;
+        if (wizard1Portrait == null || wizard2Portrait == null)
+            return;
 
         final double activeStrokeWidth = 6;
         final double inactiveStrokeWidth = 1.5;
-        final String activeColor = "#e2b96f";   // gold — current player
+        final String activeColor = "#e2b96f"; // gold — current player
         final String inactiveColor = "#444466"; // dim border — other player
 
         if (currentPlayer == wizard1) {
@@ -564,10 +583,9 @@ public class GameController implements GameEngine.GameListener {
             if (response == playAgain) {
                 GameController.setWizards(
                         new Wizard(wizard1.getName(), 200,
-                                wizard1.getSkin(), wizard1.getPreferredArena()),
+                                wizard1.getSkin()),
                         new Wizard(wizard2.getName(), 200,
-                                wizard2.getSkin(), wizard2.getPreferredArena())
-                );
+                                wizard2.getSkin()));
                 Main.navigateTo("game-view.fxml");
             } else {
                 Main.navigateTo("menu-view.fxml");
