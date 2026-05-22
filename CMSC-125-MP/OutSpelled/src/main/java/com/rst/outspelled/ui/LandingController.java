@@ -18,6 +18,7 @@ import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.util.Duration;
+import javafx.animation.TranslateTransition;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,9 +29,10 @@ public class LandingController {
     @FXML private ImageView backgroundImageView;
     @FXML private Pane weatherPane;
 
-    private final List<Circle> starCluster = new ArrayList<>();
-    private long lastStarUpdate = 0;
-    private boolean isTransitioning = false; // Prevents double-triggering inputs
+    //Animation Properties
+    private final List<Circle> starCluster = new ArrayList<>(); //array for every star instantiated
+    private long lastStarUpdate = 0;                            //timestamp for star updates
+    private boolean isTransitioning = false;                    // Prevents double-triggering inputs
 
     @FXML
     public void initialize() {
@@ -42,18 +44,20 @@ public class LandingController {
 
         SoundManager.startBgm("bgm.mp3");
 
+        //Setting up the background image
         java.net.URL imgUrl = LandingController.class.getResource("/assets/Landing-background.png");
         if (imgUrl != null) {
             backgroundImageView.setImage(new Image(imgUrl.toExternalForm()));
         }
 
+        //Prevent javaFX from smoothing out the pixel art
         backgroundImageView.setSmooth(false);
         backgroundImageView.fitWidthProperty().bind(rootPane.widthProperty());
         backgroundImageView.fitHeightProperty().bind(rootPane.heightProperty());
 
         setupAtmosphereEffects();
 
-        // Key Listeners
+        // Keyboard Event Listeners for spacebar and enter
         rootPane.setFocusTraversable(true);
         rootPane.setOnKeyPressed(event -> {
             switch (event.getCode()) {
@@ -66,14 +70,14 @@ public class LandingController {
             }
         });
 
-        // FIX: Run later guarantees the stage is open and window focus context is stable
+        // Forces focus onto the rootPane once the window is fully open and active
         Platform.runLater(() -> {
             rootPane.requestFocus();
         });
     }
 
     private void setupAtmosphereEffects() {
-        // Moon Glow
+        // Moon Glow Overlay
         RadialGradient moonGlowGradient = new RadialGradient(
             0, 0, 0.5, 0.5, 0.5, true, CycleMethod.NO_CYCLE,
             new Stop(0, Color.web("#fffdd0", 0.18)), 
@@ -93,9 +97,10 @@ public class LandingController {
         
         weatherPane.getChildren().add(moonGlow);
 
-        // 80 Stars
+        // Generates 80 stars 
         generateStars(80);
 
+        //Animation timer for the stars
         AnimationTimer coreGameLoop = new AnimationTimer() {
             @Override
             public void handle(long now) {
@@ -114,9 +119,13 @@ public class LandingController {
 
     private void generateStars(int count) {
         for (int i = 0; i < count; i++) {
+            //star size randomizer, makes only 25% of the stars bigger
             double radius = (Math.random() > 0.75) ? 1.5 : 1.0;
+            //setting the initial appearance of the stars
             Circle star = new Circle(radius, Color.web("#fffdd0", 0.75));
+            //randomize x and y positions
             star.layoutXProperty().bind(rootPane.widthProperty().multiply(Math.random()));
+            //limit the stars to top 38% of the screen
             star.layoutYProperty().bind(rootPane.heightProperty().multiply(Math.random() * 0.38)); 
             weatherPane.getChildren().add(star);
             starCluster.add(star);
@@ -131,10 +140,7 @@ public class LandingController {
 
         SoundManager.playClick();
         
-        FadeTransition ft = new FadeTransition(Duration.millis(450), rootPane);
-        ft.setFromValue(1.0);
-        ft.setToValue(0.0);
-        ft.setOnFinished(e -> Main.navigateTo("profile-view.fxml"));
-        ft.play();
+        // Navigate to the next view with a slide-up transition for both screens
+        Main.navigateWithSlideUpTransition("profile-view.fxml");
     }
 }
