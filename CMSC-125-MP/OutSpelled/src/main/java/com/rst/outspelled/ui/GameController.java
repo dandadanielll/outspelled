@@ -122,7 +122,6 @@ public class GameController implements GameEngine.GameListener {
         btn.setStyle(tile.isSelected() ? getSelectedStyle() : getIdleStyle());
 
         btn.setOnAction(e -> {
-            SoundManager.playKeyTap(); // tile click sound
             if (tile.isSelected()) {
                 grid.deselectTile(row, col);
                 btn.setStyle(getIdleStyle());
@@ -175,7 +174,6 @@ public class GameController implements GameEngine.GameListener {
         }
 
         setInputEnabled(false);
-        SoundManager.playClick();
         feedbackLabel.setText("Validating spell...");
         feedbackLabel.setStyle("-fx-text-fill: #a0a0c0;");
         engine.submitWord(word, grid);
@@ -183,7 +181,6 @@ public class GameController implements GameEngine.GameListener {
 
     @FXML
     private void onClearClicked() {
-        SoundManager.playClick();
         LetterGrid grid = halfHpChallengeActive && currentSharedGrid != null
                 ? currentSharedGrid
                 : engine.getCurrentGrid();
@@ -195,7 +192,6 @@ public class GameController implements GameEngine.GameListener {
 
     @FXML
     private void onShuffleClicked() {
-        SoundManager.playClick();
         if (halfHpChallengeActive) {
             feedbackLabel.setText("Can't shuffle during a skill check!");
             feedbackLabel.setStyle("-fx-text-fill: #ff6b6b;");
@@ -212,6 +208,7 @@ public class GameController implements GameEngine.GameListener {
 
     @Override
     public void onGameReady() {
+        SoundManager.startBgm("BattleMusic.wav"); // switch to battle music
         feedbackLabel.setText("Game started! " + wizard1.getName() + " goes first.");
         feedbackLabel.setStyle("-fx-text-fill: #4caf50;");
         setInputEnabled(true);
@@ -231,7 +228,7 @@ public class GameController implements GameEngine.GameListener {
 
     @Override
     public void onSpellCast(Spell spell, Wizard caster, Wizard target) {
-        SoundManager.playCast();
+        SoundManager.playCast(); // successful word launched
         String entry = getSpellEmoji(spell) + " " + spell.getSpellDescription();
         battleLog.getItems().add(0, entry);
         updateHpDisplay();
@@ -251,6 +248,7 @@ public class GameController implements GameEngine.GameListener {
 
     @Override
     public void onInvalidWord(String word) {
+        SoundManager.playInvalid(); // key_delete sound for invalid submission
         feedbackLabel.setText("\"" + word + "\" is not a valid word. Fix your spell!");
         feedbackLabel.setStyle("-fx-text-fill: #ff6b6b;");
         setInputEnabled(true);
@@ -258,8 +256,6 @@ public class GameController implements GameEngine.GameListener {
 
     @Override
     public void onPlayerDefeated(Wizard loser, Wizard winner) {
-        SoundManager.stopBgm();
-        SoundManager.playVictory();
         stopSkillCheckTimer();
         setInputEnabled(false);
         feedbackLabel.setText(winner.getName() + " wins the duel!");
@@ -338,6 +334,7 @@ public class GameController implements GameEngine.GameListener {
 
     @Override
     public void onHalfHpChallengeStart(LetterGrid sharedGrid) {
+        SoundManager.playSkillCheck();
         halfHpChallengeActive = true;
         currentSharedGrid = sharedGrid;
 
@@ -386,6 +383,7 @@ public class GameController implements GameEngine.GameListener {
 
     @Override
     public void onLastStandStart(String scrambledWord) {
+        SoundManager.playSkillCheck();
         lastStandOverlay.setVisible(true);
         scrambledWordLabel.setText(scrambledWord);
         lastStandFeedbackLabel.setText("");
@@ -549,6 +547,9 @@ public class GameController implements GameEngine.GameListener {
     }
 
     protected void showGameOverDialog(Wizard winner, Wizard loser) {
+        SoundManager.stopBgm();
+        SoundManager.playVictory(); // local 2P: play victory for the match winner
+
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Duel Over!");
         alert.setHeaderText(winner.getName() + " wins!");
@@ -586,6 +587,7 @@ public class GameController implements GameEngine.GameListener {
         if (code == javafx.scene.input.KeyCode.BACK_SPACE) {
             String currentWord = grid.getSelectedWord();
             if (!currentWord.isEmpty()) {
+                SoundManager.playKeyDelete(); // delete key sound
                 char lastChar = currentWord.charAt(currentWord.length() - 1);
                 grid.deselectLastMatchingTile(lastChar);
                 renderGrid();
@@ -612,7 +614,7 @@ public class GameController implements GameEngine.GameListener {
         if (key != null && key.length() == 1 && Character.isLetter(key.charAt(0))) {
             LetterTile matched = grid.selectFirstMatchingTile(key.charAt(0));
             if (matched != null) {
-                SoundManager.playKeyTap(); // keyboard tile select sound
+                SoundManager.playKeyTap(); // key tap for each letter selected
                 renderGrid();
                 updateSelectedWordDisplay();
             } else {

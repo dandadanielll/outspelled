@@ -26,7 +26,7 @@ public class MenuController {
 
     @FXML
     public void initialize() {
-        SoundManager.startBgm("bgm.mp3"); // start menu music
+        SoundManager.startBgm("MenuBGM.mp3"); // start menu music
         if (windowModeCombo != null) {
             windowModeCombo.setItems(FXCollections.observableArrayList(
                     "Windowed", "Windowed Fullscreen", "Fullscreen"));
@@ -53,9 +53,9 @@ public class MenuController {
     @FXML
     private void onPlayVsAiClicked() {
         SoundManager.playClick();
-        // Create wizards and a standard AI opponent, then jump straight into the game
         Wizard player = new Wizard("Player", 200, Wizard.WizardSkin.EMBER_MAGE, Wizard.ArenaBackground.DARK_TOWER);
         Wizard ai = new Wizard("AI", 200, Wizard.WizardSkin.SHADOW_SCRIBE, Wizard.ArenaBackground.DARK_TOWER);
+        // Skip the Mana Wheel for AI mode — player always goes first
         SoloGameController.setup(player, ai, new AiOpponent(new StandardAi()));
         Main.navigateTo("solo-game-view.fxml");
     }

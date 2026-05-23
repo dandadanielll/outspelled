@@ -4,6 +4,7 @@ import com.rst.outspelled.Main;
 import com.rst.outspelled.ai.AiOpponent;
 import com.rst.outspelled.model.LetterGrid;
 import com.rst.outspelled.model.Wizard;
+import com.rst.outspelled.util.SoundManager;
 import javafx.scene.control.*;
 
 // Extends from GameController and only overrides the parts that differ for singleplayer. All shared UI logic is inherited. 
@@ -80,6 +81,14 @@ public class SoloGameController extends GameController {
 
     @Override
     protected void showGameOverDialog(Wizard winner, Wizard loser) {
+        // Stop battle music, then play the appropriate fanfare for the human player
+        SoundManager.stopBgm();
+        if (winner == wizard1) {
+            SoundManager.playVictory();  // human wins
+        } else {
+            SoundManager.playDefeat();   // human loses
+        }
+
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Duel Over!");
         alert.setHeaderText(winner.getName() + " wins!");
