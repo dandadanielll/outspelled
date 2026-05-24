@@ -123,7 +123,7 @@
                 </VBox>
 
                 <!-- Center: Grid + Word + Buttons -->
-                <VBox alignment="CENTER" spacing="10" HBox.hgrow="ALWAYS">
+                <VBox alignment="BOTTOM_CENTER" spacing="10" HBox.hgrow="ALWAYS" style="-fx-padding: 0 0 10 0;">
 
                     <!-- Skill Check Status -->
                     <Label fx:id="skillCheckStatusLabel" text=""
@@ -131,59 +131,39 @@
                                   -fx-font-size: 13px;
                                   -fx-font-weight: bold;"/>
 
-                    <!-- Letter Grid -->
-                    <GridPane fx:id="letterGridPane"
-                              alignment="CENTER"
-                              hgap="6" vgap="6">
-                        <padding>
-                            <Insets top="5" bottom="5" left="5" right="5"/>
-                        </padding>
-                    </GridPane>
-
-                    <!-- Selected Word Display -->
-                    <HBox alignment="CENTER" spacing="5">
-                        <Label text="Spell:"
-                               style="-fx-text-fill: #a0a0c0; -fx-font-size: 13px;"/>
-                        <Label fx:id="selectedWordLabel" text="_ _ _"
+                    <!-- Selected Word Display (above grid) -->
+                    <HBox alignment="CENTER" spacing="5" minHeight="70" translateY="-100">
+                        <VBox.margin>
+                            <Insets bottom="-8"/>
+                        </VBox.margin>
+                        <Label fx:id="selectedWordLabel" text=""
                                style="-fx-text-fill: #e2b96f;
                                       -fx-font-size: 20px;
                                       -fx-font-weight: bold;
                                       -fx-font-family: 'Pixelify Sans';"/>
                     </HBox>
 
-                    <!-- Feedback -->
-                    <Label fx:id="feedbackLabel" text=""
-                           style="-fx-font-size: 12px; -fx-text-fill: #a0a0c0;"/>
+                    <Label fx:id="feedbackLabel" text="" visible="false" managed="false"/>
+
+                    <!-- Letter Grid -->
+                    <GridPane fx:id="letterGridPane"
+                              alignment="CENTER"
+                              hgap="1" vgap="1"
+                              maxWidth="253" maxHeight="253"
+                              style="-fx-background-color: #000000; -fx-padding: 1;">
+                    </GridPane>
 
                     <!-- Action Buttons -->
                     <HBox alignment="CENTER" spacing="10">
-                        <Button fx:id="castButton" text="✨ Cast!"
-                                onAction="#onCastClicked"
-                                style="-fx-background-color: #e2b96f;
-                                       -fx-text-fill: #1a1a2e;
-                                       -fx-font-size: 14px;
-                                       -fx-font-weight: bold;
-                                       -fx-padding: 10 25 10 25;
-                                       -fx-background-radius: 6;
-                                       -fx-cursor: hand;"/>
                         <Button text="↺ Clear"
                                 onAction="#onClearClicked"
-                                style="-fx-background-color: transparent;
-                                       -fx-text-fill: #a0a0c0;
-                                       -fx-font-size: 13px;
-                                       -fx-border-color: #a0a0c0;
-                                       -fx-border-radius: 5;
-                                       -fx-padding: 8 18 8 18;
-                                       -fx-cursor: hand;"/>
-                        <Button text="🔀 Shuffle (Space)"
+                                styleClass="action-btn-secondary"/>
+                        <Button fx:id="castButton" text="✨ Cast!"
+                                onAction="#onCastClicked"
+                                styleClass="action-btn-primary"/>
+                        <Button text="🔀 Shuffle"
                                 onAction="#onShuffleClicked"
-                                style="-fx-background-color: transparent;
-                                       -fx-text-fill: #a0a0c0;
-                                       -fx-font-size: 13px;
-                                       -fx-border-color: #a0a0c0;
-                                       -fx-border-radius: 5;
-                                       -fx-padding: 8 18 8 18;
-                                       -fx-cursor: hand;"/>
+                                styleClass="action-btn-secondary"/>
                     </HBox>
 
                     <!-- Battle Log -->

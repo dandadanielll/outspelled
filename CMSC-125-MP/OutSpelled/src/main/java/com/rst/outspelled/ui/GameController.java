@@ -215,18 +215,66 @@ public class GameController implements GameEngine.GameListener {
 
     private Button createTileButton(LetterTile tile, int row, int col,
             LetterGrid grid) {
-        Button btn = new Button(
-                String.valueOf(tile.getLetter()) + "\n" + tile.getValue());
+        Button btn = new Button();
         btn.setPrefSize(62, 62);
-        btn.setStyle(tile.isSelected() ? getSelectedStyle() : getIdleStyle());
+        btn.setMinSize(62, 62);
+        btn.setMaxSize(62, 62);
+
+        StackPane graphicPane = new StackPane();
+        graphicPane.setPrefSize(58, 58);
+        graphicPane.setMinSize(58, 58);
+        graphicPane.setMaxSize(58, 58);
+
+        Label letterLabel = new Label(String.valueOf(tile.getLetter()));
+        letterLabel.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 24px; -fx-font-weight: bold;");
+
+        Label valueLabel = new Label(String.valueOf(tile.getValue()));
+        valueLabel.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 9px; -fx-font-weight: bold;");
+
+        graphicPane.getChildren().addAll(letterLabel, valueLabel);
+        StackPane.setAlignment(letterLabel, javafx.geometry.Pos.CENTER);
+        StackPane.setAlignment(valueLabel, javafx.geometry.Pos.BOTTOM_RIGHT);
+        valueLabel.setTranslateX(-2);
+        valueLabel.setTranslateY(-1);
+
+        btn.setGraphic(graphicPane);
+
+        java.util.function.Consumer<String> updateColors = (state) -> {
+            if ("selected".equals(state)) {
+                btn.setStyle(getSelectedStyle());
+                letterLabel.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1a1000;");
+                valueLabel.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 9px; -fx-font-weight: bold; -fx-text-fill: rgba(26, 16, 0, 0.65);");
+            } else if ("hover".equals(state)) {
+                btn.setStyle(getHoverStyle());
+                letterLabel.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #ffffff;");
+                valueLabel.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 9px; -fx-font-weight: bold; -fx-text-fill: rgba(255, 255, 255, 0.65);");
+            } else {
+                btn.setStyle(getIdleStyle());
+                letterLabel.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #e2b96f;");
+                valueLabel.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 9px; -fx-font-weight: bold; -fx-text-fill: rgba(226, 185, 111, 0.65);");
+            }
+        };
+
+        updateColors.accept(tile.isSelected() ? "selected" : "idle");
+
+        btn.setOnMouseEntered(e -> {
+            if (!tile.isSelected() && !btn.isDisabled()) {
+                updateColors.accept("hover");
+            }
+        });
+        btn.setOnMouseExited(e -> {
+            if (!btn.isDisabled()) {
+                updateColors.accept(tile.isSelected() ? "selected" : "idle");
+            }
+        });
 
         btn.setOnAction(e -> {
             if (tile.isSelected()) {
                 grid.deselectTile(row, col);
-                btn.setStyle(getIdleStyle());
+                updateColors.accept(btn.isHover() ? "hover" : "idle");
             } else if (tile.isIdle()) {
                 grid.selectTile(row, col);
-                btn.setStyle(getSelectedStyle());
+                updateColors.accept("selected");
             }
             updateSelectedWordDisplay();
         });
@@ -239,7 +287,64 @@ public class GameController implements GameEngine.GameListener {
                 ? currentSharedGrid
                 : engine.getCurrentGrid();
         String word = grid.getSelectedWord();
-        selectedWordLabel.setText(word.isEmpty() ? "_ _ _" : word);
+        
+        if (word.isEmpty()) {
+            selectedWordLabel.setText("");
+            selectedWordLabel.setGraphic(null);
+        } else {
+            javafx.scene.layout.HBox tiles = new javafx.scene.layout.HBox(4);
+            tiles.setAlignment(javafx.geometry.Pos.CENTER);
+            
+            for (int i = 0; i < word.length(); i++) {
+                char letter = word.charAt(i);
+                int points = 1;
+                for (int r = 0; r < grid.getRows(); r++) {
+                    for (int c = 0; c < grid.getCols(); c++) {
+                        LetterTile t = grid.getTile(r, c);
+                        if (t.getLetter() == letter) {
+                            points = t.getValue();
+                            break;
+                        }
+                    }
+                }
+                
+                StackPane tile = new StackPane();
+                tile.setPrefSize(56, 62);
+                tile.setMinSize(56, 62);
+                tile.setMaxSize(56, 62);
+                tile.setStyle("-fx-background-color: linear-gradient(to bottom, #ffe9a0 0%, #ffe9a0 3px, #f0c040 3px, #e8a828 100%); " +
+                              "-fx-background-insets: 0; " +
+                              "-fx-background-radius: 0; " +
+                              "-fx-border-color: #fff5c0 #c09030 #c09030 #fff5c0; " +
+                              "-fx-border-width: 2px; " +
+                              "-fx-border-radius: 0; " +
+                              "-fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.35), 0, 0.0, 2, 2);");
+                
+                Label letterLbl = new Label(String.valueOf(letter));
+                letterLbl.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1a1000;");
+                
+                Label valueLbl = new Label(String.valueOf(points));
+                valueLbl.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 8px; -fx-font-weight: bold; -fx-text-fill: rgba(26, 16, 0, 0.65);");
+                
+                tile.getChildren().addAll(letterLbl, valueLbl);
+                StackPane.setAlignment(letterLbl, javafx.geometry.Pos.CENTER);
+                StackPane.setAlignment(valueLbl, javafx.geometry.Pos.BOTTOM_RIGHT);
+                valueLbl.setTranslateX(-3);
+                valueLbl.setTranslateY(-2);
+                
+                tiles.getChildren().add(tile);
+            }
+            selectedWordLabel.setText("");
+            selectedWordLabel.setGraphic(tiles);
+            
+            for (int i = 0; i < tiles.getChildren().size(); i++) {
+                javafx.scene.Node n = tiles.getChildren().get(i);
+                javafx.animation.TranslateTransition tt = new javafx.animation.TranslateTransition(Duration.millis(300), n);
+                tt.setFromY(6);
+                tt.setToY(0);
+                tt.play();
+            }
+        }
     }
 
     // --- Button Actions ---
@@ -342,7 +447,8 @@ public class GameController implements GameEngine.GameListener {
                 caster == wizard1 ? player2HpBar : player1HpBar,
                 target.getHpPercentage());
 
-        selectedWordLabel.setText("_ _ _");
+        selectedWordLabel.setText("");
+        selectedWordLabel.setGraphic(null);
     }
 
     @Override
@@ -374,7 +480,8 @@ public class GameController implements GameEngine.GameListener {
         setInputEnabled(true);
         renderGrid();
         updatePortraitHighlight(currentPlayer);
-        selectedWordLabel.setText("_ _ _");
+        selectedWordLabel.setText("");
+        selectedWordLabel.setGraphic(null);
         skillCheckStatusLabel.setText("");
         feedbackLabel.setText(currentPlayer.getName()
                 + "'s turn — select your letters!");
@@ -445,7 +552,8 @@ public class GameController implements GameEngine.GameListener {
                 "-fx-text-fill: #ff6b6b; -fx-font-size: 30px; -fx-font-weight: bold;");
 
         renderSharedGrid(sharedGrid);
-        selectedWordLabel.setText("_ _ _");
+        selectedWordLabel.setText("");
+        selectedWordLabel.setGraphic(null);
         feedbackLabel.setText("Select letters and cast your best spell!");
         feedbackLabel.setStyle("-fx-text-fill: #e2b96f;");
         setInputEnabled(true);
@@ -616,25 +724,48 @@ public class GameController implements GameEngine.GameListener {
     }
 
     protected String getIdleStyle() {
-        return "-fx-background-color: #2a2a4a;" +
+        return "-fx-background-color: linear-gradient(to bottom, #424266 0%, #424266 3px, #2a2a4a 3px, #1a1a30 100%);" +
+                "-fx-background-insets: 0;" +
+                "-fx-background-radius: 0;" +
+                "-fx-border-color: #555588 #1a1a2a #1a1a2a #555588;" +
+                "-fx-border-width: 2px;" +
+                "-fx-border-radius: 0;" +
                 "-fx-text-fill: #e2b96f;" +
+                "-fx-font-family: 'Pixelify Sans';" +
                 "-fx-font-size: 14px;" +
                 "-fx-font-weight: bold;" +
-                "-fx-border-color: #444466;" +
-                "-fx-border-radius: 6;" +
-                "-fx-background-radius: 6;" +
-                "-fx-cursor: hand;";
+                "-fx-cursor: hand;" +
+                "-fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.55), 0, 0.0, 2, 2);";
+    }
+
+    protected String getHoverStyle() {
+        return "-fx-background-color: linear-gradient(to bottom, #50507d 0%, #50507d 3px, #33335c 3px, #202042 100%);" +
+                "-fx-background-insets: 0;" +
+                "-fx-background-radius: 0;" +
+                "-fx-border-color: #6e6eab #222238 #222238 #6e6eab;" +
+                "-fx-border-width: 2px;" +
+                "-fx-border-radius: 0;" +
+                "-fx-text-fill: #ffffff;" +
+                "-fx-font-family: 'Pixelify Sans';" +
+                "-fx-font-size: 14px;" +
+                "-fx-font-weight: bold;" +
+                "-fx-cursor: hand;" +
+                "-fx-effect: dropshadow(three-pass-box, rgba(110,110,180,0.18), 6, 0.1, 0, 0);";
     }
 
     protected String getSelectedStyle() {
-        return "-fx-background-color: #e2b96f;" +
-                "-fx-text-fill: #1a1a2e;" +
+        return "-fx-background-color: linear-gradient(to bottom, #ffe9a0 0%, #ffe9a0 3px, #f0c040 3px, #e8a828 100%);" +
+                "-fx-background-insets: 0;" +
+                "-fx-background-radius: 0;" +
+                "-fx-border-color: #fff5c0 #c09030 #c09030 #fff5c0;" +
+                "-fx-border-width: 2px;" +
+                "-fx-border-radius: 0;" +
+                "-fx-text-fill: #1a1000;" +
+                "-fx-font-family: 'Pixelify Sans';" +
                 "-fx-font-size: 14px;" +
                 "-fx-font-weight: bold;" +
-                "-fx-border-color: #ffffff;" +
-                "-fx-border-radius: 6;" +
-                "-fx-background-radius: 6;" +
-                "-fx-cursor: hand;";
+                "-fx-cursor: hand;" +
+                "-fx-effect: dropshadow(three-pass-box, rgba(255,200,60,0.22), 6, 0.1, 0, 0);";
     }
 
     protected String getSpellEmoji(Spell spell) {

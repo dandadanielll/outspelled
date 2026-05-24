@@ -220,22 +220,82 @@ public class NetworkGameController {
     }
 
     private Button createTileButton(LetterTile tile, int row, int col, boolean isOpponentSelected) {
-        Button btn = new Button(String.valueOf(tile.getLetter()) + "\n" + tile.getValue());
+        Button btn = new Button();
         btn.setPrefSize(62, 62);
+        btn.setMinSize(62, 62);
+        btn.setMaxSize(62, 62);
+
+        StackPane graphicPane = new StackPane();
+        graphicPane.setPrefSize(58, 58);
+        graphicPane.setMinSize(58, 58);
+        graphicPane.setMaxSize(58, 58);
+
+        Label letterLabel = new Label(String.valueOf(tile.getLetter()));
+        letterLabel.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 24px; -fx-font-weight: bold;");
+
+        Label valueLabel = new Label(String.valueOf(tile.getValue()));
+        valueLabel.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 9px; -fx-font-weight: bold;");
+
+        graphicPane.getChildren().addAll(letterLabel, valueLabel);
+        StackPane.setAlignment(letterLabel, javafx.geometry.Pos.CENTER);
+        StackPane.setAlignment(valueLabel, javafx.geometry.Pos.BOTTOM_RIGHT);
+        valueLabel.setTranslateX(-2);
+        valueLabel.setTranslateY(-1);
+
+        btn.setGraphic(graphicPane);
+
+        java.util.function.Consumer<String> updateColors = (state) -> {
+            if ("selected".equals(state)) {
+                btn.setStyle(getSelectedStyle());
+                letterLabel.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1a1000;");
+                valueLabel.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 9px; -fx-font-weight: bold; -fx-text-fill: rgba(26, 16, 0, 0.65);");
+            } else if ("opponentSelected".equals(state)) {
+                btn.setStyle(getOpponentSelectedStyle());
+                letterLabel.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #e0d0f0;");
+                valueLabel.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 9px; -fx-font-weight: bold; -fx-text-fill: rgba(224, 208, 240, 0.65);");
+            } else if ("hover".equals(state)) {
+                btn.setStyle(getHoverStyle());
+                letterLabel.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #ffffff;");
+                valueLabel.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 9px; -fx-font-weight: bold; -fx-text-fill: rgba(255, 255, 255, 0.65);");
+            } else {
+                btn.setStyle(getIdleStyle());
+                letterLabel.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #e2b96f;");
+                valueLabel.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 9px; -fx-font-weight: bold; -fx-text-fill: rgba(226, 185, 111, 0.65);");
+            }
+        };
+
         if (tile.isSelected()) {
-            btn.setStyle(getSelectedStyle());
+            updateColors.accept("selected");
         } else if (isOpponentSelected) {
-            btn.setStyle(getOpponentSelectedStyle());
+            updateColors.accept("opponentSelected");
         } else {
-            btn.setStyle(getIdleStyle());
+            updateColors.accept("idle");
         }
+
+        btn.setOnMouseEntered(e -> {
+            if (!tile.isSelected() && !isOpponentSelected && !btn.isDisabled()) {
+                updateColors.accept("hover");
+            }
+        });
+        btn.setOnMouseExited(e -> {
+            if (!btn.isDisabled()) {
+                if (tile.isSelected()) {
+                    updateColors.accept("selected");
+                } else if (isOpponentSelected) {
+                    updateColors.accept("opponentSelected");
+                } else {
+                    updateColors.accept("idle");
+                }
+            }
+        });
+
         btn.setOnAction(e -> {
             if (tile.isSelected()) {
                 letterGrid.deselectTile(row, col);
-                btn.setStyle(getIdleStyle());
+                updateColors.accept(btn.isHover() ? "hover" : "idle");
             } else if (tile.isIdle() && !isOpponentSelected) {
                 letterGrid.selectTile(row, col);
-                btn.setStyle(getSelectedStyle());
+                updateColors.accept("selected");
             }
             updateSelectedWordDisplay();
         });
@@ -243,18 +303,63 @@ public class NetworkGameController {
     }
 
     private static String getIdleStyle() {
-        return "-fx-background-color: #2a2a4a; -fx-text-fill: #e2b96f; -fx-font-size: 14px; -fx-font-weight: bold;"
-                + " -fx-border-color: #444466; -fx-border-radius: 6; -fx-background-radius: 6; -fx-cursor: hand;";
+        return "-fx-background-color: linear-gradient(to bottom, #424266 0%, #424266 3px, #2a2a4a 3px, #1a1a30 100%);"
+                + "-fx-background-insets: 0;"
+                + "-fx-background-radius: 0;"
+                + "-fx-border-color: #555588 #1a1a2a #1a1a2a #555588;"
+                + "-fx-border-width: 2px;"
+                + "-fx-border-radius: 0;"
+                + "-fx-text-fill: #e2b96f;"
+                + "-fx-font-family: 'Pixelify Sans';"
+                + "-fx-font-size: 14px;"
+                + "-fx-font-weight: bold;"
+                + "-fx-cursor: hand;"
+                + "-fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.55), 0, 0.0, 2, 2);";
+    }
+
+    private static String getHoverStyle() {
+        return "-fx-background-color: linear-gradient(to bottom, #50507d 0%, #50507d 3px, #33335c 3px, #202042 100%);"
+                + "-fx-background-insets: 0;"
+                + "-fx-background-radius: 0;"
+                + "-fx-border-color: #6e6eab #222238 #222238 #6e6eab;"
+                + "-fx-border-width: 2px;"
+                + "-fx-border-radius: 0;"
+                + "-fx-text-fill: #ffffff;"
+                + "-fx-font-family: 'Pixelify Sans';"
+                + "-fx-font-size: 14px;"
+                + "-fx-font-weight: bold;"
+                + "-fx-cursor: hand;"
+                + "-fx-effect: dropshadow(three-pass-box, rgba(110,110,180,0.18), 6, 0.1, 0, 0);";
     }
 
     private static String getSelectedStyle() {
-        return "-fx-background-color: #e2b96f; -fx-text-fill: #1a1a2e; -fx-font-size: 14px; -fx-font-weight: bold;"
-                + " -fx-border-color: #ffffff; -fx-border-radius: 6; -fx-background-radius: 6; -fx-cursor: hand;";
+        return "-fx-background-color: linear-gradient(to bottom, #ffe9a0 0%, #ffe9a0 3px, #f0c040 3px, #e8a828 100%);"
+                + "-fx-background-insets: 0;"
+                + "-fx-background-radius: 0;"
+                + "-fx-border-color: #fff5c0 #c09030 #c09030 #fff5c0;"
+                + "-fx-border-width: 2px;"
+                + "-fx-border-radius: 0;"
+                + "-fx-text-fill: #1a1000;"
+                + "-fx-font-family: 'Pixelify Sans';"
+                + "-fx-font-size: 14px;"
+                + "-fx-font-weight: bold;"
+                + "-fx-cursor: hand;"
+                + "-fx-effect: dropshadow(three-pass-box, rgba(255,200,60,0.22), 6, 0.1, 0, 0);";
     }
 
     private static String getOpponentSelectedStyle() {
-        return "-fx-background-color: #4a2a6a; -fx-text-fill: #a0a0c0; -fx-font-size: 14px; -fx-font-weight: bold;"
-                + " -fx-border-color: #664488; -fx-border-radius: 6; -fx-background-radius: 6; -fx-cursor: default;";
+        return "-fx-background-color: linear-gradient(to bottom, #8060a0 0%, #8060a0 3px, #5a3a7a 3px, #3a1a5a 100%);"
+                + "-fx-background-insets: 0;"
+                + "-fx-background-radius: 0;"
+                + "-fx-border-color: #a080c0 #2a1040 #2a1040 #a080c0;"
+                + "-fx-border-width: 2px;"
+                + "-fx-border-radius: 0;"
+                + "-fx-text-fill: #e0d0f0;"
+                + "-fx-font-family: 'Pixelify Sans';"
+                + "-fx-font-size: 14px;"
+                + "-fx-font-weight: bold;"
+                + "-fx-cursor: default;"
+                + "-fx-effect: dropshadow(three-pass-box, rgba(160,80,200,0.25), 6, 0.1, 0, 0);";
     }
 
     private void buildHearts() {
@@ -313,10 +418,46 @@ public class NetworkGameController {
         if (floatingLettersPane == null) return;
         floatingLettersPane.getChildren().clear();
         if (word == null || word.isEmpty()) return;
-        for (char c : word.toUpperCase().toCharArray()) {
-            Label l = new Label(String.valueOf(c));
-            l.setStyle("-fx-text-fill: #e2b96f; -fx-font-size: 28px; -fx-font-weight: bold; -fx-background-color: #2a2a4a; -fx-padding: 8 12; -fx-border-color: #444466; -fx-border-radius: 6;");
-            floatingLettersPane.getChildren().add(l);
+        for (int i = 0; i < word.length(); i++) {
+            char letter = word.charAt(i);
+            int points = 1;
+            if (letterGrid != null) {
+                for (int r = 0; r < letterGrid.getRows(); r++) {
+                    for (int c = 0; c < letterGrid.getCols(); c++) {
+                        LetterTile t = letterGrid.getTile(r, c);
+                        if (t.getLetter() == letter) {
+                            points = t.getValue();
+                            break;
+                        }
+                    }
+                }
+            }
+
+            StackPane tile = new StackPane();
+            tile.setPrefSize(56, 62);
+            tile.setMinSize(56, 62);
+            tile.setMaxSize(56, 62);
+            tile.setStyle("-fx-background-color: linear-gradient(to bottom, #ffe9a0 0%, #ffe9a0 3px, #f0c040 3px, #e8a828 100%); " +
+                          "-fx-background-insets: 0; " +
+                          "-fx-background-radius: 0; " +
+                          "-fx-border-color: #fff5c0 #c09030 #c09030 #fff5c0; " +
+                          "-fx-border-width: 2px; " +
+                          "-fx-border-radius: 0; " +
+                          "-fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.35), 0, 0.0, 2, 2);");
+
+            Label letterLbl = new Label(String.valueOf(letter));
+            letterLbl.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1a1000;");
+
+            Label valueLbl = new Label(String.valueOf(points));
+            valueLbl.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 8px; -fx-font-weight: bold; -fx-text-fill: rgba(26, 16, 0, 0.65);");
+
+            tile.getChildren().addAll(letterLbl, valueLbl);
+            StackPane.setAlignment(letterLbl, javafx.geometry.Pos.CENTER);
+            StackPane.setAlignment(valueLbl, javafx.geometry.Pos.BOTTOM_RIGHT);
+            valueLbl.setTranslateX(-3);
+            valueLbl.setTranslateY(-2);
+
+            floatingLettersPane.getChildren().add(tile);
         }
         startFloatingAnimation();
     }
