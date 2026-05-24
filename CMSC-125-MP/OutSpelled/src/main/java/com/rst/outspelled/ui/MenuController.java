@@ -88,7 +88,11 @@ public class MenuController {
 
     private void onPlayVsAiClicked() {
         SoundManager.playClick();
-        Wizard player = new Wizard("Player", 200, Wizard.WizardSkin.ARCANE_WIZARD);
+        Wizard active = com.rst.outspelled.network.SessionManager.getActiveWizard();
+        String playerName = (active != null) ? active.getName() : "Player";
+        Wizard.WizardSkin playerSkin = (active != null) ? active.getSkin() : Wizard.WizardSkin.ARCANE_WIZARD;
+
+        Wizard player = new Wizard(playerName, 200, playerSkin);
         Wizard ai = new Wizard("AI", 200, Wizard.WizardSkin.ARCANE_WIZARD);
         SoloGameController.setup(player, ai, new AiOpponent(new StandardAi()));
         Main.navigateTo("solo-game-view.fxml");

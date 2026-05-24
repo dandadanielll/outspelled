@@ -168,3 +168,55 @@
     -fx-padding: 0;
     -fx-background-color: #0d0f18;
 }
+
+/* ==========================================
+   RETRO PIXEL HEALTH BARS
+   ========================================== */
+.progress-bar,
+.pixel-hp-bar {
+    -fx-background-color: #3e3e3e, #111111;
+    /* Outer dark gray, inner black border */
+    -fx-background-insets: 0, 3;
+    -fx-background-radius: 0;
+    -fx-padding: 6;
+    /* padding keeps the track inside the border */
+    -fx-pref-height: 28px;
+    -fx-min-height: 28px;
+    -fx-max-height: 28px;
+    -fx-effect: dropshadow(two-pass-box, rgba(0, 0, 0, 0.8), 0, 0, 5, 5);
+    /* Crisp, blocky pixel drop shadow */
+}
+
+.progress-bar .track,
+.pixel-hp-bar .track {
+    -fx-background-color: #1a1a1a;
+    /* Empty HP slot background */
+    -fx-background-radius: 0;
+    -fx-background-insets: 0;
+}
+
+.progress-bar .bar,
+.pixel-hp-bar .bar {
+    -fx-background-radius: 0;
+    -fx-background-insets: 0;
+    -fx-background-color: linear-gradient(to bottom,
+            derive(-fx-accent, 60%) 0%,
+            derive(-fx-accent, 60%) 15%,
+            -fx-accent 15%,
+            -fx-accent 75%,
+            derive(-fx-accent, -35%) 75%,
+            derive(-fx-accent, -35%) 100%);
+}
+
+/* ==========================================
+   GLOBAL RETRO TYPOGRAPHY CONSISTENCY
+   ========================================== */
+.root,
+.button,
+.label,
+.text-field,
+.list-cell,
+.list-view,
+.dialog-pane {
+    -fx-font-family: 'Pixelify Sans';
+}
