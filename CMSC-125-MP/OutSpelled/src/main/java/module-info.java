@@ -9,6 +9,8 @@ module com.rst.outspelled {
     requires com.almasb.fxgl.all;
 
     requires java.prefs;
+    requires org.apache.lucene.analysis.common;
+    requires org.apache.lucene.core;
 
     opens com.rst.outspelled to javafx.fxml;
     opens com.rst.outspelled.ui to javafx.fxml;
