@@ -1,15 +1,64 @@
+/* Profile screen brick background */
+.profile-root {
+    -fx-background-image: url('dungeon-brick.png');
+    -fx-background-repeat: repeat;
+    -fx-background-size: auto;
+}
+
 @font-face {
     font-family: 'PixelFont';
     src: url('fonts/PixelifySans-VariableFont_wght.ttf');
 }
 
+/* Base Pixel Font */
 .pixel-font {
     -fx-font-family: 'Pixelify Sans';
 }
 
-.profile-root {
-    -fx-background-image: url('dungeon-brick.png');
-    -fx-background-repeat: repeat;
-    -fx-background-size: auto;
-    -fx-background-color: #1a1a2e;
+/* Arrow Buttons — these are still real Button nodes inside the cards */
+.arrow-button {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent;
+    -fx-text-fill: #e2b96f;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.arrow-button:hover {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-text-fill: #ffffff;
+}
+
+.arrow-button:pressed,
+.arrow-button:armed {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-text-fill: #c9a050;
+}
+
+.arrow-left {
+    -fx-padding: 0 12 0 0;
+}
+
+.arrow-right {
+    -fx-padding: 0 0 0 12;
+}
+
+/* Status Label color classes */
+.status-success {
+    -fx-text-fill: #4caf50;
+    -fx-font-size: 13px;
+}
+
+.status-error {
+    -fx-text-fill: #ff6b6b;
+    -fx-font-size: 13px;
+}
+
+.status-neutral {
+    -fx-text-fill: #a0a0c0;
+    -fx-font-size: 13px;
 }
