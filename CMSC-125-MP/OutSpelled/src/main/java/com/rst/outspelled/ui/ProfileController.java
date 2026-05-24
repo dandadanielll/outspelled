@@ -448,7 +448,7 @@ public class ProfileController {
         Wizard w = profiles.get(selectedSlot);
         SessionManager.setMyName(w.getName());
         SessionManager.setActiveProfile(selectedSlot, w);
-        Main.navigateTo("menu-view.fxml");
+        Main.navigateWithSlideLeftTransition("menu-view.fxml");
     }
 
     // Creator Action

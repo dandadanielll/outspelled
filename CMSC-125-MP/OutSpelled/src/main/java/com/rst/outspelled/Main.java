@@ -172,6 +172,126 @@ public class Main extends Application {
         }
     }
 
+    // navigates to the next screen with a slide-left transition for both the
+    // current
+    // and new screen
+    public static void navigateWithSlideLeftTransition(String fxmlFile) {
+        try {
+            String path = fxmlFile.startsWith("/") ? fxmlFile : "/com/rst/outspelled/" + fxmlFile;
+            java.net.URL location = Main.class.getResource(path);
+
+            if (location == null) {
+                throw new IOException("FXML resource not found: " + path);
+            }
+
+            FXMLLoader loader = new FXMLLoader(location);
+            javafx.scene.Parent newRoot = loader.load();
+
+            Scene currentScene = primaryStage.getScene();
+            if (currentScene != null && currentScene.getRoot() != null) {
+                javafx.scene.Parent currentRoot = currentScene.getRoot();
+
+                // Temporary container to hold both scenes during the transition
+                javafx.scene.layout.StackPane transitionContainer = new javafx.scene.layout.StackPane();
+                transitionContainer.getChildren().addAll(currentRoot, newRoot);
+
+                double sceneWidth = currentScene.getWidth() > 0 ? currentScene.getWidth() : WINDOWED_WIDTH;
+
+                // Start the new scene exactly to the right of the current screen
+                newRoot.setTranslateX(sceneWidth);
+
+                // Replace the scene's root with our transition container
+                currentScene.setRoot(transitionContainer);
+
+                // Animate old screen moving left (out of view)
+                javafx.animation.TranslateTransition slideOut = new javafx.animation.TranslateTransition(
+                        javafx.util.Duration.millis(1500), currentRoot);
+                slideOut.setByX(-sceneWidth);
+                slideOut.setInterpolator(javafx.animation.Interpolator.EASE_OUT);
+
+                // Animate new screen moving left (into view)
+                javafx.animation.TranslateTransition slideIn = new javafx.animation.TranslateTransition(
+                        javafx.util.Duration.millis(1500), newRoot);
+                slideIn.setByX(-sceneWidth);
+                slideIn.setInterpolator(javafx.animation.Interpolator.EASE_OUT);
+
+                slideIn.setOnFinished(e -> {
+                    // Reset properties and lock in the new scene
+                    newRoot.setTranslateX(0);
+                    currentScene.setRoot(newRoot);
+                });
+
+                slideOut.play();
+                slideIn.play();
+            } else {
+                Scene scene = new Scene(newRoot);
+                primaryStage.setScene(scene);
+            }
+        } catch (IOException e) {
+            System.err.println("Failed to load " + fxmlFile + ": " + e.getMessage());
+        }
+    }
+
+    // navigates to the next screen with a slide-right transition for both the
+    // current
+    // and new screen
+    public static void navigateWithSlideRightTransition(String fxmlFile) {
+        try {
+            String path = fxmlFile.startsWith("/") ? fxmlFile : "/com/rst/outspelled/" + fxmlFile;
+            java.net.URL location = Main.class.getResource(path);
+
+            if (location == null) {
+                throw new IOException("FXML resource not found: " + path);
+            }
+
+            FXMLLoader loader = new FXMLLoader(location);
+            javafx.scene.Parent newRoot = loader.load();
+
+            Scene currentScene = primaryStage.getScene();
+            if (currentScene != null && currentScene.getRoot() != null) {
+                javafx.scene.Parent currentRoot = currentScene.getRoot();
+
+                // Temporary container to hold both scenes during the transition
+                javafx.scene.layout.StackPane transitionContainer = new javafx.scene.layout.StackPane();
+                transitionContainer.getChildren().addAll(currentRoot, newRoot);
+
+                double sceneWidth = currentScene.getWidth() > 0 ? currentScene.getWidth() : WINDOWED_WIDTH;
+
+                // Start the new scene exactly to the left of the current screen
+                newRoot.setTranslateX(-sceneWidth);
+
+                // Replace the scene's root with our transition container
+                currentScene.setRoot(transitionContainer);
+
+                // Animate old screen moving right (out of view)
+                javafx.animation.TranslateTransition slideOut = new javafx.animation.TranslateTransition(
+                        javafx.util.Duration.millis(1500), currentRoot);
+                slideOut.setByX(sceneWidth);
+                slideOut.setInterpolator(javafx.animation.Interpolator.EASE_OUT);
+
+                // Animate new screen moving right (into view)
+                javafx.animation.TranslateTransition slideIn = new javafx.animation.TranslateTransition(
+                        javafx.util.Duration.millis(1500), newRoot);
+                slideIn.setByX(sceneWidth);
+                slideIn.setInterpolator(javafx.animation.Interpolator.EASE_OUT);
+
+                slideIn.setOnFinished(e -> {
+                    // Reset properties and lock in the new scene
+                    newRoot.setTranslateX(0);
+                    currentScene.setRoot(newRoot);
+                });
+
+                slideOut.play();
+                slideIn.play();
+            } else {
+                Scene scene = new Scene(newRoot);
+                primaryStage.setScene(scene);
+            }
+        } catch (IOException e) {
+            System.err.println("Failed to load " + fxmlFile + ": " + e.getMessage());
+        }
+    }
+
     // method for other controllers to call the window
     public static Stage getPrimaryStage() {
         return primaryStage;

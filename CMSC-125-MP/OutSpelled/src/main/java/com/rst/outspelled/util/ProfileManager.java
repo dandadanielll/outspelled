@@ -30,13 +30,13 @@ public final class ProfileManager {
         int losses = PREFS.getInt(key(slot, "losses"), 0);
 
         String skinName = PREFS.get(key(slot, "skin"),
-                Wizard.WizardSkin.EMBER_MAGE.name());
+                Wizard.WizardSkin.ARCANE_WIZARD.name());
 
         Wizard.WizardSkin skin;
         try {
             skin = Wizard.WizardSkin.valueOf(skinName);
         } catch (Exception e) {
-            skin = Wizard.WizardSkin.EMBER_MAGE;
+            skin = Wizard.WizardSkin.ARCANE_WIZARD;
         }
 
         Wizard w = new Wizard(name, 200, skin);
