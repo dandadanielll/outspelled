@@ -566,11 +566,22 @@ public class NetworkGameController {
                 instance.castButton.setDisable(true);
                 instance.letterGridPane.setDisable(true);
                 if (instance.menuButton != null) instance.menuButton.setDisable(false);
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Game Over");
-                alert.setHeaderText(winnerName + " wins!");
-                alert.showAndWait();
-                Main.navigateTo("menu-view.fxml");
+                
+                javafx.stage.Stage dialog = com.rst.outspelled.util.DialogBuilder.buildDialogStage("Game Over", 400, 250);
+                javafx.scene.control.Label headerLabel = com.rst.outspelled.util.DialogBuilder.styledDialogLabel(winnerName + " wins!");
+                javafx.scene.layout.StackPane menuBtn = com.rst.outspelled.util.DialogBuilder.buildDialogButton("Main Menu", true);
+                menuBtn.setOnMouseClicked(e -> {
+                    SoundManager.playClick();
+                    dialog.close();
+                    Main.navigateTo("menu-view.fxml");
+                });
+                javafx.scene.layout.VBox body = new javafx.scene.layout.VBox(20);
+                body.setStyle("-fx-padding: 30 24 24 24;");
+                body.setAlignment(javafx.geometry.Pos.CENTER);
+                body.getChildren().addAll(headerLabel, menuBtn);
+                javafx.scene.layout.VBox dialogRoot = com.rst.outspelled.util.DialogBuilder.buildDialogRoot("🏆 Game Over 🏆", false, body, dialog);
+                dialog.getScene().setRoot(dialogRoot);
+                dialog.showAndWait();
             }
         });
     }
@@ -644,11 +655,55 @@ public class NetworkGameController {
     }
 
     @FXML
-    private void onMenuClicked() {
-        if (client != null) {
-            client.sendDisconnect(); // Notify server so opponent gets a proper game-over.
-        }
-        SessionManager.clear();
-        Main.navigateTo("menu-view.fxml");
+    private void onOptionsClicked() {
+        SoundManager.playClick();
+        javafx.stage.Stage dialog = com.rst.outspelled.util.DialogBuilder.buildDialogStage("Settings", 400, 380);
+        javafx.scene.control.Label headerLabel = com.rst.outspelled.util.DialogBuilder.styledDialogLabel("Adjust Game Volumes");
+        headerLabel.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 13px; -fx-text-fill: #8899aa;");
+
+        javafx.scene.control.Label bgmLabel = new javafx.scene.control.Label("Background Music");
+        bgmLabel.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 14px; -fx-text-fill: #e2b96f;");
+        javafx.scene.control.Slider bgmSlider = new javafx.scene.control.Slider(0, 1.0, SoundManager.getBgmVolume());
+        bgmSlider.valueProperty().addListener((obs, oldVal, newVal) -> SoundManager.setBgmVolume(newVal.doubleValue()));
+
+        javafx.scene.control.Label sfxLabel = new javafx.scene.control.Label("Sound Effects");
+        sfxLabel.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 14px; -fx-text-fill: #e2b96f;");
+        javafx.scene.control.Slider sfxSlider = new javafx.scene.control.Slider(0, 1.0, SoundManager.getSfxVolume());
+        sfxSlider.valueProperty().addListener((obs, oldVal, newVal) -> SoundManager.setSfxVolume(newVal.doubleValue()));
+        sfxSlider.setOnMouseReleased(e -> SoundManager.playClick());
+
+        javafx.scene.layout.VBox bgmBox = new javafx.scene.layout.VBox(5, bgmLabel, bgmSlider);
+        javafx.scene.layout.VBox sfxBox = new javafx.scene.layout.VBox(5, sfxLabel, sfxSlider);
+        bgmBox.setAlignment(javafx.geometry.Pos.CENTER);
+        sfxBox.setAlignment(javafx.geometry.Pos.CENTER);
+
+        javafx.scene.layout.StackPane closeBtn = com.rst.outspelled.util.DialogBuilder.buildDialogButton("Resume", true);
+        closeBtn.setOnMouseClicked(e -> {
+            SoundManager.playClick();
+            dialog.close();
+        });
+
+        javafx.scene.layout.StackPane quitBtn = com.rst.outspelled.util.DialogBuilder.buildDialogButton("Quit to Menu", false);
+        quitBtn.setOnMouseClicked(e -> {
+            SoundManager.playClick();
+            dialog.close();
+            if (client != null) {
+                client.sendDisconnect();
+            }
+            SessionManager.clear();
+            Main.navigateTo("menu-view.fxml");
+        });
+        
+        javafx.scene.layout.HBox buttons = new javafx.scene.layout.HBox(10, closeBtn, quitBtn);
+        buttons.setAlignment(javafx.geometry.Pos.CENTER);
+
+        javafx.scene.layout.VBox body = new javafx.scene.layout.VBox(24);
+        body.setStyle("-fx-padding: 30 24 24 24;");
+        body.setAlignment(javafx.geometry.Pos.CENTER);
+        body.getChildren().addAll(headerLabel, bgmBox, sfxBox, buttons);
+
+        javafx.scene.layout.VBox dialogRoot = com.rst.outspelled.util.DialogBuilder.buildDialogRoot("⚙  Options  ⚙", false, body, dialog);
+        dialog.getScene().setRoot(dialogRoot);
+        dialog.showAndWait();
     }
 }

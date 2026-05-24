@@ -97,8 +97,52 @@ public class MenuController {
 
     private void onOptionsClicked() {
         SoundManager.playClick();
-        if (errorLabel != null)
-            errorLabel.setText("Options coming soon.");
+        showSettingsDialog();
+    }
+
+    private void showSettingsDialog() {
+        Stage dialog = buildDialogStage("Settings", 400, 320);
+
+        Label headerLabel = styledDialogLabel("Adjust Game Volumes");
+        headerLabel.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 13px; -fx-text-fill: #8899aa;");
+
+        // BGM Slider
+        Label bgmLabel = new Label("Background Music");
+        bgmLabel.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 14px; -fx-text-fill: #e2b96f;");
+        javafx.scene.control.Slider bgmSlider = new javafx.scene.control.Slider(0, 1.0, SoundManager.getBgmVolume());
+        bgmSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+            SoundManager.setBgmVolume(newVal.doubleValue());
+        });
+
+        // SFX Slider
+        Label sfxLabel = new Label("Sound Effects");
+        sfxLabel.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 14px; -fx-text-fill: #e2b96f;");
+        javafx.scene.control.Slider sfxSlider = new javafx.scene.control.Slider(0, 1.0, SoundManager.getSfxVolume());
+        sfxSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+            SoundManager.setSfxVolume(newVal.doubleValue());
+        });
+
+        sfxSlider.setOnMouseReleased(e -> SoundManager.playClick());
+
+        VBox bgmBox = new VBox(5, bgmLabel, bgmSlider);
+        VBox sfxBox = new VBox(5, sfxLabel, sfxSlider);
+        bgmBox.setAlignment(Pos.CENTER);
+        sfxBox.setAlignment(Pos.CENTER);
+
+        StackPane closeBtn = buildDialogButton("Close", true);
+        closeBtn.setOnMouseClicked(e -> {
+            SoundManager.playClick();
+            dialog.close();
+        });
+
+        VBox body = new VBox(24);
+        body.setStyle("-fx-padding: 30 24 24 24;");
+        body.setAlignment(Pos.CENTER);
+        body.getChildren().addAll(headerLabel, bgmBox, sfxBox, closeBtn);
+
+        VBox dialogRoot = buildDialogRoot("⚙  Options  ⚙", false, body, dialog);
+        dialog.getScene().setRoot(dialogRoot);
+        dialog.showAndWait();
     }
 
     private void onTutorialClicked() {
