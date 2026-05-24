@@ -56,6 +56,10 @@
                            style="-fx-text-fill: #a0a0c0; -fx-font-size: 11px;"/>
                 </VBox>
 
+                <!-- Options Button -->
+                <Button text="⚙" onAction="#onOptionsClicked"
+                        style="-fx-background-color: transparent; -fx-text-fill: #a0a0c0; -fx-font-size: 20px; -fx-cursor: hand;"/>
+
             </HBox>
         </top>
 

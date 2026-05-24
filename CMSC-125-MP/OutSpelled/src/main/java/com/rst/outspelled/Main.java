@@ -122,8 +122,6 @@ public class Main extends Application {
             }
 
             FXMLLoader loader = new FXMLLoader(location); // create fxmlLoader object
-            Scene scene = new Scene(loader.load()); // create the fxml scene
-            primaryStage.setScene(scene); // sets the window to the fxml scene created
             javafx.scene.Parent root = loader.load();
 
             if (primaryStage.getScene() == null) {

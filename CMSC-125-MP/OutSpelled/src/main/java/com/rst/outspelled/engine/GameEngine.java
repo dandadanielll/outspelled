@@ -91,6 +91,7 @@ public class GameEngine {
 
                     @Override
                     public void onHalfHpChallengeStart(LetterGrid sharedGrid) {
+                        turnManager.stopTimer();
                         Platform.runLater(() ->
                                 listener.onHalfHpChallengeStart(sharedGrid));
                     }
@@ -99,8 +100,16 @@ public class GameEngine {
                     public void onHalfHpChallengeComplete(SkillCheckResult result) {
                         Platform.runLater(() -> {
                             listener.onHalfHpChallengeComplete(result);
-                            if (state == GameState.IN_PROGRESS) {
-                                turnManager.startTurn();
+                            if (player1.isDefeated() || player2.isDefeated()) {
+                                Wizard loser = player1.isDefeated() ? player1 : player2;
+                                Wizard winner = loser == player1 ? player2 : player1;
+                                state = GameState.GAME_OVER;
+                                turnManager.shutdown();
+                                listener.onPlayerDefeated(loser, winner);
+                                winner.recordWin();
+                                loser.recordLoss();
+                            } else if (state == GameState.IN_PROGRESS) {
+                                turnManager.endTurn();
                             }
                         });
                     }
@@ -116,8 +125,9 @@ public class GameEngine {
                     public void onLastStandComplete(SkillCheckResult result) {
                         Platform.runLater(() -> {
                             listener.onLastStandComplete(result);
+                            // Last Stand does not deal damage, so nobody dies as a direct result.
                             if (state == GameState.IN_PROGRESS) {
-                                turnManager.startTurn();
+                                turnManager.endTurn();
                             }
                         });
                     }
