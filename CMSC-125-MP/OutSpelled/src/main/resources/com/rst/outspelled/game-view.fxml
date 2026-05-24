@@ -21,7 +21,7 @@
 
         <!-- TOP: HP Bars + Options -->
         <top>
-            <VBox style="-fx-background-color: transparent;">
+            <VBox style="-fx-background-color: transparent;" alignment="CENTER">
 
                 <!-- Options Row -->
                 <HBox alignment="CENTER_RIGHT"
@@ -88,7 +88,18 @@
 
                 </HBox>
 
-
+                <!-- Centered Flat Battle Log (Displays only latest action) -->
+                <ListView fx:id="battleLog"
+                          prefWidth="700" prefHeight="38"
+                          minWidth="700" minHeight="38"
+                          maxWidth="700" maxHeight="38"
+                          mouseTransparent="true"
+                          focusTraversable="false"
+                          styleClass="battle-log-flat">
+                    <VBox.margin>
+                        <Insets top="20" bottom="5"/>
+                    </VBox.margin>
+                </ListView>
 
             </VBox>
         </top>
@@ -168,11 +179,7 @@
                                        -fx-cursor: hand;"/>
                     </HBox>
 
-                    <ListView fx:id="battleLog"
-                              prefHeight="150" prefWidth="400"
-                              style="-fx-background-color: #12122a;
-                                     -fx-border-color: #2a2a4a;
-                                     -fx-border-radius: 5;"/>
+
 
                 </VBox>
 

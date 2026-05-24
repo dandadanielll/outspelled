@@ -209,6 +209,59 @@
 }
 
 /* ==========================================
+   FLAT TRANSPARENT BATTLE LOG
+   ========================================== */
+.battle-log-flat {
+    -fx-background-color: transparent !important;
+    -fx-background-insets: 0 !important;
+    -fx-padding: 0 !important;
+    -fx-border-color: transparent !important;
+    -fx-border-width: 0 !important;
+    -fx-max-height: 38px !important;
+    -fx-pref-height: 38px !important;
+    -fx-min-height: 38px !important;
+    -fx-fixed-cell-size: 38px !important;
+}
+
+.battle-log-flat .viewport {
+    -fx-background-color: transparent !important;
+}
+
+.battle-log-flat .list-cell {
+    -fx-background-color: transparent !important;
+    -fx-text-fill: #ffd54f !important; /* Premium bright gold */
+    -fx-font-size: 26px !important;
+    -fx-font-weight: bold !important;
+    -fx-alignment: CENTER !important; /* Center the action text */
+    -fx-padding: 0 !important;
+    -fx-effect: dropshadow(one-pass-box, rgba(0, 0, 0, 0.95), 0, 0, 1.5, 1.5) !important;
+}
+
+.battle-log-flat .list-cell:empty {
+    -fx-background-color: transparent !important;
+    -fx-text-fill: transparent !important;
+}
+
+.battle-log-flat .list-cell:filled:hover,
+.battle-log-flat .list-cell:filled:selected {
+    -fx-background-color: transparent !important;
+    -fx-text-fill: #ffd54f !important;
+}
+
+/* Hide scrollbars */
+.battle-log-flat .scroll-bar:horizontal,
+.battle-log-flat .scroll-bar:vertical {
+    -fx-opacity: 0 !important;
+    -fx-pref-width: 0 !important;
+    -fx-pref-height: 0 !important;
+}
+
+.battle-log-flat .placeholder {
+    -fx-background-color: transparent !important;
+    -fx-text-fill: transparent !important;
+}
+
+/* ==========================================
    GLOBAL RETRO TYPOGRAPHY CONSISTENCY
    ========================================== */
 .root,
