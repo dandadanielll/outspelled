@@ -7,13 +7,15 @@ import javafx.scene.control.ComboBox;
 
 public class CosmeticsController {
 
-    @FXML private ComboBox<String> player1SkinCombo;
-    @FXML private ComboBox<String> player2SkinCombo;
-    @FXML private ComboBox<String> arenaCombo;
+    @FXML
+    private ComboBox<String> player1SkinCombo;
+    @FXML
+    private ComboBox<String> player2SkinCombo;
+    @FXML
+    private ComboBox<String> arenaCombo;
 
     private static Wizard.WizardSkin selectedPlayer1Skin = Wizard.WizardSkin.EMBER_MAGE;
-    private static Wizard.WizardSkin selectedPlayer2Skin = Wizard.WizardSkin.FROST_WITCH;
-    private static Wizard.ArenaBackground selectedArena = Wizard.ArenaBackground.DARK_TOWER;
+    private static Wizard.WizardSkin selectedPlayer2Skin = Wizard.WizardSkin.ARCANE_WIZARD;
 
     @FXML
     public void initialize() {
@@ -21,13 +23,9 @@ public class CosmeticsController {
             player1SkinCombo.getItems().add(s.getDisplayName());
             player2SkinCombo.getItems().add(s.getDisplayName());
         }
-        for (Wizard.ArenaBackground a : Wizard.ArenaBackground.values()) {
-            arenaCombo.getItems().add(a.getDisplayName());
-        }
 
         player1SkinCombo.setValue(selectedPlayer1Skin.getDisplayName());
         player2SkinCombo.setValue(selectedPlayer2Skin.getDisplayName());
-        arenaCombo.setValue(selectedArena.getDisplayName());
 
         player1SkinCombo.setOnAction(e -> applySelections());
         player2SkinCombo.setOnAction(e -> applySelections());
@@ -41,23 +39,14 @@ public class CosmeticsController {
         if (player2SkinCombo.getValue() != null) {
             selectedPlayer2Skin = skinFromDisplayName(player2SkinCombo.getValue());
         }
-        if (arenaCombo.getValue() != null) {
-            selectedArena = arenaFromDisplayName(arenaCombo.getValue());
-        }
     }
 
     private static Wizard.WizardSkin skinFromDisplayName(String name) {
         for (Wizard.WizardSkin s : Wizard.WizardSkin.values()) {
-            if (s.getDisplayName().equals(name)) return s;
+            if (s.getDisplayName().equals(name))
+                return s;
         }
         return Wizard.WizardSkin.EMBER_MAGE;
-    }
-
-    private static Wizard.ArenaBackground arenaFromDisplayName(String name) {
-        for (Wizard.ArenaBackground a : Wizard.ArenaBackground.values()) {
-            if (a.getDisplayName().equals(name)) return a;
-        }
-        return Wizard.ArenaBackground.DARK_TOWER;
     }
 
     @FXML
@@ -73,9 +62,5 @@ public class CosmeticsController {
 
     public static Wizard.WizardSkin getSelectedPlayer2Skin() {
         return selectedPlayer2Skin;
-    }
-
-    public static Wizard.ArenaBackground getSelectedArena() {
-        return selectedArena;
     }
 }

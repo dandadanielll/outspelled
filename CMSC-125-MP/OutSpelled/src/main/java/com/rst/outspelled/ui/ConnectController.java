@@ -2,7 +2,6 @@ package com.rst.outspelled.ui;
 
 import com.rst.outspelled.Main;
 import com.rst.outspelled.model.Wizard;
-import com.rst.outspelled.model.Wizard.ArenaBackground;
 import com.rst.outspelled.model.Wizard.WizardSkin;
 import com.rst.outspelled.network.GameClient;
 import com.rst.outspelled.network.GameServer;
@@ -20,9 +19,12 @@ import java.util.Enumeration;
 
 public class ConnectController {
 
-    @FXML private TextField hostField;
-    @FXML private Label statusLabel;
-    @FXML private Label localIpLabel;
+    @FXML
+    private TextField hostField;
+    @FXML
+    private Label statusLabel;
+    @FXML
+    private Label localIpLabel;
 
     private static GameServer server;
 
@@ -39,7 +41,8 @@ public class ConnectController {
         statusLabel.setStyle("-fx-text-fill: #a0a0c0;");
         new Thread(() -> {
             try {
-                if (server != null) server.stop();
+                if (server != null)
+                    server.stop();
                 server = new GameServer(Protocol.DEFAULT_PORT);
                 server.start();
                 Thread.sleep(500);
@@ -88,8 +91,10 @@ public class ConnectController {
             @Override
             public void onPlayerJoined(int playerId, String playerName) {
                 Platform.runLater(() -> {
-                    if (playerId == 1) SessionManager.setPlayer1Name(playerName);
-                    else SessionManager.setPlayer2Name(playerName);
+                    if (playerId == 1)
+                        SessionManager.setPlayer1Name(playerName);
+                    else
+                        SessionManager.setPlayer2Name(playerName);
                     ReadyController.updatePlayerName(playerId, playerName);
                 });
             }
@@ -98,8 +103,10 @@ public class ConnectController {
             public void onReadyAck(int playerId) {
                 Platform.runLater(() -> {
                     if (ReadyController.instance != null) {
-                        if (playerId == 1) ReadyController.instance.setPlayer1Ready(true);
-                        else ReadyController.instance.setPlayer2Ready(true);
+                        if (playerId == 1)
+                            ReadyController.instance.setPlayer1Ready(true);
+                        else
+                            ReadyController.instance.setPlayer2Ready(true);
                     }
                 });
             }
@@ -109,10 +116,12 @@ public class ConnectController {
                 Platform.runLater(() -> {
                     String n1 = SessionManager.getPlayer1Name();
                     String n2 = SessionManager.getPlayer2Name();
-                    if (n1.isEmpty()) n1 = "Player 1";
-                    if (n2.isEmpty()) n2 = "Player 2";
-                    Wizard w1 = new Wizard(n1, 200, WizardSkin.EMBER_MAGE, ArenaBackground.DARK_TOWER);
-                    Wizard w2 = new Wizard(n2, 200, WizardSkin.FROST_WITCH, ArenaBackground.DARK_TOWER);
+                    if (n1.isEmpty())
+                        n1 = "Player 1";
+                    if (n2.isEmpty())
+                        n2 = "Player 2";
+                    Wizard w1 = new Wizard(n1, 200, WizardSkin.EMBER_MAGE);
+                    Wizard w2 = new Wizard(n2, 200, WizardSkin.ARCANE_WIZARD);
                     WheelController.setWizards(w1, w2);
                     WheelController.setNetworkMode(true);
                     Main.navigateTo("wheel-view.fxml");
@@ -120,7 +129,8 @@ public class ConnectController {
             }
 
             @Override
-            public void onWheelStart() {}
+            public void onWheelStart() {
+            }
 
             @Override
             public void onWheelMana(int playerId, int mana) {
@@ -133,7 +143,8 @@ public class ConnectController {
             }
 
             @Override
-            public void onWheelResult(int firstPlayerId) {}
+            public void onWheelResult(int firstPlayerId) {
+            }
 
             @Override
             public void onGameStart(String name1, String name2, int firstPlayerId, long gridSeed) {
@@ -141,14 +152,17 @@ public class ConnectController {
                     WheelController.stopWheel();
                     String n1 = (name1 == null || name1.isEmpty()) ? SessionManager.getPlayer1Name() : name1;
                     String n2 = (name2 == null || name2.isEmpty()) ? SessionManager.getPlayer2Name() : name2;
-                    if (n1.isEmpty()) n1 = "Player 1";
-                    if (n2.isEmpty()) n2 = "Player 2";
-                    Wizard w1 = new Wizard(n1, 200, WizardSkin.EMBER_MAGE, ArenaBackground.DARK_TOWER);
-                    Wizard w2 = new Wizard(n2, 200, WizardSkin.FROST_WITCH, ArenaBackground.DARK_TOWER);
+                    if (n1.isEmpty())
+                        n1 = "Player 1";
+                    if (n2.isEmpty())
+                        n2 = "Player 2";
+                    Wizard w1 = new Wizard(n1, 200, WizardSkin.EMBER_MAGE);
+                    Wizard w2 = new Wizard(n2, 200, WizardSkin.ARCANE_WIZARD);
                     Wizard first = firstPlayerId == 1 ? w1 : w2;
                     Wizard second = firstPlayerId == 1 ? w2 : w1;
                     GameController.setWizards(first, second);
-                    NetworkGameController.setSession(SessionManager.getClient(), SessionManager.getMyPlayerId(), w1, w2, gridSeed);
+                    NetworkGameController.setSession(SessionManager.getClient(), SessionManager.getMyPlayerId(), w1, w2,
+                            gridSeed);
                     Main.navigateTo("network-game-view.fxml");
                 });
             }
@@ -159,8 +173,8 @@ public class ConnectController {
             }
 
             @Override
-            public void onShuffleGrid(String letters) {
-                Platform.runLater(() -> NetworkGameController.applyShuffleGrid(letters));
+            public void onShuffleGrid(int shufflerId, String letters) {
+                Platform.runLater(() -> NetworkGameController.applyShuffleGrid(shufflerId, letters));
             }
 
             @Override
@@ -254,10 +268,11 @@ public class ConnectController {
             Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
             while (interfaces.hasMoreElements()) {
                 NetworkInterface iface = interfaces.nextElement();
-                if (iface.isLoopback() || !iface.isUp()) continue;
+                if (iface.isLoopback() || !iface.isUp())
+                    continue;
 
                 Enumeration<InetAddress> addresses = iface.getInetAddresses();
-                while(addresses.hasMoreElements()) {
+                while (addresses.hasMoreElements()) {
                     InetAddress addr = addresses.nextElement();
                     // Check for IPv4 and non-loopback
                     if (addr.isSiteLocalAddress()) {

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+
+<StackPane fx:id="rootPane" xmlns="http://javafx.com/javafx"
+           xmlns:fx="http://javafx.com/fxml"
+           fx:controller="com.rst.outspelled.ui.LandingController"
+           prefWidth="900"
+           prefHeight="650"
+           onMouseClicked="#onEnterClicked"
+           style="-fx-background-color: #0c0f12;">
+
+    <stylesheets>
+        <URL value="@../../../assets/style.css" />
+    </stylesheets>
+
+    <ImageView fx:id="backgroundImageView" preserveRatio="false" smooth="false" />
+
+    <Region style="-fx-background-color: radial-gradient(center 55% 42%, radius 80%, transparent 25%, #0c0f12 95%);" mouseTransparent="true" />
+
+    <Pane fx:id="weatherPane" mouseTransparent="true" />
+
+    <VBox alignment="TOP_LEFT" spacing="10" StackPane.alignment="TOP_LEFT" style="-fx-padding: 40 0 0 30;">
+        <Label text="OutSpelled"
+               styleClass="pixel-font"
+               style="-fx-font-size: 82px;
+                      -fx-font-weight: bold;
+                      -fx-text-fill: #e2b96f;
+                      -fx-effect: dropshadow(three-pass-box, #000000, 15, 0.8, 0, 0);" />
+        
+        <Label text="A Wizard Dueling Word Game"
+               styleClass="pixel-font"
+               style="-fx-font-size: 22px;
+                      -fx-text-fill: #99aab8;
+                      -fx-font-style: italic;
+                      -fx-effect: dropshadow(three-pass-box, #000000, 8, 0.8, 0, 2);" />
+    </VBox>
+
+    <VBox alignment="BOTTOM_CENTER" StackPane.alignment="BOTTOM_CENTER" style="-fx-padding: 0 0 50 0;">
+        <Label text="[ Press SPACEBAR or ENTER to Continue ]"
+               styleClass="pixel-font"
+               style="-fx-font-size: 24px;
+                      -fx-text-fill: #506275;
+                      -fx-font-weight: bold;
+                      -fx-effect: dropshadow(three-pass-box, #000000, 4, 1.0, 0, 0);" />
+    </VBox>
+
+</StackPane>

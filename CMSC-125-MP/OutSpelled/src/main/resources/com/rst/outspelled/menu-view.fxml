@@ -3,68 +3,87 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import java.net.URL?>
 
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.rst.outspelled.ui.MenuController"
       alignment="CENTER"
-      spacing="24"
-      style="-fx-background-color: #1a1a2e;"
-      prefWidth="700"
-      prefHeight="600">
+      spacing="0"
+      styleClass="profile-root"
+      prefWidth="900"
+      prefHeight="650">
 
-    <padding><Insets top="50" bottom="50" left="60" right="60"/></padding>
+    <stylesheets>
+        <URL value="@../../../assets/style.css" />
+    </stylesheets>
 
-    <!-- Title (wizard / Bookworm-style) -->
-    <VBox alignment="CENTER" spacing="4">
+    <!-- TOP SPACER FOR VERTICAL CENTERING -->
+    <Region VBox.vgrow="ALWAYS" />
+
+    <!-- TITLE -->
+    <VBox alignment="CENTER" spacing="4" style="-fx-padding: 26 0 20 0;">
         <Label text="OutSpelled"
-               style="-fx-font-size: 48px; -fx-font-weight: bold; -fx-text-fill: #e2b96f; -fx-font-family: 'Georgia';"/>
-        <Label text="A Wizard Dueling Word Game"
-               style="-fx-font-size: 16px; -fx-text-fill: #a0a0c0; -fx-font-family: 'Georgia';"/>
+               styleClass="pixel-font"
+               style="-fx-font-size: 86px;
+                      -fx-font-weight: bold;
+                      -fx-text-fill: #e2b96f;
+                      -fx-effect: dropshadow(three-pass-box, #000000, 14, 0.9, 0, 3);" />
+        <Label text="— A Wizard Dueling Word Game —"
+               styleClass="pixel-font"
+               style="-fx-font-size: 20px;
+                      -fx-text-fill: #8899aa;
+                      -fx-effect: dropshadow(three-pass-box, #000000, 6, 0.8, 0, 2);" />
     </VBox>
 
-    <Region VBox.vgrow="ALWAYS" maxHeight="20"/>
+    <!-- Decorative divider -->
+    <Region prefHeight="14" />
+    <HBox alignment="CENTER" spacing="0">
+        <Region prefWidth="160" minHeight="2" maxHeight="2" prefHeight="2" style="-fx-background-color: #e2b96f; -fx-opacity: 0.7;"/>
+        <Label text="✦" styleClass="pixel-font"
+               style="-fx-text-fill: #e2b96f; -fx-font-size: 14px; -fx-padding: 0 8; -fx-opacity: 1.0; -fx-effect: dropshadow(three-pass-box, rgba(226, 185, 111, 0.3), 4, 0.5, 0, 0);"/>
+        <Region prefWidth="160" minHeight="2" maxHeight="2" prefHeight="2" style="-fx-background-color: #e2b96f; -fx-opacity: 0.7;"/>
+    </HBox>
+    <Region prefHeight="12" />
 
-    <!-- Menu buttons -->
-    <VBox alignment="CENTER" spacing="12">
-        <Button fx:id="startGameButton" text="⚡ Start Game"
-                onAction="#onStartGameClicked"
-                style="-fx-background-color: #e2b96f; -fx-text-fill: #1a1a2e; -fx-font-size: 18px; -fx-font-weight: bold;
-                       -fx-padding: 14 40 14 40; -fx-background-radius: 8; -fx-cursor: hand; -fx-min-width: 220;"/>
+    <!-- PRIMARY BUTTONS — injected by controller -->
+    <VBox fx:id="primaryButtonsBox" alignment="CENTER" spacing="14" />
 
-        <Button text="🤖 Play vs AI"
-                onAction="#onPlayVsAiClicked"
-                style="-fx-background-color: #7b68ee; -fx-text-fill: #ffffff; -fx-font-size: 18px; -fx-font-weight: bold;
-                       -fx-padding: 14 40 14 40; -fx-background-radius: 8; -fx-cursor: hand; -fx-min-width: 220;"/>
+    <Region prefHeight="16" />
 
-        <Button fx:id="optionsButton" text="⚙ Options"
-                onAction="#onOptionsClicked"
-                style="-fx-background-color: transparent; -fx-text-fill: #a0a0c0; -fx-font-size: 14px;
-                       -fx-border-color: #a0a0c0; -fx-border-radius: 6; -fx-padding: 10 28 10 28; -fx-cursor: hand; -fx-min-width: 220;"/>
-
-        <Button fx:id="shopButton" text="🛒 Shop (Cosmetics)"
-                onAction="#onShopClicked"
-                style="-fx-background-color: transparent; -fx-text-fill: #a0a0c0; -fx-font-size: 14px;
-                       -fx-border-color: #a0a0c0; -fx-border-radius: 6; -fx-padding: 10 28 10 28; -fx-cursor: hand; -fx-min-width: 220;"/>
-
-        <Button fx:id="tutorialButton" text="📖 Tutorial"
-                onAction="#onTutorialClicked"
-                style="-fx-background-color: transparent; -fx-text-fill: #a0a0c0; -fx-font-size: 14px;
-                       -fx-border-color: #a0a0c0; -fx-border-radius: 6; -fx-padding: 10 28 10 28; -fx-cursor: hand; -fx-min-width: 220;"/>
-
-        <Button fx:id="quitButton" text="Quit"
-                onAction="#onQuitClicked"
-                style="-fx-background-color: transparent; -fx-text-fill: #8888aa; -fx-font-size: 13px;
-                       -fx-border-color: #666688; -fx-border-radius: 6; -fx-padding: 8 24 8 24; -fx-cursor: hand; -fx-min-width: 220;"/>
-    </VBox>
-
-    <Region VBox.vgrow="ALWAYS" maxHeight="20"/>
-
-    <HBox alignment="CENTER" spacing="8" style="-fx-padding: 5;">
-        <Label text="Window:" style="-fx-text-fill: #606080; -fx-font-size: 12px;"/>
-        <ComboBox fx:id="windowModeCombo" maxWidth="160" style="-fx-background-color: #2a2a4a; -fx-text-fill: #e2b96f;"/>
+    <!-- Divider -->
+    <HBox alignment="CENTER">
+        <Region prefWidth="120" prefHeight="1" style="-fx-background-color: #1e2335;"/>
     </HBox>
 
-    <Label fx:id="errorLabel" text="" style="-fx-text-fill: #ff6b6b; -fx-font-size: 12px;"/>
+    <Region prefHeight="12" />
+
+    <!-- SECONDARY BUTTONS — injected by controller -->
+    <VBox fx:id="secondaryButtonsBox" alignment="CENTER" spacing="12" />
+
+    <!-- QUIT — plain text link style, injected -->
+    <StackPane fx:id="quitButtonContainer" style="-fx-padding: 10 0 0 0;" />
+
+    <Region VBox.vgrow="ALWAYS" />
+
+    <!-- Window mode at bottom -->
+    <HBox alignment="CENTER" spacing="10" style="-fx-padding: 0 0 12 0;">
+        <Label text="Window:"
+               styleClass="pixel-font"
+               style="-fx-text-fill: #8899aa; -fx-font-size: 11px;"/>
+        <ComboBox fx:id="windowModeCombo"
+                  style="-fx-background-color: #0d0f18;
+                         -fx-border-color: #2a3050;
+                         -fx-border-width: 1px;
+                         -fx-text-fill: #506275;
+                         -fx-font-family: 'Pixelify Sans';
+                         -fx-font-size: 11px;"
+                  prefWidth="150" />
+    </HBox>
+
+    <Label fx:id="errorLabel" text=""
+           styleClass="pixel-font"
+           style="-fx-text-fill: #ff6b6b; -fx-font-size: 11px; -fx-padding: 0 0 12 0;
+                  -fx-min-height: 16px; -fx-pref-height: 16px;" />
+
 </VBox>

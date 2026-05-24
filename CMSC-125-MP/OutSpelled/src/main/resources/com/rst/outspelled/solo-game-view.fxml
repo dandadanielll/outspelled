@@ -4,6 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.*?>
+<?import java.net.URL?>
 
 <!-- Identical layout to game-view.fxml; only the controller attribute is different -->
 <StackPane xmlns="http://javafx.com/javafx"
@@ -12,53 +13,98 @@
            prefWidth="900"
            prefHeight="650">
 
+    <stylesheets>
+        <URL value="@../../../assets/style.css"/>
+    </stylesheets>
+
     <!-- Main Game Screen -->
-    <BorderPane style="-fx-background-color: #1a1a2e;">
+    <BorderPane fx:id="gameRoot" style="-fx-background-color: #1a1a2e;">
 
-        <!-- TOP: HP Bars -->
+        <!-- TOP: HP Bars + Options (transparent header) -->
         <top>
-            <HBox alignment="CENTER" spacing="20"
-                  style="-fx-background-color: #12122a; -fx-padding: 12;">
+            <VBox style="-fx-background-color: transparent;" alignment="CENTER">
 
-                <!-- Player 1 HP -->
-                <VBox alignment="CENTER_LEFT" spacing="4" HBox.hgrow="ALWAYS">
-                    <Label fx:id="player1NameLabel" text="Player"
-                           style="-fx-text-fill: #e2b96f;
-                                  -fx-font-size: 14px;
-                                  -fx-font-weight: bold;"/>
-                    <ProgressBar fx:id="player1HpBar" progress="1.0"
-                                 prefWidth="260" prefHeight="20"
-                                 style="-fx-accent: #4caf50;"/>
-                    <Label fx:id="player1HpLabel" text="200 / 200"
-                           style="-fx-text-fill: #a0a0c0; -fx-font-size: 11px;"/>
-                </VBox>
+                <!-- Options Row -->
+                <HBox alignment="CENTER_RIGHT"
+                      style="-fx-padding: 4 12 0 12; -fx-background-color: transparent;">
+                    <Button text="⚙" onAction="#onOptionsClicked"
+                            style="-fx-background-color: transparent;
+                                   -fx-text-fill: #a0a0c0;
+                                   -fx-font-size: 18px;
+                                   -fx-cursor: hand;
+                                   -fx-padding: 2 6 2 6;"/>
+                </HBox>
 
-                <!-- Timer Center -->
-                <VBox alignment="CENTER" spacing="2" minWidth="100">
-                    <Label text="⏳" style="-fx-font-size: 14px;"/>
-                    <Label fx:id="timerLabel" text="30"
-                           style="-fx-text-fill: #e2b96f;
-                                  -fx-font-size: 30px;
-                                  -fx-font-weight: bold;"/>
-                    <Label fx:id="turnLabel" text="Player's Turn"
-                           style="-fx-text-fill: #a0a0c0; -fx-font-size: 10px;"/>
-                </VBox>
+                <!-- HP + Timer Row -->
+                <HBox alignment="CENTER" spacing="20"
+                      style="-fx-background-color: transparent; -fx-padding: 4 70 10 70;">
 
-                <!-- Player 2 (AI) HP -->
-                <VBox alignment="CENTER_RIGHT" spacing="4" HBox.hgrow="ALWAYS">
-                    <Label fx:id="player2NameLabel" text="AI 🤖"
-                           style="-fx-text-fill: #7eb8e2;
-                                  -fx-font-size: 14px;
-                                  -fx-font-weight: bold;"/>
-                    <ProgressBar fx:id="player2HpBar" progress="1.0"
-                                 prefWidth="260" prefHeight="20"
-                                 style="-fx-accent: #4caf50;"/>
-                    <Label fx:id="player2HpLabel" text="200 / 200"
-                           style="-fx-text-fill: #a0a0c0; -fx-font-size: 11px;"/>
-                </VBox>
+                    <!-- Player HP -->
+                    <VBox alignment="CENTER_LEFT" spacing="3" HBox.hgrow="ALWAYS">
+                        <Label fx:id="player1NameLabel" text="Player"
+                               styleClass="pixel-font"
+                               style="-fx-text-fill: #e2b96f;
+                                      -fx-font-size: 18px;
+                                      -fx-font-weight: bold;
+                                      -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.95), 0, 0.0, 2, 2);"/>
+                        <ProgressBar fx:id="player1HpBar" progress="1.0"
+                                     prefWidth="370" prefHeight="32"
+                                     styleClass="progress-bar pixel-hp-bar pixel-hp-p1"/>
+                        <Label fx:id="player1HpLabel" text="200 / 200"
+                               styleClass="pixel-font"
+                               style="-fx-text-fill: #a0a0c0; -fx-font-size: 14px; -fx-font-weight: bold; -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.8), 0, 0.0, 1, 1);"/>
+                    </VBox>
 
-            </HBox>
+                    <!-- Timer Center -->
+                    <VBox alignment="CENTER" spacing="1" minWidth="90">
+                        <Label text="⏳" style="-fx-font-size: 12px;"/>
+                        <Label fx:id="timerLabel" text="30"
+                               styleClass="pixel-font"
+                               style="-fx-text-fill: #e2b96f;
+                                      -fx-font-size: 42px;
+                                      -fx-font-weight: bold;
+                                      -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.9), 0, 0.0, 1, 2);"/>
+                        <Label fx:id="turnLabel" text="Player's Turn"
+                               styleClass="pixel-font"
+                               style="-fx-text-fill: #a0a0c0; -fx-font-size: 10px;
+                                      -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.8), 0, 0.0, 1, 1);"/>
+                    </VBox>
+
+                    <!-- AI HP -->
+                    <VBox alignment="CENTER_RIGHT" spacing="3" HBox.hgrow="ALWAYS">
+                        <Label fx:id="player2NameLabel" text="AI 🤖"
+                               styleClass="pixel-font"
+                               style="-fx-text-fill: #7eb8e2;
+                                      -fx-font-size: 18px;
+                                      -fx-font-weight: bold;
+                                      -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.95), 0, 0.0, 2, 2);"/>
+                        <ProgressBar fx:id="player2HpBar" progress="1.0"
+                                     prefWidth="370" prefHeight="32"
+                                     scaleX="-1"
+                                     styleClass="progress-bar pixel-hp-bar pixel-hp-p2"/>
+                        <Label fx:id="player2HpLabel" text="200 / 200"
+                               styleClass="pixel-font"
+                               style="-fx-text-fill: #a0a0c0; -fx-font-size: 14px; -fx-font-weight: bold; -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.8), 0, 0.0, 1, 1);"/>
+                    </VBox>
+
+                </HBox>
+
+                <!-- Centered Flat Battle Log (Displays only latest action) -->
+                <ListView fx:id="battleLog"
+                          prefWidth="700" prefHeight="38"
+                          minWidth="700" minHeight="38"
+                          maxWidth="700" maxHeight="38"
+                          mouseTransparent="true"
+                          focusTraversable="false"
+                          styleClass="battle-log-flat">
+                    <VBox.margin>
+                        <Insets top="20" bottom="5"/>
+                    </VBox.margin>
+                </ListView>
+
+            </VBox>
         </top>
+
 
         <!-- CENTER: Arena -->
         <center>
@@ -66,19 +112,17 @@
                   style="-fx-padding: 10;">
 
                 <!-- Player 1 Wizard Portrait -->
-                <VBox alignment="BOTTOM_CENTER" spacing="8" prefWidth="180">
+                <VBox alignment="BOTTOM_CENTER" spacing="8" prefWidth="180" translateY="-275" translateX="90" mouseTransparent="true">
                     <padding>
                         <Insets top="4" right="4" bottom="4" left="4"/>
                     </padding>
-                    <Rectangle fx:id="wizard1Portrait" width="120" height="160"
-                               arcWidth="10" arcHeight="10"
-                               fill="#2a1a4a" stroke="#444466" strokeWidth="1.5"/>
-                    <Label text="🧙 You"
-                           style="-fx-text-fill: #e2b96f; -fx-font-size: 12px;"/>
+                    <StackPane fx:id="wizard1Portrait" prefWidth="120" prefHeight="160"
+                               style="-fx-background-color: transparent;"/>
+                    <Label fx:id="wizard1NameTag" text="" visible="false" managed="false"/>
                 </VBox>
 
                 <!-- Center: Grid + Word + Buttons -->
-                <VBox alignment="CENTER" spacing="10" HBox.hgrow="ALWAYS">
+                <VBox alignment="BOTTOM_CENTER" spacing="10" HBox.hgrow="ALWAYS" style="-fx-padding: 0 0 10 0;">
 
                     <!-- Skill Check Status -->
                     <Label fx:id="skillCheckStatusLabel" text=""
@@ -86,80 +130,54 @@
                                   -fx-font-size: 13px;
                                   -fx-font-weight: bold;"/>
 
-                    <!-- Letter Grid -->
-                    <GridPane fx:id="letterGridPane"
-                              alignment="CENTER"
-                              hgap="6" vgap="6">
-                        <padding>
-                            <Insets top="5" bottom="5" left="5" right="5"/>
-                        </padding>
-                    </GridPane>
-
-                    <!-- Selected Word Display -->
-                    <HBox alignment="CENTER" spacing="5">
-                        <Label text="Spell:"
-                               style="-fx-text-fill: #a0a0c0; -fx-font-size: 13px;"/>
-                        <Label fx:id="selectedWordLabel" text="_ _ _"
+                    <!-- Selected Word Display (above grid) -->
+                    <HBox alignment="CENTER" spacing="5" minHeight="70" translateY="-100">
+                        <VBox.margin>
+                            <Insets bottom="-8"/>
+                        </VBox.margin>
+                        <Label fx:id="selectedWordLabel" text=""
                                style="-fx-text-fill: #e2b96f;
                                       -fx-font-size: 20px;
                                       -fx-font-weight: bold;
-                                      -fx-font-family: 'Georgia';"/>
+                                      -fx-font-family: 'Pixelify Sans';"/>
                     </HBox>
 
-                    <!-- Feedback -->
-                    <Label fx:id="feedbackLabel" text=""
-                           style="-fx-font-size: 12px; -fx-text-fill: #a0a0c0;"/>
+                    <Label fx:id="feedbackLabel" text="" visible="false" managed="false"/>
+
+                    <!-- Letter Grid -->
+                    <GridPane fx:id="letterGridPane"
+                              alignment="CENTER"
+                              hgap="1" vgap="1"
+                              maxWidth="253" maxHeight="253"
+                              style="-fx-background-color: #000000; -fx-padding: 1;">
+                    </GridPane>
 
                     <!-- Action Buttons -->
                     <HBox alignment="CENTER" spacing="10">
-                        <Button fx:id="castButton" text="✨ Cast!"
-                                onAction="#onCastClicked"
-                                style="-fx-background-color: #e2b96f;
-                                       -fx-text-fill: #1a1a2e;
-                                       -fx-font-size: 14px;
-                                       -fx-font-weight: bold;
-                                       -fx-padding: 10 25 10 25;
-                                       -fx-background-radius: 6;
-                                       -fx-cursor: hand;"/>
                         <Button text="↺ Clear"
                                 onAction="#onClearClicked"
-                                style="-fx-background-color: transparent;
-                                       -fx-text-fill: #a0a0c0;
-                                       -fx-font-size: 13px;
-                                       -fx-border-color: #a0a0c0;
-                                       -fx-border-radius: 5;
-                                       -fx-padding: 8 18 8 18;
-                                       -fx-cursor: hand;"/>
-                        <Button text="🔀 Shuffle (Space)"
+                                styleClass="action-btn-secondary"/>
+                        <Button fx:id="castButton" text="✨ Cast!"
+                                onAction="#onCastClicked"
+                                styleClass="action-btn-primary"/>
+                        <Button text="🔀 Shuffle"
                                 onAction="#onShuffleClicked"
-                                style="-fx-background-color: transparent;
-                                       -fx-text-fill: #a0a0c0;
-                                       -fx-font-size: 13px;
-                                       -fx-border-color: #a0a0c0;
-                                       -fx-border-radius: 5;
-                                       -fx-padding: 8 18 8 18;
-                                       -fx-cursor: hand;"/>
+                                styleClass="action-btn-secondary"/>
                     </HBox>
 
                     <!-- Battle Log -->
-                    <ListView fx:id="battleLog"
-                              prefHeight="150" prefWidth="400"
-                              style="-fx-background-color: #12122a;
-                                     -fx-border-color: #2a2a4a;
-                                     -fx-border-radius: 5;"/>
+
 
                 </VBox>
 
                 <!-- Player 2 (AI) Wizard Portrait -->
-                <VBox alignment="BOTTOM_CENTER" spacing="8" prefWidth="180">
+                <VBox alignment="BOTTOM_CENTER" spacing="8" prefWidth="180" translateY="-275" translateX="-90" mouseTransparent="true">
                     <padding>
                         <Insets top="4" right="4" bottom="4" left="4"/>
                     </padding>
-                    <Rectangle fx:id="wizard2Portrait" width="120" height="160"
-                               arcWidth="10" arcHeight="10"
-                               fill="#1a2a4a" stroke="#444466" strokeWidth="1.5"/>
-                    <Label text="🤖 AI"
-                           style="-fx-text-fill: #7eb8e2; -fx-font-size: 12px;"/>
+                    <StackPane fx:id="wizard2Portrait" prefWidth="120" prefHeight="160"
+                               style="-fx-background-color: transparent;"/>
+                    <Label fx:id="wizard2NameTag" text="" visible="false" managed="false"/>
                 </VBox>
 
             </HBox>
@@ -180,7 +198,7 @@
                    style="-fx-text-fill: #ff6b6b;
                           -fx-font-size: 32px;
                           -fx-font-weight: bold;
-                          -fx-font-family: 'Georgia';"/>
+                          -fx-font-family: 'Pixelify Sans';"/>
 
             <Label text="Unscramble the word to survive!"
                    style="-fx-text-fill: #a0a0c0; -fx-font-size: 14px;"/>
@@ -189,7 +207,7 @@
                    style="-fx-text-fill: #e2b96f;
                           -fx-font-size: 48px;
                           -fx-font-weight: bold;
-                          -fx-font-family: 'Georgia';"/>
+                          -fx-font-family: 'Pixelify Sans';"/>
 
             <Label fx:id="lastStandTimerLabel" text="15"
                    style="-fx-text-fill: #ff6b6b;
