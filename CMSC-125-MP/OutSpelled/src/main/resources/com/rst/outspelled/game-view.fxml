@@ -110,7 +110,7 @@
                   style="-fx-padding: 10;">
 
                 <!-- Player 1 Wizard -->
-                <VBox alignment="BOTTOM_CENTER" spacing="8" prefWidth="180" translateY="-275" translateX="90">
+                <VBox alignment="BOTTOM_CENTER" spacing="8" prefWidth="180" translateY="-275" translateX="90" mouseTransparent="true">
                     <padding>
                         <Insets top="4" right="4" bottom="4" left="4"/>
                     </padding>
@@ -161,7 +161,7 @@
                 </VBox>
 
                 <!-- Player 2 Wizard -->
-                <VBox alignment="BOTTOM_CENTER" spacing="8" prefWidth="180" translateY="-275" translateX="-90">
+                <VBox alignment="BOTTOM_CENTER" spacing="8" prefWidth="180" translateY="-275" translateX="-90" mouseTransparent="true">
                     <padding>
                         <Insets top="4" right="4" bottom="4" left="4"/>
                     </padding>
