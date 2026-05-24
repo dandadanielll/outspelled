@@ -47,7 +47,7 @@
     <Region prefHeight="12" />
 
     <!-- PRIMARY BUTTONS — injected by controller -->
-    <VBox fx:id="primaryButtonsBox" alignment="CENTER" spacing="12" />
+    <VBox fx:id="primaryButtonsBox" alignment="CENTER" spacing="14" />
 
     <Region prefHeight="16" />
 
@@ -59,7 +59,7 @@
     <Region prefHeight="12" />
 
     <!-- SECONDARY BUTTONS — injected by controller -->
-    <VBox fx:id="secondaryButtonsBox" alignment="CENTER" spacing="10" />
+    <VBox fx:id="secondaryButtonsBox" alignment="CENTER" spacing="12" />
 
     <!-- QUIT — plain text link style, injected -->
     <StackPane fx:id="quitButtonContainer" style="-fx-padding: 10 0 0 0;" />
