@@ -5,12 +5,18 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.*?>
 
+<?import java.net.URL?>
+
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.rst.outspelled.ui.CosmeticsController"
             style="-fx-background-color: #1a1a2e;"
             prefWidth="600"
             prefHeight="500">
+
+    <stylesheets>
+        <URL value="@../../../assets/style.css"/>
+    </stylesheets>
 
     <!-- Header -->
     <top>
@@ -20,7 +26,7 @@
                    style="-fx-font-size: 28px;
                           -fx-font-weight: bold;
                           -fx-text-fill: #e2b96f;
-                          -fx-font-family: 'Georgia';"/>
+                          -fx-font-family: 'Pixelify Sans';"/>
             <Label text="Customize your wizard before battle"
                    style="-fx-font-size: 12px; -fx-text-fill: #666688;"/>
         </VBox>

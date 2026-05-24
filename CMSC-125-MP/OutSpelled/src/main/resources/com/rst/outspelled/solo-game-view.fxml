@@ -4,6 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.*?>
+<?import java.net.URL?>
 
 <!-- Identical layout to game-view.fxml; only the controller attribute is different -->
 <StackPane xmlns="http://javafx.com/javafx"
@@ -12,57 +13,87 @@
            prefWidth="900"
            prefHeight="650">
 
+    <stylesheets>
+        <URL value="@../../../assets/style.css"/>
+    </stylesheets>
+
     <!-- Main Game Screen -->
     <BorderPane fx:id="gameRoot" style="-fx-background-color: #1a1a2e;">
 
-        <!-- TOP: HP Bars -->
+        <!-- TOP: HP Bars + Options (transparent header) -->
         <top>
-            <HBox alignment="CENTER" spacing="20"
-                  style="-fx-background-color: #12122a; -fx-padding: 12;">
+            <VBox style="-fx-background-color: transparent;">
 
-                <!-- Player 1 HP -->
-                <VBox alignment="CENTER_LEFT" spacing="4" HBox.hgrow="ALWAYS">
-                    <Label fx:id="player1NameLabel" text="Player"
-                           style="-fx-text-fill: #e2b96f;
-                                  -fx-font-size: 14px;
-                                  -fx-font-weight: bold;"/>
-                    <ProgressBar fx:id="player1HpBar" progress="1.0"
-                                 prefWidth="260" prefHeight="20"
-                                 style="-fx-accent: #4caf50;"/>
-                    <Label fx:id="player1HpLabel" text="200 / 200"
-                           style="-fx-text-fill: #a0a0c0; -fx-font-size: 11px;"/>
-                </VBox>
+                <!-- Options Row -->
+                <HBox alignment="CENTER_RIGHT"
+                      style="-fx-padding: 4 12 0 12; -fx-background-color: transparent;">
+                    <Button text="⚙" onAction="#onOptionsClicked"
+                            style="-fx-background-color: transparent;
+                                   -fx-text-fill: #a0a0c0;
+                                   -fx-font-size: 18px;
+                                   -fx-cursor: hand;
+                                   -fx-padding: 2 6 2 6;"/>
+                </HBox>
 
-                <!-- Timer Center -->
-                <VBox alignment="CENTER" spacing="2" minWidth="100">
-                    <Label text="⏳" style="-fx-font-size: 14px;"/>
-                    <Label fx:id="timerLabel" text="30"
-                           style="-fx-text-fill: #e2b96f;
-                                  -fx-font-size: 30px;
-                                  -fx-font-weight: bold;"/>
-                    <Label fx:id="turnLabel" text="Player's Turn"
-                           style="-fx-text-fill: #a0a0c0; -fx-font-size: 10px;"/>
-                </VBox>
+                <!-- HP + Timer Row -->
+                <HBox alignment="CENTER" spacing="20"
+                      style="-fx-background-color: transparent; -fx-padding: 4 70 10 70;">
 
-                <!-- Player 2 (AI) HP -->
-                <VBox alignment="CENTER_RIGHT" spacing="4" HBox.hgrow="ALWAYS">
-                    <Label fx:id="player2NameLabel" text="AI 🤖"
-                           style="-fx-text-fill: #7eb8e2;
-                                  -fx-font-size: 14px;
-                                  -fx-font-weight: bold;"/>
-                    <ProgressBar fx:id="player2HpBar" progress="1.0"
-                                 prefWidth="260" prefHeight="20"
-                                 style="-fx-accent: #4caf50;"/>
-                    <Label fx:id="player2HpLabel" text="200 / 200"
-                           style="-fx-text-fill: #a0a0c0; -fx-font-size: 11px;"/>
-                </VBox>
+                    <!-- Player HP -->
+                    <VBox alignment="CENTER_LEFT" spacing="3" HBox.hgrow="ALWAYS">
+                        <Label fx:id="player1NameLabel" text="Player"
+                               styleClass="pixel-font"
+                               style="-fx-text-fill: #e2b96f;
+                                      -fx-font-size: 18px;
+                                      -fx-font-weight: bold;
+                                      -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.95), 0, 0.0, 2, 2);"/>
+                        <ProgressBar fx:id="player1HpBar" progress="1.0"
+                                     prefWidth="370" prefHeight="32"
+                                     styleClass="progress-bar pixel-hp-bar pixel-hp-p1"/>
+                        <Label fx:id="player1HpLabel" text="200 / 200"
+                               styleClass="pixel-font"
+                               style="-fx-text-fill: #a0a0c0; -fx-font-size: 14px; -fx-font-weight: bold; -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.8), 0, 0.0, 1, 1);"/>
+                    </VBox>
 
-                <!-- Options Button -->
-                <Button text="⚙" onAction="#onOptionsClicked"
-                        style="-fx-background-color: transparent; -fx-text-fill: #a0a0c0; -fx-font-size: 20px; -fx-cursor: hand;"/>
+                    <!-- Timer Center -->
+                    <VBox alignment="CENTER" spacing="1" minWidth="90">
+                        <Label text="⏳" style="-fx-font-size: 12px;"/>
+                        <Label fx:id="timerLabel" text="30"
+                               styleClass="pixel-font"
+                               style="-fx-text-fill: #e2b96f;
+                                      -fx-font-size: 42px;
+                                      -fx-font-weight: bold;
+                                      -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.9), 0, 0.0, 1, 2);"/>
+                        <Label fx:id="turnLabel" text="Player's Turn"
+                               styleClass="pixel-font"
+                               style="-fx-text-fill: #a0a0c0; -fx-font-size: 10px;
+                                      -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.8), 0, 0.0, 1, 1);"/>
+                    </VBox>
 
-            </HBox>
+                    <!-- AI HP -->
+                    <VBox alignment="CENTER_RIGHT" spacing="3" HBox.hgrow="ALWAYS">
+                        <Label fx:id="player2NameLabel" text="AI 🤖"
+                               styleClass="pixel-font"
+                               style="-fx-text-fill: #7eb8e2;
+                                      -fx-font-size: 18px;
+                                      -fx-font-weight: bold;
+                                      -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.95), 0, 0.0, 2, 2);"/>
+                        <ProgressBar fx:id="player2HpBar" progress="1.0"
+                                     prefWidth="370" prefHeight="32"
+                                     scaleX="-1"
+                                     styleClass="progress-bar pixel-hp-bar pixel-hp-p2"/>
+                        <Label fx:id="player2HpLabel" text="200 / 200"
+                               styleClass="pixel-font"
+                               style="-fx-text-fill: #a0a0c0; -fx-font-size: 14px; -fx-font-weight: bold; -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.8), 0, 0.0, 1, 1);"/>
+                    </VBox>
+
+                </HBox>
+
+
+
+            </VBox>
         </top>
+
 
         <!-- CENTER: Arena -->
         <center>
@@ -106,7 +137,7 @@
                                style="-fx-text-fill: #e2b96f;
                                       -fx-font-size: 20px;
                                       -fx-font-weight: bold;
-                                      -fx-font-family: 'Georgia';"/>
+                                      -fx-font-family: 'Pixelify Sans';"/>
                     </HBox>
 
                     <!-- Feedback -->
@@ -182,7 +213,7 @@
                    style="-fx-text-fill: #ff6b6b;
                           -fx-font-size: 32px;
                           -fx-font-weight: bold;
-                          -fx-font-family: 'Georgia';"/>
+                          -fx-font-family: 'Pixelify Sans';"/>
 
             <Label text="Unscramble the word to survive!"
                    style="-fx-text-fill: #a0a0c0; -fx-font-size: 14px;"/>
@@ -191,7 +222,7 @@
                    style="-fx-text-fill: #e2b96f;
                           -fx-font-size: 48px;
                           -fx-font-weight: bold;
-                          -fx-font-family: 'Georgia';"/>
+                          -fx-font-family: 'Pixelify Sans';"/>
 
             <Label fx:id="lastStandTimerLabel" text="15"
                    style="-fx-text-fill: #ff6b6b;

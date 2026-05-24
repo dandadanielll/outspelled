@@ -19,7 +19,7 @@
 
     <Label text="Ready for the Mana Wheel?"
            style="-fx-font-size: 24px; -fx-font-weight: bold;
-                  -fx-text-fill: #e2b96f; -fx-font-family: 'Georgia';"/>
+                  -fx-text-fill: #e2b96f; -fx-font-family: 'Pixelify Sans';"/>
 
     <Label text="Both players must confirm before the skill-check wheel starts."
            style="-fx-font-size: 13px; -fx-text-fill: #a0a0c0;"/>

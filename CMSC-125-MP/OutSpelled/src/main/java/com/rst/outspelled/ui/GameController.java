@@ -596,15 +596,17 @@ public class GameController implements GameEngine.GameListener {
         player2HpBar.setProgress(wizard2.getHpPercentage());
         player1HpLabel.setText(wizard1.getHp() + " / " + wizard1.getMaxHp());
         player2HpLabel.setText(wizard2.getHp() + " / " + wizard2.getMaxHp());
+        updateHpBarColor(player1HpBar, wizard1.getHpPercentage());
+        updateHpBarColor(player2HpBar, wizard2.getHpPercentage());
     }
 
     protected void updateHpBarColor(ProgressBar bar, double percentage) {
         if (percentage > 0.5) {
-            bar.setStyle("-fx-accent: #4caf50;");
+            bar.setStyle("-fx-accent: #3fc53f;"); // Vibrant retro forest green
         } else if (percentage > 0.25) {
-            bar.setStyle("-fx-accent: #ff9800;");
+            bar.setStyle("-fx-accent: #ff9f3a;"); // Radiant pixel amber orange
         } else {
-            bar.setStyle("-fx-accent: #f44336;");
+            bar.setStyle("-fx-accent: #ff4f4f;"); // Fiery pixel crimson red
         }
     }
 
@@ -650,11 +652,14 @@ public class GameController implements GameEngine.GameListener {
 
         javafx.stage.Stage dialog = com.rst.outspelled.util.DialogBuilder.buildDialogStage("Duel Over!", 400, 250);
 
-        javafx.scene.control.Label headerLabel = com.rst.outspelled.util.DialogBuilder.styledDialogLabel(winner.getName() + " wins!");
-        javafx.scene.control.Label contentLabel = new javafx.scene.control.Label(winner.getName() + " defeated " + loser.getName() + "!\n\nPlay again?");
+        javafx.scene.control.Label headerLabel = com.rst.outspelled.util.DialogBuilder
+                .styledDialogLabel(winner.getName() + " wins!");
+        javafx.scene.control.Label contentLabel = new javafx.scene.control.Label(
+                winner.getName() + " defeated " + loser.getName() + "!\n\nPlay again?");
         contentLabel.setStyle("-fx-text-fill: #a0a0c0; -fx-font-size: 14px;");
 
-        javafx.scene.layout.StackPane playAgainBtn = com.rst.outspelled.util.DialogBuilder.buildDialogButton("Rematch", true);
+        javafx.scene.layout.StackPane playAgainBtn = com.rst.outspelled.util.DialogBuilder.buildDialogButton("Rematch",
+                true);
         playAgainBtn.setOnMouseClicked(e -> {
             SoundManager.playClick();
             dialog.close();
@@ -665,7 +670,8 @@ public class GameController implements GameEngine.GameListener {
             Main.navigateTo("game-view.fxml");
         });
 
-        javafx.scene.layout.StackPane menuBtn = com.rst.outspelled.util.DialogBuilder.buildDialogButton("Main Menu", false);
+        javafx.scene.layout.StackPane menuBtn = com.rst.outspelled.util.DialogBuilder.buildDialogButton("Main Menu",
+                false);
         menuBtn.setOnMouseClicked(e -> {
             SoundManager.playClick();
             dialog.close();
@@ -681,7 +687,8 @@ public class GameController implements GameEngine.GameListener {
         body.setAlignment(javafx.geometry.Pos.CENTER);
         body.getChildren().addAll(headerLabel, contentLabel, btnBox);
 
-        javafx.scene.layout.VBox dialogRoot = com.rst.outspelled.util.DialogBuilder.buildDialogRoot("🏆 Duel Over 🏆", false, body, dialog);
+        javafx.scene.layout.VBox dialogRoot = com.rst.outspelled.util.DialogBuilder.buildDialogRoot("🏆 Duel Over 🏆",
+                false, body, dialog);
         dialog.getScene().setRoot(dialogRoot);
         dialog.showAndWait();
     }
@@ -695,7 +702,8 @@ public class GameController implements GameEngine.GameListener {
     private void showSettingsDialog() {
         javafx.stage.Stage dialog = com.rst.outspelled.util.DialogBuilder.buildDialogStage("Settings", 400, 380);
 
-        javafx.scene.control.Label headerLabel = com.rst.outspelled.util.DialogBuilder.styledDialogLabel("Adjust Game Volumes");
+        javafx.scene.control.Label headerLabel = com.rst.outspelled.util.DialogBuilder
+                .styledDialogLabel("Adjust Game Volumes");
         headerLabel.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 13px; -fx-text-fill: #8899aa;");
 
         // BGM Slider
@@ -720,20 +728,22 @@ public class GameController implements GameEngine.GameListener {
         bgmBox.setAlignment(javafx.geometry.Pos.CENTER);
         sfxBox.setAlignment(javafx.geometry.Pos.CENTER);
 
-        javafx.scene.layout.StackPane closeBtn = com.rst.outspelled.util.DialogBuilder.buildDialogButton("Resume", true);
+        javafx.scene.layout.StackPane closeBtn = com.rst.outspelled.util.DialogBuilder.buildDialogButton("Resume",
+                true);
         closeBtn.setOnMouseClicked(e -> {
             SoundManager.playClick();
             dialog.close();
         });
 
-        javafx.scene.layout.StackPane quitBtn = com.rst.outspelled.util.DialogBuilder.buildDialogButton("Quit to Menu", false);
+        javafx.scene.layout.StackPane quitBtn = com.rst.outspelled.util.DialogBuilder.buildDialogButton("Quit to Menu",
+                false);
         quitBtn.setOnMouseClicked(e -> {
             SoundManager.playClick();
             dialog.close();
             engine.shutdown();
             Main.navigateTo("menu-view.fxml");
         });
-        
+
         javafx.scene.layout.HBox buttons = new javafx.scene.layout.HBox(10, closeBtn, quitBtn);
         buttons.setAlignment(javafx.geometry.Pos.CENTER);
 
@@ -742,7 +752,8 @@ public class GameController implements GameEngine.GameListener {
         body.setAlignment(javafx.geometry.Pos.CENTER);
         body.getChildren().addAll(headerLabel, bgmBox, sfxBox, buttons);
 
-        javafx.scene.layout.VBox dialogRoot = com.rst.outspelled.util.DialogBuilder.buildDialogRoot("⚙  Options  ⚙", false, body, dialog);
+        javafx.scene.layout.VBox dialogRoot = com.rst.outspelled.util.DialogBuilder.buildDialogRoot("⚙  Options  ⚙",
+                false, body, dialog);
         dialog.getScene().setRoot(dialogRoot);
         dialog.showAndWait();
     }

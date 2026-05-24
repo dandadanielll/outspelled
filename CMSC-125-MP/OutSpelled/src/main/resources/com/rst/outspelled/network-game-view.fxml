@@ -4,12 +4,17 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.*?>
+<?import java.net.URL?>
 
 <StackPane xmlns="http://javafx.com/javafx"
            xmlns:fx="http://javafx.com/fxml"
            fx:controller="com.rst.outspelled.ui.NetworkGameController"
            prefWidth="1000" prefHeight="700"
            style="-fx-background-color: #1a1a2e;">
+
+    <stylesheets>
+        <URL value="@../../../assets/style.css"/>
+    </stylesheets>
 
     <BorderPane>
 
@@ -49,7 +54,7 @@
                            style="-fx-text-fill: #e2b96f;
                                   -fx-font-size: 15px;
                                   -fx-font-weight: bold;
-                                  -fx-font-family: 'Georgia';"/>
+                                  -fx-font-family: 'Pixelify Sans';"/>
 
                     <!-- Portrait -->
                     <StackPane>
@@ -125,7 +130,7 @@
                                        -fx-text-fill: #1a1a2e;
                                        -fx-font-size: 16px;
                                        -fx-font-weight: bold;
-                                       -fx-font-family: 'Georgia';
+                                       -fx-font-family: 'Pixelify Sans';
                                        -fx-padding: 12 36;
                                        -fx-background-radius: 8;
                                        -fx-cursor: hand;"/>
@@ -161,7 +166,7 @@
                            style="-fx-text-fill: #7eb8e2;
                                   -fx-font-size: 15px;
                                   -fx-font-weight: bold;
-                                  -fx-font-family: 'Georgia';"/>
+                                  -fx-font-family: 'Pixelify Sans';"/>
 
                     <!-- Portrait -->
                     <StackPane>
@@ -217,14 +222,14 @@
                    style="-fx-text-fill: #ff6b6b;
                           -fx-font-size: 36px;
                           -fx-font-weight: bold;
-                          -fx-font-family: 'Georgia';"/>
+                          -fx-font-family: 'Pixelify Sans';"/>
             <Label text="Unscramble the word to survive!"
                    style="-fx-text-fill: #888; -fx-font-size: 14px;"/>
             <Label fx:id="scrambledWordLabel" text="??????"
                    style="-fx-text-fill: #e2b96f;
                           -fx-font-size: 56px;
                           -fx-font-weight: bold;
-                          -fx-font-family: 'Georgia';"/>
+                          -fx-font-family: 'Pixelify Sans';"/>
             <Label fx:id="lastStandTimerLabel" text="15"
                    style="-fx-text-fill: #ff6b6b;
                           -fx-font-size: 32px;
