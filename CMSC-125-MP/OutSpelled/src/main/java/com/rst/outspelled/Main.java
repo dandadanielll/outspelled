@@ -67,6 +67,8 @@ public class Main extends Application {
         // returns nothing if no window exists
         if (primaryStage == null)
             return;
+        if (primaryStage == null)
+            return;
 
         // clear the window state first before applying any new state
         primaryStage.setFullScreen(false);
@@ -122,6 +124,15 @@ public class Main extends Application {
             FXMLLoader loader = new FXMLLoader(location); // create fxmlLoader object
             Scene scene = new Scene(loader.load()); // create the fxml scene
             primaryStage.setScene(scene); // sets the window to the fxml scene created
+            FXMLLoader loader = new FXMLLoader(location); // create fxmlLoader object
+            javafx.scene.Parent root = loader.load();
+
+            if (primaryStage.getScene() == null) {
+                primaryStage.setScene(new Scene(root)); // create the fxml scene only the first time
+                applyWindowMode(); // apply window mode once
+            } else {
+                primaryStage.getScene().setRoot(root); // swap the root node to avoid window resize/flicker bugs
+            }
         } catch (IOException e) {
             System.err.println("Failed to load " + fxmlFile + ": " + e.getMessage()); // formatted error code pag wala
                                                                                       // yung file
