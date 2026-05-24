@@ -46,7 +46,7 @@ public class LandingController {
             Font.loadFont(fontUrl.toExternalForm(), 12);
         }
 
-        SoundManager.startBgm("bgm.mp3");
+        SoundManager.startBgm("MenuBGM.mp3");
 
         // Setting up the background image
         java.net.URL imgUrl = LandingController.class.getResource("/assets/Landing-background.png");

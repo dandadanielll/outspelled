@@ -188,10 +188,10 @@
                         <Label fx:id="player2HpLabel" text="200 / 200" style="-fx-text-fill: #a0a0c0; -fx-font-size: 11px;"/>
                     </VBox>
 
-                    <!-- Menu button -->
+                    <!-- Options button -->
                     <Region VBox.vgrow="ALWAYS"/>
-                    <Button fx:id="menuButton" text="⛶ Menu"
-                            onAction="#onMenuClicked"
+                    <Button fx:id="menuButton" text="⚙ Options"
+                            onAction="#onOptionsClicked"
                             style="-fx-background-color: transparent;
                                    -fx-text-fill: #666688;
                                    -fx-font-size: 12px;

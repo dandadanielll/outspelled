@@ -20,6 +20,7 @@ public final class SoundManager {
 
     // BGM player (streams audio; supports loop)
     private static MediaPlayer bgmPlayer;
+    private static String currentBgmFilename = null;
 
     // Volume levels (0.0 to 1.0)
     private static double sfxVolume = 0.5;
@@ -39,7 +40,7 @@ public final class SoundManager {
         victoryClip = loadClip("VictoryFare.wav");
         defeatClip = loadClip("DefeatSound.wav");
         skillCheckClip = loadClip("Correct_Sound_Effect.wav");
-        keyTapClip = loadClip("Key_delete.wav");
+        keyTapClip = loadClip("SingleKeyTap.wav");
         keyDeleteClip = loadClip("Key_delete.wav");
 
         // Pre-warm the click clip at volume 0 so the audio subsystem is primed
@@ -101,6 +102,9 @@ public final class SoundManager {
      *                 "MenuBGM.mp3")
      */
     public static void startBgm(String filename) {
+        if (filename.equals(currentBgmFilename) && bgmPlayer != null) {
+            return;
+        }
         stopBgm();
         URL url = SoundManager.class.getResource("/com/rst/outspelled/audio/" + filename);
         if (url == null) {
@@ -112,17 +116,18 @@ public final class SoundManager {
             bgmPlayer.setCycleCount(MediaPlayer.INDEFINITE); // loop forever
             bgmPlayer.setVolume(muted ? 0.0 : bgmVolume);
             bgmPlayer.play();
+            currentBgmFilename = filename;
         } catch (Exception e) {
             System.err.println("[SoundManager] Failed to play BGM: " + e.getMessage());
         }
     }
 
-    /** Stops the currently playing background music. */
     public static void stopBgm() {
         if (bgmPlayer != null) {
             bgmPlayer.stop();
             bgmPlayer.dispose();
             bgmPlayer = null;
+            currentBgmFilename = null;
         }
     }
 

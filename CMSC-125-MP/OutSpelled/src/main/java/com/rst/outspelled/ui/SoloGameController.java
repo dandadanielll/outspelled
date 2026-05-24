@@ -95,27 +95,44 @@ public class SoloGameController extends GameController {
             SoundManager.playDefeat();   // human loses
         }
 
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Duel Over!");
-        alert.setHeaderText(winner.getName() + " wins!");
-        alert.setContentText(winner.getName() + " defeated "
-                + loser.getName() + "!\n\nPlay again?");
-        ButtonType playAgain = new ButtonType("Play Again");
-        ButtonType mainMenu = new ButtonType("Main Menu");
-        alert.getButtonTypes().setAll(playAgain, mainMenu);
+        javafx.stage.Stage dialog = com.rst.outspelled.util.DialogBuilder.buildDialogStage("Duel Over!", 400, 250);
 
-        alert.showAndWait().ifPresent(response -> {
+        javafx.scene.control.Label headerLabel = com.rst.outspelled.util.DialogBuilder.styledDialogLabel(winner.getName() + " wins!");
+        javafx.scene.control.Label contentLabel = new javafx.scene.control.Label(winner.getName() + " defeated " + loser.getName() + "!\n\nPlay again?");
+        contentLabel.setStyle("-fx-text-fill: #a0a0c0; -fx-font-size: 14px;");
+
+        javafx.scene.layout.StackPane playAgainBtn = com.rst.outspelled.util.DialogBuilder.buildDialogButton("Rematch", true);
+        playAgainBtn.setOnMouseClicked(e -> {
+            SoundManager.playClick();
+            dialog.close();
             engine.shutdown();
             aiOpponent.shutdown();
-            if (response == playAgain) {
-                SoloGameController.setup(
-                        new Wizard(wizard1.getName(), 200, wizard1.getSkin()),
-                        new Wizard(wizard2.getName(), 200, wizard2.getSkin()),
-                        new AiOpponent(aiOpponent.getBrain()));
-                Main.navigateTo("solo-game-view.fxml");
-            } else {
-                Main.navigateTo("menu-view.fxml");
-            }
+            SoloGameController.setup(
+                    new Wizard(wizard1.getName(), 200, wizard1.getSkin()),
+                    new Wizard(wizard2.getName(), 200, wizard2.getSkin()),
+                    new AiOpponent(aiOpponent.getBrain()));
+            Main.navigateTo("solo-game-view.fxml");
         });
+
+        javafx.scene.layout.StackPane menuBtn = com.rst.outspelled.util.DialogBuilder.buildDialogButton("Main Menu", false);
+        menuBtn.setOnMouseClicked(e -> {
+            SoundManager.playClick();
+            dialog.close();
+            engine.shutdown();
+            aiOpponent.shutdown();
+            Main.navigateTo("menu-view.fxml");
+        });
+
+        javafx.scene.layout.HBox btnBox = new javafx.scene.layout.HBox(15, playAgainBtn, menuBtn);
+        btnBox.setAlignment(javafx.geometry.Pos.CENTER);
+
+        javafx.scene.layout.VBox body = new javafx.scene.layout.VBox(20);
+        body.setStyle("-fx-padding: 30 24 24 24;");
+        body.setAlignment(javafx.geometry.Pos.CENTER);
+        body.getChildren().addAll(headerLabel, contentLabel, btnBox);
+
+        javafx.scene.layout.VBox dialogRoot = com.rst.outspelled.util.DialogBuilder.buildDialogRoot("🏆 Duel Over 🏆", false, body, dialog);
+        dialog.getScene().setRoot(dialogRoot);
+        dialog.showAndWait();
     }
 }
