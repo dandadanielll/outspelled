@@ -7,6 +7,7 @@ import com.rst.outspelled.model.Spell;
 import com.rst.outspelled.model.Wizard;
 import com.rst.outspelled.network.GameClient;
 import com.rst.outspelled.network.SessionManager;
+import com.rst.outspelled.util.ProfileManager;
 import com.rst.outspelled.util.SoundManager;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
@@ -645,6 +646,18 @@ public class NetworkGameController {
                 alert.setTitle("Game Over");
                 alert.setHeaderText(winnerName + " wins!");
                 alert.showAndWait();
+                
+                int slot = SessionManager.getActiveProfileSlot();
+                Wizard active = SessionManager.getActiveWizard();
+                if (slot != -1 && active != null) {
+                    if (winnerId == myPlayerId) {
+                        active.recordWin();
+                    } else {
+                        active.recordLoss();
+                    }
+                    ProfileManager.saveSlot(slot, active);
+                }
+
                 Main.navigateTo("menu-view.fxml");
             }
         });

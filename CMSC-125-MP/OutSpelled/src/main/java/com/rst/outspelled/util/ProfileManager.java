@@ -53,6 +53,11 @@ public final class ProfileManager {
         PREFS.putInt(key(slot, "wins"), wizard.getWins());
         PREFS.putInt(key(slot, "losses"), wizard.getLosses());
         PREFS.put(key(slot, "skin"), wizard.getSkin().name());
+        try {
+            PREFS.flush();
+        } catch (java.util.prefs.BackingStoreException e) {
+            System.err.println("Failed to flush preferences: " + e.getMessage());
+        }
     }
 
     public static void deleteSlot(int slot) {
@@ -60,7 +65,11 @@ public final class ProfileManager {
         PREFS.remove(key(slot, "wins"));
         PREFS.remove(key(slot, "losses"));
         PREFS.remove(key(slot, "skin"));
-        PREFS.remove(key(slot, "arena"));
+        try {
+            PREFS.flush();
+        } catch (java.util.prefs.BackingStoreException e) {
+            System.err.println("Failed to flush preferences: " + e.getMessage());
+        }
     }
 
     /** Returns a list of all loaded profiles (null entries = empty slots). */
