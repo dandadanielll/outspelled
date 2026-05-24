@@ -10,7 +10,6 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
@@ -105,8 +104,6 @@ public class MenuController {
     }
 
     private void showSettingsDialog() {
-        Stage dialog = buildDialogStage("Settings", 400, 320);
-
         Label headerLabel = styledDialogLabel("Adjust Game Volumes");
         headerLabel.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 13px; -fx-text-fill: #8899aa;");
 
@@ -136,7 +133,7 @@ public class MenuController {
         StackPane closeBtn = buildDialogButton("Close", true);
         closeBtn.setOnMouseClicked(e -> {
             SoundManager.playClick();
-            dialog.close();
+            com.rst.outspelled.util.OverlayManager.hideOverlay();
         });
 
         VBox body = new VBox(24);
@@ -144,14 +141,12 @@ public class MenuController {
         body.setAlignment(Pos.CENTER);
         body.getChildren().addAll(headerLabel, bgmBox, sfxBox, closeBtn);
 
-        VBox dialogRoot = buildDialogRoot("⚙  Options  ⚙", false, body, dialog);
-        dialog.getScene().setRoot(dialogRoot);
-        dialog.showAndWait();
+        VBox dialogRoot = buildDialogRoot("⚙  Options  ⚙", false, body, 400, 320);
+        com.rst.outspelled.util.OverlayManager.showOverlay(dialogRoot);
     }
 
     private void onTutorialClicked() {
         SoundManager.playClick();
-        Stage dialog = buildDialogStage("Tutorial", 560, 460);
 
         final int[] currentStep = { 0 };
 
@@ -206,7 +201,7 @@ public class MenuController {
 
         // Got it close button
         StackPane gotItBtn = buildDialogButton("Got it!", true);
-        gotItBtn.setOnMouseClicked(e -> { SoundManager.playClick(); dialog.close(); });
+        gotItBtn.setOnMouseClicked(e -> { SoundManager.playClick(); com.rst.outspelled.util.OverlayManager.hideOverlay(); });
 
         HBox footerRow = new HBox(gotItBtn);
         footerRow.setAlignment(Pos.CENTER);
@@ -267,19 +262,8 @@ public class MenuController {
         // Initial setup
         updateStep.run();
 
-    VBox dialogRoot = buildDialogRoot("✦  Wizard Academy  ✦", false, body, dialog);
-    dialog.getScene().setRoot(dialogRoot);
-
-    // Force the scene to fit the actual content size
-    dialogRoot.applyCss();
-    dialogRoot.layout();
-    double contentW = dialogRoot.prefWidth(-1);
-    double contentH = dialogRoot.prefHeight(-1);
-    dialog.getScene().getWindow().setWidth(contentW);
-    dialog.getScene().getWindow().setHeight(contentH);
-    dialog.centerOnScreen();
-
-    dialog.showAndWait();
+        VBox dialogRoot = buildDialogRoot("✦  Wizard Academy  ✦", false, body, 560, 460);
+        com.rst.outspelled.util.OverlayManager.showOverlay(dialogRoot);
     }
 
     private StackPane buildArrowButton(String text) {
@@ -421,23 +405,7 @@ public class MenuController {
 
     // ── Dialog builders and helpers matching ProfileController.java ───────────
 
-    private Stage buildDialogStage(String title, double width, double height) {
-        Stage stage = new Stage();
-        stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
-        stage.initStyle(javafx.stage.StageStyle.TRANSPARENT);
-        stage.setTitle(title);
-        stage.setResizable(false);
-
-        javafx.scene.layout.StackPane placeholder = new javafx.scene.layout.StackPane();
-        placeholder.setPrefSize(width, height);
-        javafx.scene.Scene scene = new javafx.scene.Scene(placeholder, width, height);
-        scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
-        stage.setScene(scene);
-        stage.centerOnScreen();
-        return stage;
-    }
-
-    private VBox buildDialogRoot(String titleText, boolean danger, VBox body, Stage stage) {
+    private VBox buildDialogRoot(String titleText, boolean danger, VBox body, double width, double height) {
         Label titleLabel = new Label(titleText);
         titleLabel.setStyle(
                 "-fx-font-family: 'Pixelify Sans';" +
@@ -455,16 +423,6 @@ public class MenuController {
                         "-fx-border-width: 0 0 1 0;" +
                         "-fx-border-opacity: 0.5;");
 
-        final double[] dragDelta = new double[2];
-        titleBar.setOnMousePressed(e -> {
-            dragDelta[0] = stage.getX() - e.getScreenX();
-            dragDelta[1] = stage.getY() - e.getScreenY();
-        });
-        titleBar.setOnMouseDragged(e -> {
-            stage.setX(e.getScreenX() + dragDelta[0]);
-            stage.setY(e.getScreenY() + dragDelta[1]);
-        });
-
         VBox inner = new VBox(0, titleBar, body);
         inner.setStyle(
                 "-fx-background-color: #1a1e2e;" +
@@ -480,6 +438,8 @@ public class MenuController {
         StackPane.setAlignment(notchBR, Pos.BOTTOM_RIGHT);
 
         StackPane root = new StackPane(inner, notchTL, notchTR, notchBL, notchBR);
+        root.setPrefSize(width, height);
+        root.setMaxSize(width, height);
         root.setStyle("-fx-background-color: transparent;");
 
         VBox outerShell = new VBox(root);
@@ -789,53 +749,6 @@ public class MenuController {
     }
 
     private StackPane buildQuitButton() {
-        Label label = new Label("— Quit —");
-        label.setStyle(
-                "-fx-font-family: 'Pixelify Sans'; -fx-font-size: 12px; -fx-text-fill: #506275; -fx-cursor: hand;");
-        label.setMouseTransparent(true);
-
-        StackPane btn = new StackPane(label);
-        btn.setPrefSize(120, 28);
-        btn.setStyle("-fx-background-color: transparent; -fx-cursor: hand;");
-
-        ScaleTransition hoverPulse = new ScaleTransition(Duration.millis(120), btn);
-
-        btn.setOnMouseEntered(e -> {
-            label.setStyle(
-                    "-fx-font-family: 'Pixelify Sans'; -fx-font-size: 12px; -fx-text-fill: #ff6b6b; -fx-cursor: hand;");
-            hoverPulse.stop();
-            hoverPulse.setFromX(btn.getScaleX());
-            hoverPulse.setFromY(btn.getScaleY());
-            hoverPulse.setToX(1.08);
-            hoverPulse.setToY(1.08);
-            hoverPulse.play();
-        });
-        btn.setOnMouseExited(e -> {
-            label.setStyle(
-                    "-fx-font-family: 'Pixelify Sans'; -fx-font-size: 12px; -fx-text-fill: #506275; -fx-cursor: hand;");
-            hoverPulse.stop();
-            hoverPulse.setFromX(btn.getScaleX());
-            hoverPulse.setFromY(btn.getScaleY());
-            hoverPulse.setToX(1.0);
-            hoverPulse.setToY(1.0);
-            hoverPulse.play();
-        });
-        btn.setOnMousePressed(e -> {
-            label.setStyle(
-                    "-fx-font-family: 'Pixelify Sans'; -fx-font-size: 12px; -fx-text-fill: #cc3333; -fx-cursor: hand;");
-            label.setTranslateY(1);
-        });
-        btn.setOnMouseReleased(e -> {
-            label.setTranslateY(0);
-            if (btn.isHover()) {
-                label.setStyle(
-                        "-fx-font-family: 'Pixelify Sans'; -fx-font-size: 12px; -fx-text-fill: #ff6b6b; -fx-cursor: hand;");
-            } else {
-                label.setStyle(
-                        "-fx-font-family: 'Pixelify Sans'; -fx-font-size: 12px; -fx-text-fill: #506275; -fx-cursor: hand;");
-            }
-        });
-
-        return btn;
+        return buildSecondaryButton("🚪   Quit");
     }
 }

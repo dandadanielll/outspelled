@@ -7,7 +7,6 @@ import com.rst.outspelled.model.Spell;
 import com.rst.outspelled.model.Wizard;
 import com.rst.outspelled.network.GameClient;
 import com.rst.outspelled.network.SessionManager;
-import com.rst.outspelled.util.ProfileManager;
 import com.rst.outspelled.util.SoundManager;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
@@ -16,7 +15,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
@@ -629,23 +627,42 @@ public class NetworkGameController {
             if (instance == null || client == null) return;
             if (myPlayerId != playerId) return;
             String name = playerId == 1 && wizard1 != null ? wizard1.getName() : (wizard2 != null ? wizard2.getName() : "You");
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Skill Check Available!");
-            alert.setHeaderText(name + " can initiate a challenge!");
-            alert.setContentText(
+            
+            javafx.scene.control.Label headerLabel = com.rst.outspelled.util.DialogBuilder.styledDialogLabel(name + " can initiate a challenge!");
+            javafx.scene.control.Label contentLabel = new javafx.scene.control.Label(
                     "You are at or below 50% HP.\n\n" +
                             "Initiate the Half HP Challenge?\n" +
                             "Win → opponent drops to your HP level\n" +
                             "Lose → you take word damage\n\n" +
                             "This can only be used once per match!"
             );
-            ButtonType initiate = new ButtonType("⚔ Initiate!");
-            ButtonType skip = new ButtonType("Skip");
-            alert.getButtonTypes().setAll(initiate, skip);
-            alert.showAndWait().ifPresent(response -> {
-                if (response == initiate) client.sendHalfHpInitiate();
-                else client.sendHalfHpSkip();
+            contentLabel.setStyle("-fx-text-fill: #a0a0c0; -fx-font-size: 13px; -fx-wrap-text: true; -fx-text-alignment: center;");
+            contentLabel.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
+            
+            javafx.scene.layout.StackPane initiateBtn = com.rst.outspelled.util.DialogBuilder.buildDialogButton("⚔ Initiate!", true);
+            initiateBtn.setOnMouseClicked(e -> {
+                SoundManager.playClick();
+                com.rst.outspelled.util.OverlayManager.hideOverlay();
+                client.sendHalfHpInitiate();
             });
+
+            javafx.scene.layout.StackPane skipBtn = com.rst.outspelled.util.DialogBuilder.buildDialogButton("Skip", false);
+            skipBtn.setOnMouseClicked(e -> {
+                SoundManager.playClick();
+                com.rst.outspelled.util.OverlayManager.hideOverlay();
+                client.sendHalfHpSkip();
+            });
+
+            javafx.scene.layout.HBox btnBox = new javafx.scene.layout.HBox(15, skipBtn, initiateBtn);
+            btnBox.setAlignment(javafx.geometry.Pos.CENTER);
+
+            javafx.scene.layout.VBox body = new javafx.scene.layout.VBox(15);
+            body.setStyle("-fx-padding: 20 24 24 24;");
+            body.setAlignment(javafx.geometry.Pos.CENTER);
+            body.getChildren().addAll(headerLabel, contentLabel, btnBox);
+
+            javafx.scene.layout.VBox dialogRoot = com.rst.outspelled.util.DialogBuilder.buildDialogRoot("Skill Check Available!", true, body, 420, 320);
+            com.rst.outspelled.util.OverlayManager.showOverlay(dialogRoot);
         });
     }
 
@@ -784,21 +801,19 @@ public class NetworkGameController {
                 instance.letterGridPane.setDisable(true);
                 if (instance.menuButton != null) instance.menuButton.setDisable(false);
                 
-                javafx.stage.Stage dialog = com.rst.outspelled.util.DialogBuilder.buildDialogStage("Game Over", 400, 250);
                 javafx.scene.control.Label headerLabel = com.rst.outspelled.util.DialogBuilder.styledDialogLabel(winnerName + " wins!");
                 javafx.scene.layout.StackPane menuBtn = com.rst.outspelled.util.DialogBuilder.buildDialogButton("Main Menu", true);
                 menuBtn.setOnMouseClicked(e -> {
                     SoundManager.playClick();
-                    dialog.close();
+                    com.rst.outspelled.util.OverlayManager.hideOverlay();
                     Main.navigateTo("menu-view.fxml");
                 });
                 javafx.scene.layout.VBox body = new javafx.scene.layout.VBox(20);
                 body.setStyle("-fx-padding: 30 24 24 24;");
                 body.setAlignment(javafx.geometry.Pos.CENTER);
                 body.getChildren().addAll(headerLabel, menuBtn);
-                javafx.scene.layout.VBox dialogRoot = com.rst.outspelled.util.DialogBuilder.buildDialogRoot("🏆 Game Over 🏆", false, body, dialog);
-                dialog.getScene().setRoot(dialogRoot);
-                dialog.showAndWait();
+                javafx.scene.layout.VBox dialogRoot = com.rst.outspelled.util.DialogBuilder.buildDialogRoot("🏆 Game Over 🏆", false, body, 400, 250);
+                com.rst.outspelled.util.OverlayManager.showOverlay(dialogRoot);
             }
         });
     }
@@ -875,7 +890,6 @@ public class NetworkGameController {
     @FXML
     private void onOptionsClicked() {
         SoundManager.playClick();
-        javafx.stage.Stage dialog = com.rst.outspelled.util.DialogBuilder.buildDialogStage("Settings", 400, 380);
         javafx.scene.control.Label headerLabel = com.rst.outspelled.util.DialogBuilder.styledDialogLabel("Adjust Game Volumes");
         headerLabel.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 13px; -fx-text-fill: #8899aa;");
 
@@ -898,13 +912,13 @@ public class NetworkGameController {
         javafx.scene.layout.StackPane closeBtn = com.rst.outspelled.util.DialogBuilder.buildDialogButton("Resume", true);
         closeBtn.setOnMouseClicked(e -> {
             SoundManager.playClick();
-            dialog.close();
+            com.rst.outspelled.util.OverlayManager.hideOverlay();
         });
 
         javafx.scene.layout.StackPane quitBtn = com.rst.outspelled.util.DialogBuilder.buildDialogButton("Quit to Menu", false);
         quitBtn.setOnMouseClicked(e -> {
             SoundManager.playClick();
-            dialog.close();
+            com.rst.outspelled.util.OverlayManager.hideOverlay();
             if (client != null) {
                 client.sendDisconnect();
             }
@@ -920,8 +934,7 @@ public class NetworkGameController {
         body.setAlignment(javafx.geometry.Pos.CENTER);
         body.getChildren().addAll(headerLabel, bgmBox, sfxBox, buttons);
 
-        javafx.scene.layout.VBox dialogRoot = com.rst.outspelled.util.DialogBuilder.buildDialogRoot("⚙  Options  ⚙", false, body, dialog);
-        dialog.getScene().setRoot(dialogRoot);
-        dialog.showAndWait();
+        javafx.scene.layout.VBox dialogRoot = com.rst.outspelled.util.DialogBuilder.buildDialogRoot("⚙  Options  ⚙", false, body, 400, 380);
+        com.rst.outspelled.util.OverlayManager.showOverlay(dialogRoot);
     }
 }

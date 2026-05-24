@@ -16,7 +16,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.animation.Transition;
 import javafx.geometry.Rectangle2D;
@@ -515,27 +514,45 @@ public class GameController implements GameEngine.GameListener {
     @Override
     public void onHalfHpPrompt(Wizard initiator) {
         SoundManager.playSkillCheck();
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Skill Check Available!");
-        alert.setHeaderText(initiator.getName() + " can initiate a challenge!");
-        alert.setContentText(
+
+        javafx.scene.control.Label headerLabel = com.rst.outspelled.util.DialogBuilder
+                .styledDialogLabel(initiator.getName() + " can initiate a challenge!");
+        javafx.scene.control.Label contentLabel = new javafx.scene.control.Label(
                 "You are at or below 50% HP.\n\n" +
                         "Initiate the Half HP Challenge?\n" +
                         "Win → opponent drops to your HP level\n" +
                         "Lose → you take word damage\n\n" +
                         "This can only be used once per match!");
+        contentLabel.setStyle(
+                "-fx-text-fill: #a0a0c0; -fx-font-size: 13px; -fx-wrap-text: true; -fx-text-alignment: center;");
+        contentLabel.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
 
-        ButtonType initiate = new ButtonType("⚔ Initiate!");
-        ButtonType skip = new ButtonType("Skip");
-        alert.getButtonTypes().setAll(initiate, skip);
-
-        alert.showAndWait().ifPresent(response -> {
-            if (response == initiate) {
-                engine.initiateHalfHpChallenge(initiator);
-            } else {
-                engine.skipHalfHpChallenge();
-            }
+        javafx.scene.layout.StackPane initiateBtn = com.rst.outspelled.util.DialogBuilder
+                .buildDialogButton("⚔ Initiate!", true);
+        initiateBtn.setOnMouseClicked(e -> {
+            SoundManager.playClick();
+            com.rst.outspelled.util.OverlayManager.hideOverlay();
+            engine.initiateHalfHpChallenge(initiator);
         });
+
+        javafx.scene.layout.StackPane skipBtn = com.rst.outspelled.util.DialogBuilder.buildDialogButton("Skip", false);
+        skipBtn.setOnMouseClicked(e -> {
+            SoundManager.playClick();
+            com.rst.outspelled.util.OverlayManager.hideOverlay();
+            engine.skipHalfHpChallenge();
+        });
+
+        javafx.scene.layout.HBox btnBox = new javafx.scene.layout.HBox(15, skipBtn, initiateBtn);
+        btnBox.setAlignment(javafx.geometry.Pos.CENTER);
+
+        javafx.scene.layout.VBox body = new javafx.scene.layout.VBox(15);
+        body.setStyle("-fx-padding: 20 24 24 24;");
+        body.setAlignment(javafx.geometry.Pos.CENTER);
+        body.getChildren().addAll(headerLabel, contentLabel, btnBox);
+
+        javafx.scene.layout.VBox dialogRoot = com.rst.outspelled.util.DialogBuilder
+                .buildDialogRoot("Skill Check Available!", true, body, 420, 320);
+        com.rst.outspelled.util.OverlayManager.showOverlay(dialogRoot);
     }
 
     @Override
@@ -781,19 +798,19 @@ public class GameController implements GameEngine.GameListener {
         SoundManager.stopBgm();
         SoundManager.playVictory(); // local 2P: play victory for the match winner
 
-        javafx.stage.Stage dialog = com.rst.outspelled.util.DialogBuilder.buildDialogStage("Duel Over!", 400, 250);
-
         javafx.scene.control.Label headerLabel = com.rst.outspelled.util.DialogBuilder
                 .styledDialogLabel(winner.getName() + " wins!");
         javafx.scene.control.Label contentLabel = new javafx.scene.control.Label(
                 winner.getName() + " defeated " + loser.getName() + "!\n\nPlay again?");
-        contentLabel.setStyle("-fx-text-fill: #a0a0c0; -fx-font-size: 14px;");
+        contentLabel.setStyle(
+                "-fx-text-fill: #a0a0c0; -fx-font-size: 14px; -fx-alignment: center; -fx-text-alignment: center;");
+        contentLabel.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
 
         javafx.scene.layout.StackPane playAgainBtn = com.rst.outspelled.util.DialogBuilder.buildDialogButton("Rematch",
                 true);
         playAgainBtn.setOnMouseClicked(e -> {
             SoundManager.playClick();
-            dialog.close();
+            com.rst.outspelled.util.OverlayManager.hideOverlay();
             engine.shutdown();
             GameController.setWizards(
                     new Wizard(wizard1.getName(), 200, wizard1.getSkin()),
@@ -805,7 +822,7 @@ public class GameController implements GameEngine.GameListener {
                 false);
         menuBtn.setOnMouseClicked(e -> {
             SoundManager.playClick();
-            dialog.close();
+            com.rst.outspelled.util.OverlayManager.hideOverlay();
             engine.shutdown();
             Main.navigateTo("menu-view.fxml");
         });
@@ -819,9 +836,8 @@ public class GameController implements GameEngine.GameListener {
         body.getChildren().addAll(headerLabel, contentLabel, btnBox);
 
         javafx.scene.layout.VBox dialogRoot = com.rst.outspelled.util.DialogBuilder.buildDialogRoot("🏆 Duel Over 🏆",
-                false, body, dialog);
-        dialog.getScene().setRoot(dialogRoot);
-        dialog.showAndWait();
+                false, body, 400, 250);
+        com.rst.outspelled.util.OverlayManager.showOverlay(dialogRoot);
     }
 
     @FXML
@@ -831,8 +847,6 @@ public class GameController implements GameEngine.GameListener {
     }
 
     private void showSettingsDialog() {
-        javafx.stage.Stage dialog = com.rst.outspelled.util.DialogBuilder.buildDialogStage("Settings", 400, 380);
-
         javafx.scene.control.Label headerLabel = com.rst.outspelled.util.DialogBuilder
                 .styledDialogLabel("Adjust Game Volumes");
         headerLabel.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 13px; -fx-text-fill: #8899aa;");
@@ -863,14 +877,14 @@ public class GameController implements GameEngine.GameListener {
                 true);
         closeBtn.setOnMouseClicked(e -> {
             SoundManager.playClick();
-            dialog.close();
+            com.rst.outspelled.util.OverlayManager.hideOverlay();
         });
 
         javafx.scene.layout.StackPane quitBtn = com.rst.outspelled.util.DialogBuilder.buildDialogButton("Quit to Menu",
                 false);
         quitBtn.setOnMouseClicked(e -> {
             SoundManager.playClick();
-            dialog.close();
+            com.rst.outspelled.util.OverlayManager.hideOverlay();
             engine.shutdown();
             Main.navigateTo("menu-view.fxml");
         });
@@ -884,9 +898,8 @@ public class GameController implements GameEngine.GameListener {
         body.getChildren().addAll(headerLabel, bgmBox, sfxBox, buttons);
 
         javafx.scene.layout.VBox dialogRoot = com.rst.outspelled.util.DialogBuilder.buildDialogRoot("⚙  Options  ⚙",
-                false, body, dialog);
-        dialog.getScene().setRoot(dialogRoot);
-        dialog.showAndWait();
+                false, body, 400, 380);
+        com.rst.outspelled.util.OverlayManager.showOverlay(dialogRoot);
     }
 
     protected void handleKeyInput(javafx.scene.input.KeyEvent event) {

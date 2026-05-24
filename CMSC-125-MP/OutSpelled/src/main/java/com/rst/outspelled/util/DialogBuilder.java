@@ -60,6 +60,39 @@ public class DialogBuilder {
         return btn;
     }
 
+    public static VBox buildDialogRoot(String title, boolean withWarning, VBox contentBody, double width, double height) {
+        VBox root = new VBox();
+        root.setStyle("-fx-background-color: #1a1a2e;" +
+                "-fx-border-color: #e2b96f;" +
+                "-fx-border-width: 2;" +
+                "-fx-border-radius: 8;" +
+                "-fx-background-radius: 8;");
+        root.setPrefSize(width, height);
+        root.setMaxSize(width, height);
+
+        // Header
+        HBox header = new HBox();
+        header.setStyle("-fx-background-color: #12122a;" +
+                "-fx-padding: 10 15;" +
+                "-fx-background-radius: 8 8 0 0;");
+        header.setAlignment(Pos.CENTER_LEFT);
+
+        Label titleLabel = new Label(title);
+        titleLabel.setStyle("-fx-text-fill: #e2b96f; -fx-font-size: 14px; -fx-font-weight: bold;");
+
+        javafx.scene.layout.Region spacer = new javafx.scene.layout.Region();
+        HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
+
+        header.getChildren().addAll(titleLabel, spacer);
+        if (withWarning) {
+            Polygon notch = dialogNotch();
+            header.getChildren().add(notch);
+        }
+
+        root.getChildren().addAll(header, contentBody);
+        return root;
+    }
+
     public static VBox buildDialogRoot(String title, boolean withWarning, VBox contentBody, Stage dialogStage) {
         VBox root = new VBox();
         root.setStyle("-fx-background-color: #1a1a2e;" +
@@ -68,6 +101,7 @@ public class DialogBuilder {
                 "-fx-border-radius: 8;" +
                 "-fx-background-radius: 8;");
         root.setPrefSize(dialogStage.getWidth(), dialogStage.getHeight());
+        root.setMaxSize(dialogStage.getWidth(), dialogStage.getHeight());
 
         // Header
         HBox header = new HBox();

@@ -171,15 +171,6 @@ public class LetterGrid {
         }
     }
 
-    private void applyLayout(List<Character> letters) {
-        int index = 0;
-        for (int r = 0; r < ROWS; r++) {
-            for (int c = 0; c < COLS; c++) {
-                grid[r][c].reset(letters.get(index++));
-            }
-        }
-    }
-
     public LetterTile selectFirstMatchingTile(char letter) {
         char upper = Character.toUpperCase(letter);
         for (int r = 0; r < ROWS; r++) {

@@ -3,7 +3,6 @@ package com.rst.outspelled.network;
 import com.rst.outspelled.dictionary.DictionaryLoader;
 import com.rst.outspelled.model.LetterGrid;
 import com.rst.outspelled.model.Spell;
-import com.rst.outspelled.model.Wizard;
 import com.rst.outspelled.util.LetterValues;
 
 import java.io.*;
@@ -21,14 +20,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class GameServer {
 
     private static final int TURN_SECONDS = 30;
-    private static final int WHEEL_TIMEOUT_MS = 20_000;
-
     private final int port;
     private final ServerSocket serverSocket;
     private final AtomicInteger connected = new AtomicInteger(0);
     private ClientHandler client1;
     private ClientHandler client2;
-    private volatile boolean bothReady = false;
     private volatile int wheelScore1 = -1;
     private volatile int wheelScore2 = -1;
     private ScheduledExecutorService turnTimer;
@@ -142,7 +138,6 @@ public class GameServer {
         else client2.setReady(true);
         broadcast(client1, client2, Protocol.READY_ACK + " " + playerId);
         if (client1.isReady() && client2.isReady()) {
-            bothReady = true;
             broadcast(client1, client2, Protocol.BOTH_READY);
             broadcast(client1, client2, Protocol.WHEEL_START);
         }

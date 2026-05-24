@@ -18,7 +18,7 @@ import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.util.Duration;
-import javafx.animation.TranslateTransition;
+
 
 import java.util.ArrayList;
 import java.util.List;

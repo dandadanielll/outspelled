@@ -1,5 +1,6 @@
 module com.rst.outspelled {
-    requires javafx.controls;
+    requires transitive javafx.graphics;
+    requires transitive javafx.controls;
     requires javafx.fxml;
     requires javafx.media;
 
@@ -8,6 +9,8 @@ module com.rst.outspelled {
     requires com.almasb.fxgl.all;
 
     requires java.prefs;
+    requires org.apache.lucene.analysis.common;
+    requires org.apache.lucene.core;
 
     opens com.rst.outspelled to javafx.fxml;
     opens com.rst.outspelled.ui to javafx.fxml;
@@ -18,4 +21,6 @@ module com.rst.outspelled {
     exports com.rst.outspelled.model;
     exports com.rst.outspelled.network;
     exports com.rst.outspelled.util;
+    exports com.rst.outspelled.ai;
+    exports com.rst.outspelled.engine;
 }

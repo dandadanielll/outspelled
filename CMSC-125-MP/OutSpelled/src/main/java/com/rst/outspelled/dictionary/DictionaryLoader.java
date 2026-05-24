@@ -1,17 +1,21 @@
 package com.rst.outspelled.dictionary;
 
-import java.io.BufferedReader;
-import java.io.IOException;
+import org.apache.lucene.analysis.hunspell.Dictionary;
+import org.apache.lucene.analysis.hunspell.WordFormGenerator;
+import org.apache.lucene.analysis.hunspell.AffixedWord;
+import org.apache.lucene.store.ByteBuffersDirectory;
+
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class DictionaryLoader {
 
-    private static final String DICTIONARY_PATH = "/dictionary.txt";
-    private static Set<String> words = Collections.synchronizedSet(new HashSet<>());
+    private static final String AFFIX_PATH = "/en_US.aff";
+    private static final String DICT_PATH = "/en_US.dic";
+    private static final Set<String> words = Collections.synchronizedSet(new HashSet<>());
     private static volatile boolean loaded = false;
     private static volatile boolean loading = false;
 
@@ -34,20 +38,44 @@ public class DictionaryLoader {
     }
 
     private static void load() {
-        try (InputStream is = DictionaryLoader.class.getResourceAsStream(DICTIONARY_PATH);
-             BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
+        try (InputStream affStream = DictionaryLoader.class.getResourceAsStream(AFFIX_PATH);
+             InputStream dicStream = DictionaryLoader.class.getResourceAsStream(DICT_PATH)) {
 
-            String line;
-            while ((line = reader.readLine()) != null) {
-                words.add(line.trim().toLowerCase());
+            if (affStream == null || dicStream == null) {
+                System.err.println("Dictionary files not found at: " + AFFIX_PATH + " or " + DICT_PATH);
+                return;
             }
 
-            System.out.println("Dictionary loaded: " + words.size() + " words.");
+            Dictionary hunspellDict = new Dictionary(new ByteBuffersDirectory(), "temp", affStream, dicStream);
+            WordFormGenerator generator = new WordFormGenerator(hunspellDict);
 
-        } catch (IOException e) {
+            // Read the dictionary root words
+            // In Hunspell, the .dic file has the roots. We can just parse the .dic manually or use WordFormGenerator?
+            // Actually, to expand all words in the dictionary, we should read the .dic file and pass each root to generator.getAllWordForms()
+            // Wait! The user says "Expand all word forms from both files into a HashSet<String> at startup".
+            // We can read the .dic file (ignoring the first line which is the count), split by "/" to get the root, and generate word forms.
+            // But wait, WordFormGenerator can generate forms from a root. We need to pass the root.
+            
+            // Re-open dicStream to read roots manually? Yes, because lucene's Dictionary class parses it but doesn't expose an easy way to iterate all roots.
+            try (InputStream dicReaderStream = DictionaryLoader.class.getResourceAsStream(DICT_PATH);
+                 java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(dicReaderStream))) {
+                
+                String line = reader.readLine(); // skip first line (count)
+                while ((line = reader.readLine()) != null) {
+                    if (line.trim().isEmpty()) continue;
+                    String root = line.split("/")[0].trim();
+                    List<AffixedWord> forms = generator.getAllWordForms(root, () -> {});
+                    for (AffixedWord form : forms) {
+                        words.add(form.getWord().toLowerCase());
+                    }
+                }
+            }
+            
+            System.out.println("Dictionary loaded: " + words.size() + " expanded words.");
+
+        } catch (Exception e) {
             System.err.println("Failed to load dictionary: " + e.getMessage());
-        } catch (NullPointerException e) {
-            System.err.println("Dictionary file not found at: " + DICTIONARY_PATH);
+            e.printStackTrace();
         }
     }
 

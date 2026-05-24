@@ -5,8 +5,6 @@ import com.rst.outspelled.model.Player;
 
 public class DamageCalculator {
 
-    // Base multiplier for all spells
-    private static final double BASE_MULTIPLIER = 1.0;
 
     public static int calculate(Spell spell) {
         return spell.getTotalDamage();
