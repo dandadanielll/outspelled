@@ -158,7 +158,7 @@ public class MenuController {
 
         // Got it close button
         StackPane gotItBtn = buildDialogButton("Got it!", true);
-        gotItBtn.setOnMouseClicked(e -> dialog.close());
+        gotItBtn.setOnMouseClicked(e -> { SoundManager.playClick(); dialog.close(); });
 
         HBox footerRow = new HBox(gotItBtn);
         footerRow.setAlignment(Pos.CENTER);

@@ -378,7 +378,10 @@ public class ProfileController {
         content.getChildren().addAll(nameLabel, portraitContainer, skinLabel, divider, statsBox);
         card.getChildren().addAll(content, deleteBtn);
 
-        card.setOnMouseClicked(e -> selectSlot(slot, card));
+        card.setOnMouseClicked(e -> {
+            SoundManager.playClick();
+            selectSlot(slot, card);
+        });
         card.setOnMouseEntered(e -> {
             card.setTranslateY(-8);
             if (selectedSlot != slot)
@@ -415,7 +418,10 @@ public class ProfileController {
         content.getChildren().addAll(plus, hint);
         card.getChildren().add(content);
 
-        card.setOnMouseClicked(e -> onCreateProfile(slot));
+        card.setOnMouseClicked(e -> {
+            SoundManager.playClick();
+            onCreateProfile(slot);
+        });
         card.setOnMouseEntered(e -> {
             card.setTranslateY(-8);
             card.setStyle(emptyHoverCardStyle());
@@ -441,6 +447,7 @@ public class ProfileController {
 
     // Play Action
     private void onPlayClicked() {
+        SoundManager.playClick();
         if (selectedSlot < 0 || profiles.get(selectedSlot) == null) {
             updateStatus("Select a wizard first.", "status-error");
             return;
@@ -478,6 +485,14 @@ public class ProfileController {
                 nameField.setText(oldVal);
         });
 
+        nameField.setOnKeyPressed(e -> {
+            if (e.getCode() == javafx.scene.input.KeyCode.BACK_SPACE) {
+                SoundManager.playKeyDelete();
+            } else if (e.getCode().isLetterKey() || e.getCode().isDigitKey() || e.getCode() == javafx.scene.input.KeyCode.SPACE) {
+                SoundManager.playKeyTap();
+            }
+        });
+
         Label hint = new Label("Max 16 characters");
         hint.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 11px; -fx-text-fill: #506275;");
 
@@ -503,8 +518,12 @@ public class ProfileController {
 
         dialog.getScene().setRoot(buildDialogRoot("✦  New Wizard  ✦", false, body, dialog));
 
-        cancelBtn.setOnMouseClicked(e -> dialog.close());
+        cancelBtn.setOnMouseClicked(e -> {
+            SoundManager.playClick();
+            dialog.close();
+        });
         confirmBtn.setOnMouseClicked(e -> {
+            SoundManager.playClick();
             String name = nameField.getText().trim();
             if (name.isEmpty()) {
                 errorLabel.setText("Name can't be empty.");
@@ -563,8 +582,12 @@ public class ProfileController {
 
         dialog.getScene().setRoot(buildDialogRoot("⚠  Delete Wizard  ⚠", true, body, dialog));
 
-        cancelBtn.setOnMouseClicked(e -> dialog.close());
+        cancelBtn.setOnMouseClicked(e -> {
+            SoundManager.playClick();
+            dialog.close();
+        });
         deleteBtn.setOnMouseClicked(e -> {
+            SoundManager.playClick();
             ProfileManager.deleteSlot(slot);
             profiles.set(slot, null);
             if (selectedSlot == slot)
