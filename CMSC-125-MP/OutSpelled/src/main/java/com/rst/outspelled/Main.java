@@ -157,6 +157,7 @@ public class Main extends Application {
 
                 slideIn.setOnFinished(e -> {
                     // Reset properties and lock in the new scene
+                    transitionContainer.getChildren().clear();
                     newRoot.setTranslateY(0);
                     currentScene.setRoot(newRoot);
                 });
@@ -217,6 +218,7 @@ public class Main extends Application {
 
                 slideIn.setOnFinished(e -> {
                     // Reset properties and lock in the new scene
+                    transitionContainer.getChildren().clear();
                     newRoot.setTranslateX(0);
                     currentScene.setRoot(newRoot);
                 });
@@ -277,6 +279,7 @@ public class Main extends Application {
 
                 slideIn.setOnFinished(e -> {
                     // Reset properties and lock in the new scene
+                    transitionContainer.getChildren().clear();
                     newRoot.setTranslateX(0);
                     currentScene.setRoot(newRoot);
                 });
