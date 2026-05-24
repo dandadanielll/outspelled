@@ -172,6 +172,8 @@ public class GameController implements GameEngine.GameListener {
                     wizard2Animation.stop();
                 }
                 wizard2Animation = animation;
+                // Mirror the opponent so it faces the player
+                iv.setScaleX(-1);
             }
 
             pane.getChildren().setAll(iv);
@@ -241,16 +243,22 @@ public class GameController implements GameEngine.GameListener {
         java.util.function.Consumer<String> updateColors = (state) -> {
             if ("selected".equals(state)) {
                 btn.setStyle(getSelectedStyle());
-                letterLabel.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1a1000;");
-                valueLabel.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 9px; -fx-font-weight: bold; -fx-text-fill: rgba(26, 16, 0, 0.65);");
+                letterLabel.setStyle(
+                        "-fx-font-family: 'Pixelify Sans'; -fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1a1000;");
+                valueLabel.setStyle(
+                        "-fx-font-family: 'Pixelify Sans'; -fx-font-size: 9px; -fx-font-weight: bold; -fx-text-fill: rgba(26, 16, 0, 0.65);");
             } else if ("hover".equals(state)) {
                 btn.setStyle(getHoverStyle());
-                letterLabel.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #ffffff;");
-                valueLabel.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 9px; -fx-font-weight: bold; -fx-text-fill: rgba(255, 255, 255, 0.65);");
+                letterLabel.setStyle(
+                        "-fx-font-family: 'Pixelify Sans'; -fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #ffffff;");
+                valueLabel.setStyle(
+                        "-fx-font-family: 'Pixelify Sans'; -fx-font-size: 9px; -fx-font-weight: bold; -fx-text-fill: rgba(255, 255, 255, 0.65);");
             } else {
                 btn.setStyle(getIdleStyle());
-                letterLabel.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #e2b96f;");
-                valueLabel.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 9px; -fx-font-weight: bold; -fx-text-fill: rgba(226, 185, 111, 0.65);");
+                letterLabel.setStyle(
+                        "-fx-font-family: 'Pixelify Sans'; -fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #e2b96f;");
+                valueLabel.setStyle(
+                        "-fx-font-family: 'Pixelify Sans'; -fx-font-size: 9px; -fx-font-weight: bold; -fx-text-fill: rgba(226, 185, 111, 0.65);");
             }
         };
 
@@ -286,14 +294,14 @@ public class GameController implements GameEngine.GameListener {
                 ? currentSharedGrid
                 : engine.getCurrentGrid();
         String word = grid.getSelectedWord();
-        
+
         if (word.isEmpty()) {
             selectedWordLabel.setText("");
             selectedWordLabel.setGraphic(null);
         } else {
             javafx.scene.layout.HBox tiles = new javafx.scene.layout.HBox(4);
             tiles.setAlignment(javafx.geometry.Pos.CENTER);
-            
+
             for (int i = 0; i < word.length(); i++) {
                 char letter = word.charAt(i);
                 int points = 1;
@@ -306,39 +314,44 @@ public class GameController implements GameEngine.GameListener {
                         }
                     }
                 }
-                
+
                 StackPane tile = new StackPane();
                 tile.setPrefSize(56, 62);
                 tile.setMinSize(56, 62);
                 tile.setMaxSize(56, 62);
-                tile.setStyle("-fx-background-color: linear-gradient(to bottom, #ffe9a0 0%, #ffe9a0 3px, #f0c040 3px, #e8a828 100%); " +
-                              "-fx-background-insets: 0; " +
-                              "-fx-background-radius: 0; " +
-                              "-fx-border-color: #fff5c0 #c09030 #c09030 #fff5c0; " +
-                              "-fx-border-width: 2px; " +
-                              "-fx-border-radius: 0; " +
-                              "-fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.35), 0, 0.0, 2, 2);");
-                
+                tile.setStyle(
+                        "-fx-background-color: linear-gradient(to bottom, #ffe9a0 0%, #ffe9a0 3px, #f0c040 3px, #e8a828 100%); "
+                                +
+                                "-fx-background-insets: 0; " +
+                                "-fx-background-radius: 0; " +
+                                "-fx-border-color: #fff5c0 #c09030 #c09030 #fff5c0; " +
+                                "-fx-border-width: 2px; " +
+                                "-fx-border-radius: 0; " +
+                                "-fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.35), 0, 0.0, 2, 2);");
+
                 Label letterLbl = new Label(String.valueOf(letter));
-                letterLbl.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1a1000;");
-                
+                letterLbl.setStyle(
+                        "-fx-font-family: 'Pixelify Sans'; -fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1a1000;");
+
                 Label valueLbl = new Label(String.valueOf(points));
-                valueLbl.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 8px; -fx-font-weight: bold; -fx-text-fill: rgba(26, 16, 0, 0.65);");
-                
+                valueLbl.setStyle(
+                        "-fx-font-family: 'Pixelify Sans'; -fx-font-size: 8px; -fx-font-weight: bold; -fx-text-fill: rgba(26, 16, 0, 0.65);");
+
                 tile.getChildren().addAll(letterLbl, valueLbl);
                 StackPane.setAlignment(letterLbl, javafx.geometry.Pos.CENTER);
                 StackPane.setAlignment(valueLbl, javafx.geometry.Pos.BOTTOM_RIGHT);
                 valueLbl.setTranslateX(-3);
                 valueLbl.setTranslateY(-2);
-                
+
                 tiles.getChildren().add(tile);
             }
             selectedWordLabel.setText("");
             selectedWordLabel.setGraphic(tiles);
-            
+
             for (int i = 0; i < tiles.getChildren().size(); i++) {
                 javafx.scene.Node n = tiles.getChildren().get(i);
-                javafx.animation.TranslateTransition tt = new javafx.animation.TranslateTransition(Duration.millis(300), n);
+                javafx.animation.TranslateTransition tt = new javafx.animation.TranslateTransition(Duration.millis(300),
+                        n);
                 tt.setFromY(6);
                 tt.setToY(0);
                 tt.play();
@@ -699,20 +712,12 @@ public class GameController implements GameEngine.GameListener {
         if (wizard1Portrait == null || wizard2Portrait == null)
             return;
 
-        final String w1Bg = "-fx-background-color: #2a1a4a; ";
-        final String w2Bg = "-fx-background-color: #1a2a4a; ";
-
-        final String activeBorder = "-fx-border-color: #e2b96f; -fx-border-width: 4; " +
-                "-fx-border-radius: 6; -fx-background-radius: 6;";
-        final String inactiveBorder = "-fx-border-color: #444466; -fx-border-width: 1.5; " +
-                "-fx-border-radius: 6; -fx-background-radius: 6;";
-
         if (currentPlayer == wizard1) {
-            wizard1Portrait.setStyle(w1Bg + activeBorder);
-            wizard2Portrait.setStyle(w2Bg + inactiveBorder);
+            wizard1Portrait.setOpacity(1.0);
+            wizard2Portrait.setOpacity(0.5);
         } else {
-            wizard2Portrait.setStyle(w2Bg + activeBorder);
-            wizard1Portrait.setStyle(w1Bg + inactiveBorder);
+            wizard2Portrait.setOpacity(1.0);
+            wizard1Portrait.setOpacity(0.5);
         }
     }
 

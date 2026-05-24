@@ -61,14 +61,12 @@
                         <Rectangle fx:id="wizard1Portrait"
                                    width="140" height="180"
                                    arcWidth="14" arcHeight="14"
-                                   fill="#2a1a4a"
-                                   stroke="#444466" strokeWidth="2"/>
+                                   fill="transparent"
+                                   stroke="transparent" strokeWidth="0"/>
                         <Label text="🧙" style="-fx-font-size: 64px;"/>
                     </StackPane>
 
-                    <Label fx:id="wizard1Label" text=""
-                           style="-fx-text-fill: #666688;
-                                  -fx-font-size: 11px;"/>
+                    <Label fx:id="wizard1Label" text="" visible="false" managed="false"/>
 
                     <!-- Hearts -->
                     <VBox alignment="CENTER" spacing="4">
@@ -161,14 +159,12 @@
                         <Rectangle fx:id="wizard2Portrait"
                                    width="140" height="180"
                                    arcWidth="14" arcHeight="14"
-                                   fill="#1a2a4a"
-                                   stroke="#444466" strokeWidth="2"/>
+                                   fill="transparent"
+                                   stroke="transparent" strokeWidth="0"/>
                         <Label text="🧙" style="-fx-font-size: 64px;"/>
                     </StackPane>
 
-                    <Label fx:id="wizard2Label" text=""
-                           style="-fx-text-fill: #666688;
-                                  -fx-font-size: 11px;"/>
+                    <Label fx:id="wizard2Label" text="" visible="false" managed="false"/>
 
                     <!-- Hearts -->
                     <VBox alignment="CENTER" spacing="4">

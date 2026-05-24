@@ -112,14 +112,13 @@
                   style="-fx-padding: 10;">
 
                 <!-- Player 1 Wizard Portrait -->
-                <VBox alignment="BOTTOM_CENTER" spacing="8" prefWidth="180">
+                <VBox alignment="BOTTOM_CENTER" spacing="8" prefWidth="180" translateY="-275" translateX="90">
                     <padding>
                         <Insets top="4" right="4" bottom="4" left="4"/>
                     </padding>
                     <StackPane fx:id="wizard1Portrait" prefWidth="120" prefHeight="160"
-                               style="-fx-border-color: #444466; -fx-border-width: 1.5; -fx-border-radius: 6; -fx-background-radius: 6; -fx-background-color: #2a1a4a;"/>
-                    <Label fx:id="wizard1NameTag" text="🧙 You"
-                           style="-fx-text-fill: #e2b96f; -fx-font-size: 12px;"/>
+                               style="-fx-background-color: transparent;"/>
+                    <Label fx:id="wizard1NameTag" text="" visible="false" managed="false"/>
                 </VBox>
 
                 <!-- Center: Grid + Word + Buttons -->
@@ -172,14 +171,13 @@
                 </VBox>
 
                 <!-- Player 2 (AI) Wizard Portrait -->
-                <VBox alignment="BOTTOM_CENTER" spacing="8" prefWidth="180">
+                <VBox alignment="BOTTOM_CENTER" spacing="8" prefWidth="180" translateY="-275" translateX="-90">
                     <padding>
                         <Insets top="4" right="4" bottom="4" left="4"/>
                     </padding>
                     <StackPane fx:id="wizard2Portrait" prefWidth="120" prefHeight="160"
-                               style="-fx-border-color: #444466; -fx-border-width: 1.5; -fx-border-radius: 6; -fx-background-radius: 6; -fx-background-color: #1a2a4a;"/>
-                    <Label fx:id="wizard2NameTag" text="🤖 AI"
-                           style="-fx-text-fill: #7eb8e2; -fx-font-size: 12px;"/>
+                               style="-fx-background-color: transparent;"/>
+                    <Label fx:id="wizard2NameTag" text="" visible="false" managed="false"/>
                 </VBox>
 
             </HBox>
