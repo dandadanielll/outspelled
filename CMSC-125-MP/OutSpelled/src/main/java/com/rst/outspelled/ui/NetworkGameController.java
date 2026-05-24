@@ -7,6 +7,7 @@ import com.rst.outspelled.model.Spell;
 import com.rst.outspelled.model.Wizard;
 import com.rst.outspelled.network.GameClient;
 import com.rst.outspelled.network.SessionManager;
+import com.rst.outspelled.util.SoundManager;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -109,6 +110,7 @@ public class NetworkGameController {
         Platform.runLater(this::setupKeyboardHandler);
         if (skillCheckStatusLabel != null) skillCheckStatusLabel.setText("");
         if (lastStandOverlay != null) lastStandOverlay.setVisible(false);
+        SoundManager.startBgm("BattleMusic.wav"); // switch to battle music
     }
 
     public static void applyShuffleGrid(int shufflerId, String letters) {
@@ -157,6 +159,7 @@ public class NetworkGameController {
         if (code == javafx.scene.input.KeyCode.BACK_SPACE) {
             String word = letterGrid.getSelectedWord();
             if (!word.isEmpty()) {
+                SoundManager.playKeyDelete(); // delete key sound
                 char last = word.charAt(word.length() - 1);
                 letterGrid.deselectLastMatchingTile(last);
                 renderGrid();
@@ -179,6 +182,7 @@ public class NetworkGameController {
         if (key != null && key.length() == 1 && Character.isLetter(key.charAt(0))) {
             LetterTile matched = letterGrid.selectFirstMatchingTile(key.charAt(0));
             if (matched != null) {
+                SoundManager.playKeyTap(); // key tap for each letter selected
                 renderGrid();
                 updateSelectedWordDisplay();
             } else {
@@ -430,6 +434,7 @@ public class NetworkGameController {
     public static void showInvalidWord(String word) {
         Platform.runLater(() -> {
             if (instance != null) {
+                SoundManager.playInvalid(); // key_delete sound for invalid word
                 instance.feedbackLabel.setText("\"" + word + "\" is not valid.");
                 instance.feedbackLabel.setStyle("-fx-text-fill: #ff6b6b;");
                 instance.castButton.setDisable(false);
@@ -505,6 +510,7 @@ public class NetworkGameController {
     public static void onHalfHpStart(long gridSeed) {
         Platform.runLater(() -> {
             if (instance != null && instance.letterGrid != null) {
+                SoundManager.playSkillCheck();
                 instance.halfHpChallengeActive = true;
                 instance.letterGrid.resetWithSeed(gridSeed);
                 instance.letterGrid.deselectAll();
@@ -552,6 +558,7 @@ public class NetworkGameController {
     public static void onLastStandStart(String scrambledWord) {
         Platform.runLater(() -> {
             if (instance != null) {
+                SoundManager.playSkillCheck();
                 if (instance.lastStandOverlay != null) instance.lastStandOverlay.setVisible(true);
                 if (instance.scrambledWordLabel != null) instance.scrambledWordLabel.setText(scrambledWord != null ? scrambledWord : "??????");
                 if (instance.lastStandFeedbackLabel != null) instance.lastStandFeedbackLabel.setText("");
@@ -619,6 +626,14 @@ public class NetworkGameController {
     public static void onGameOver(int winnerId) {
         Platform.runLater(() -> {
             if (instance != null) {
+                // Stop battle music then play the appropriate fanfare
+                SoundManager.stopBgm();
+                if (winnerId == myPlayerId) {
+                    SoundManager.playVictory(); // this client won
+                } else {
+                    SoundManager.playDefeat();  // this client lost
+                }
+
                 String winnerName = winnerId == 1 ? (wizard1 != null ? wizard1.getName() : "Player 1")
                         : (wizard2 != null ? wizard2.getName() : "Player 2");
                 instance.feedbackLabel.setText(winnerName + " wins!");
@@ -645,6 +660,7 @@ public class NetworkGameController {
         }
         if (client != null) {
             if (halfHpChallengeActive) {
+                SoundManager.playCast(); // cast sound for skill check word too
                 client.sendHalfHpWord(word);
                 letterGrid.deselectAll();
                 renderGrid();
@@ -654,6 +670,7 @@ public class NetworkGameController {
                 castButton.setDisable(true);
                 return;
             }
+            SoundManager.playCast(); // cast sound on word submission
             client.sendWord(word);
 
             renderGrid();

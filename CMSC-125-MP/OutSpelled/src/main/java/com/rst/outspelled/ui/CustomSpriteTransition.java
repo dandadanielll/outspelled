@@ -13,7 +13,8 @@ public class CustomSpriteTransition extends Transition {
     private final double frameHeight;
     private int lastIndex = -1;
 
-    public CustomSpriteTransition(ImageView imageView, Duration duration, int totalFrames, int columns, double frameWidth, double frameHeight) {
+    public CustomSpriteTransition(ImageView imageView, Duration duration, int totalFrames, int columns,
+            double frameWidth, double frameHeight) {
         this.imageView = imageView;
         this.totalFrames = totalFrames;
         this.columns = columns;

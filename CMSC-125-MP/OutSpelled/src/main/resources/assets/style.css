@@ -1,15 +1,170 @@
+/* Profile screen brick background */
+.profile-root {
+    -fx-background-image: url('dungeon-brick.png');
+    -fx-background-repeat: repeat;
+    -fx-background-size: auto;
+}
+
 @font-face {
     font-family: 'PixelFont';
     src: url('fonts/PixelifySans-VariableFont_wght.ttf');
 }
 
+/* Base Pixel Font */
 .pixel-font {
     -fx-font-family: 'Pixelify Sans';
 }
 
-.profile-root {
-    -fx-background-image: url('dungeon-brick.png');
-    -fx-background-repeat: repeat;
-    -fx-background-size: auto;
-    -fx-background-color: #1a1a2e;
+/* Arrow Buttons — these are still real Button nodes inside the cards */
+.arrow-button {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent;
+    -fx-text-fill: #e2b96f;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.arrow-button:hover {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-text-fill: #ffffff;
+}
+
+.arrow-button:pressed,
+.arrow-button:armed {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-text-fill: #c9a050;
+}
+
+.arrow-left {
+    -fx-padding: 0 12 0 0;
+}
+
+.arrow-right {
+    -fx-padding: 0 0 0 12;
+}
+
+/* Status Label color classes */
+.status-success {
+    -fx-text-fill: #4caf50;
+    -fx-font-size: 13px;
+}
+
+.status-error {
+    -fx-text-fill: #ff6b6b;
+    -fx-font-size: 13px;
+}
+
+.status-neutral {
+    -fx-text-fill: #a0a0c0;
+    -fx-font-size: 13px;
+}
+
+/* ComboBox base */
+.combo-box {
+    -fx-background-color: #0d0f18;
+    -fx-border-color: #2a3050;
+    -fx-border-width: 1px;
+    -fx-border-radius: 0;
+    -fx-background-radius: 0;
+}
+
+/* The selected-item cell inside the box */
+.combo-box .list-cell {
+    -fx-background-color: #0d0f18;
+    -fx-text-fill: #8899aa;
+    -fx-font-family: 'Pixelify Sans';
+    -fx-font-size: 11px;
+    -fx-padding: 2 6 2 6;
+}
+
+/* The arrow button area */
+.combo-box .arrow-button {
+    -fx-background-color: #1a1f30;
+    -fx-border-color: transparent;
+}
+
+.combo-box .arrow {
+    -fx-background-color: #506275;
+}
+
+/* The dropdown popup background */
+.combo-box-popup .list-view {
+    -fx-background-color: #0d0f18;
+    -fx-border-color: #2a3050;
+    -fx-border-width: 1px;
+    -fx-border-radius: 0;
+    -fx-background-radius: 0;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 10, 0.0, 0, 4);
+}
+
+/* Each item in the dropdown */
+.combo-box-popup .list-view .list-cell {
+    -fx-background-color: #0d0f18;
+    -fx-text-fill: #8899aa;
+    -fx-font-family: 'Pixelify Sans';
+    -fx-font-size: 11px;
+    -fx-padding: 4 8 4 8;
+}
+
+.combo-box-popup .list-view .list-cell:hover {
+    -fx-background-color: #1a1f30;
+    -fx-text-fill: #c0cce0;
+}
+
+.combo-box-popup .list-view .list-cell:selected {
+    -fx-background-color: #2a3050;
+    -fx-text-fill: #e2b96f;
+}
+
+/* Constrain the arrow button size */
+.combo-box .arrow-button {
+    -fx-background-color: #1a1f30;
+    -fx-border-color: transparent;
+    -fx-padding: 0 6 0 6;
+    -fx-max-width: 20px;
+    -fx-min-width: 20px;
+    -fx-pref-width: 20px;
+}
+
+.combo-box .arrow {
+    -fx-background-color: #506275;
+    -fx-max-width: 8px;
+    -fx-max-height: 8px;
+    -fx-pref-width: 8px;
+    -fx-pref-height: 8px;
+}
+
+/* Match popup cell height to the combo box height */
+.combo-box-popup .list-view .list-cell {
+    -fx-background-color: #0d0f18;
+    -fx-text-fill: #8899aa;
+    -fx-font-family: 'Pixelify Sans';
+    -fx-font-size: 11px;
+    -fx-padding: 0 8 0 8;
+    -fx-min-height: 24px;
+    -fx-pref-height: 24px;
+    -fx-max-height: 24px;
+}
+
+/* Remove extra padding/spacing from the list view itself */
+.combo-box-popup .list-view {
+    -fx-background-color: #0d0f18;
+    -fx-border-color: #2a3050;
+    -fx-border-width: 1px;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+    -fx-padding: 0;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 10, 0.0, 0, 4);
+}
+
+/* Also zero out the inner scroll pane/viewport padding */
+.combo-box-popup .list-view .virtual-flow,
+.combo-box-popup .list-view .scroll-pane,
+.combo-box-popup .list-view .viewport {
+    -fx-padding: 0;
+    -fx-background-color: #0d0f18;
 }

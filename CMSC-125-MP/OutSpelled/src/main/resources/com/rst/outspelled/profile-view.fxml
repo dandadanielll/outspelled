@@ -19,10 +19,10 @@
     </stylesheets>
 
     <!-- TOP TITLE -->
-    <VBox alignment="CENTER" spacing="4" style="-fx-padding: 28 0 20 0;">
+    <VBox alignment="CENTER" spacing="4" style="-fx-padding: 26 0 50 0;">
         <Label text="OutSpelled"
                styleClass="pixel-font"
-               style="-fx-font-size: 72px;
+               style="-fx-font-size: 86px;
                       -fx-font-weight: bold;
                       -fx-text-fill: #e2b96f;
                       -fx-effect: dropshadow(three-pass-box, #000000, 14, 0.9, 0, 3);" />
@@ -33,36 +33,30 @@
                       -fx-effect: dropshadow(three-pass-box, #000000, 6, 0.8, 0, 2);" />
     </VBox>
 
-    <!-- SPACER -->
-    <Region prefHeight="20" />
-
     <!-- Profile Cards -->
     <HBox fx:id="profileSlotsBox"
           alignment="CENTER"
-          spacing="30"
-          VBox.vgrow="ALWAYS" />
+          spacing="40"
+          VBox.vgrow="NEVER" />
 
     <!-- Status -->
+ <VBox alignment="CENTER"
+      spacing="2"
+      style="-fx-padding: 35 0 0 0;">
+
     <Label fx:id="statusLabel" text=""
            styleClass="pixel-font"
-           style="-fx-font-size: 13px; -fx-text-fill: #a0a0c0; -fx-padding: 10 0 0 0;" />
+           style="-fx-font-size: 13px;
+                  -fx-text-fill: #a0a0c0;
+                  -fx-min-width: 400px; -fx-pref-width: 400px; -fx-max-width: 400px;
+                  -fx-min-height: 24px; -fx-pref-height: 24px; -fx-max-height: 24px;
+                  -fx-alignment: center;" />
 
-    <!-- Play Button -->
-    <VBox alignment="CENTER" style="-fx-padding: 12 0 28 0;">
-        <Button text="▶  Play!"
-                onAction="#onPlayClicked"
-                styleClass="pixel-font"
-                style="-fx-background-color: #e2b96f;
-                       -fx-text-fill: #12151e;
-                       -fx-font-size: 18px;
-                       -fx-font-weight: bold;
-                       -fx-padding: 14 60;
-                       -fx-background-radius: 0;
-                       -fx-border-color: #c9a050;
-                       -fx-border-width: 2px;
-                       -fx-border-radius: 0;
-                       -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.6), 0, 0.0, 4, 4);
-                       -fx-cursor: hand;" />
-    </VBox>
+    <VBox fx:id="playButtonContainer"
+          alignment="CENTER"
+          style="-fx-padding: 8 0 28 0;" />
 
 </VBox>
+
+</VBox>
+

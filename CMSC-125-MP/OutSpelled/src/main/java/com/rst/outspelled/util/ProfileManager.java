@@ -7,8 +7,7 @@ import java.util.List;
 
 public final class ProfileManager {
 
-    private static final Preferences PREFS =
-            Preferences.userNodeForPackage(ProfileManager.class);
+    private static final Preferences PREFS = Preferences.userNodeForPackage(ProfileManager.class);
 
     private static final int MAX_SLOTS = 3;
 
@@ -17,41 +16,43 @@ public final class ProfileManager {
         return "slot" + slot + "_" + field;
     }
 
-    public static int getMaxSlots() { return MAX_SLOTS; }
+    public static int getMaxSlots() {
+        return MAX_SLOTS;
+    }
 
     /** Returns null if the slot is empty. */
     public static Wizard loadSlot(int slot) {
         String name = PREFS.get(key(slot, "name"), null);
-        if (name == null || name.isBlank()) return null;
+        if (name == null || name.isBlank())
+            return null;
 
-        int wins   = PREFS.getInt(key(slot, "wins"), 0);
+        int wins = PREFS.getInt(key(slot, "wins"), 0);
         int losses = PREFS.getInt(key(slot, "losses"), 0);
 
-        String skinName  = PREFS.get(key(slot, "skin"),
-                Wizard.WizardSkin.EMBER_MAGE.name());
-        String arenaName = PREFS.get(key(slot, "arena"),
-                Wizard.ArenaBackground.DARK_TOWER.name());
+        String skinName = PREFS.get(key(slot, "skin"),
+                Wizard.WizardSkin.ARCANE_WIZARD.name());
 
         Wizard.WizardSkin skin;
-        Wizard.ArenaBackground arena;
-        try { skin  = Wizard.WizardSkin.valueOf(skinName); }
-        catch (Exception e) { skin = Wizard.WizardSkin.EMBER_MAGE; }
-        try { arena = Wizard.ArenaBackground.valueOf(arenaName); }
-        catch (Exception e) { arena = Wizard.ArenaBackground.DARK_TOWER; }
+        try {
+            skin = Wizard.WizardSkin.valueOf(skinName);
+        } catch (Exception e) {
+            skin = Wizard.WizardSkin.ARCANE_WIZARD;
+        }
 
-        Wizard w = new Wizard(name, 200, skin, arena);
+        Wizard w = new Wizard(name, 200, skin);
         // restore stats without exposing setters
-        for (int i = 0; i < wins; i++) w.recordWin();
-        for (int i = 0; i < losses; i++) w.recordLoss();
+        for (int i = 0; i < wins; i++)
+            w.recordWin();
+        for (int i = 0; i < losses; i++)
+            w.recordLoss();
         return w;
     }
 
     public static void saveSlot(int slot, Wizard wizard) {
-        PREFS.put(key(slot, "name"),   wizard.getName());
-        PREFS.putInt(key(slot, "wins"),   wizard.getWins());
+        PREFS.put(key(slot, "name"), wizard.getName());
+        PREFS.putInt(key(slot, "wins"), wizard.getWins());
         PREFS.putInt(key(slot, "losses"), wizard.getLosses());
-        PREFS.put(key(slot, "skin"),   wizard.getSkin().name());
-        PREFS.put(key(slot, "arena"),  wizard.getPreferredArena().name());
+        PREFS.put(key(slot, "skin"), wizard.getSkin().name());
     }
 
     public static void deleteSlot(int slot) {
@@ -65,9 +66,11 @@ public final class ProfileManager {
     /** Returns a list of all loaded profiles (null entries = empty slots). */
     public static List<Wizard> loadAll() {
         List<Wizard> list = new ArrayList<>();
-        for (int i = 0; i < MAX_SLOTS; i++) list.add(loadSlot(i));
+        for (int i = 0; i < MAX_SLOTS; i++)
+            list.add(loadSlot(i));
         return list;
     }
 
-    private ProfileManager() {}
+    private ProfileManager() {
+    }
 }

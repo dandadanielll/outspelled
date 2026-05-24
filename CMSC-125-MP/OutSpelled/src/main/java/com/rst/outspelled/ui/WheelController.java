@@ -1,6 +1,7 @@
 package com.rst.outspelled.ui;
 
 import com.rst.outspelled.Main;
+import com.rst.outspelled.ai.AiOpponent;
 import com.rst.outspelled.model.Wizard;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
@@ -52,6 +53,8 @@ public class WheelController {
     private final java.util.Random random = new java.util.Random();
     private boolean testToggle = true; // local 2P: alternate which player gets spacebar
     private static boolean isNetworkMode = false;
+    private static boolean isSoloMode = false;        // true when coming from vs AI
+    private static AiOpponent pendingAiOpponent = null; // stored so endGame() can pass it to SoloGameController
     private AnimationTimer animationTimer;
     private ScheduledExecutorService timerExecutor;
 
@@ -62,6 +65,14 @@ public class WheelController {
 
     public static void setNetworkMode(boolean network) {
         isNetworkMode = network;
+        if (network) isSoloMode = false; // network and solo are mutually exclusive
+    }
+
+    // Call this from MenuController when launching a vs AI game
+    public static void setSoloMode(AiOpponent opponent) {
+        isSoloMode = true;
+        isNetworkMode = false;
+        pendingAiOpponent = opponent;
     }
 
     private void sendWheelManaToServer(int playerId, int mana) {
@@ -362,11 +373,28 @@ public class WheelController {
             return;
         }
 
-        // Local: winner goes first — pass in correct order to GameController
-        Wizard first = winner;
+        // Determine turn order: winner goes first
+        Wizard first  = winner;
         Wizard second = winner == wizard1 ? wizard2 : wizard1;
-        GameController.setWizards(first, second);
 
+        // Solo vs AI: pass winner-first order and the stored AI opponent to SoloGameController
+        if (isSoloMode) {
+            isSoloMode = false;
+            SoloGameController.setup(first, second, pendingAiOpponent);
+            pendingAiOpponent = null;
+            new Thread(() -> {
+                try {
+                    Thread.sleep(2500);
+                    Platform.runLater(() -> Main.navigateTo("solo-game-view.fxml"));
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }).start();
+            return;
+        }
+
+        // Local 2P: winner goes first — pass in correct order to GameController
+        GameController.setWizards(first, second);
         new Thread(() -> {
             try {
                 Thread.sleep(2500);
@@ -376,4 +404,4 @@ public class WheelController {
             }
         }).start();
     }
-}
+}
