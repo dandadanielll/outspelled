@@ -5,7 +5,7 @@ import com.rst.outspelled.ai.AiOpponent;
 import com.rst.outspelled.model.LetterGrid;
 import com.rst.outspelled.model.Wizard;
 import com.rst.outspelled.util.SoundManager;
-import javafx.scene.control.*;
+
 
 // Extends from GameController and only overrides the parts that differ for singleplayer. All shared UI logic is inherited. 
 public class SoloGameController extends GameController {
@@ -95,16 +95,15 @@ public class SoloGameController extends GameController {
             SoundManager.playDefeat();   // human loses
         }
 
-        javafx.stage.Stage dialog = com.rst.outspelled.util.DialogBuilder.buildDialogStage("Duel Over!", 400, 250);
-
         javafx.scene.control.Label headerLabel = com.rst.outspelled.util.DialogBuilder.styledDialogLabel(winner.getName() + " wins!");
         javafx.scene.control.Label contentLabel = new javafx.scene.control.Label(winner.getName() + " defeated " + loser.getName() + "!\n\nPlay again?");
-        contentLabel.setStyle("-fx-text-fill: #a0a0c0; -fx-font-size: 14px;");
+        contentLabel.setStyle("-fx-text-fill: #a0a0c0; -fx-font-size: 14px; -fx-alignment: center; -fx-text-alignment: center;");
+        contentLabel.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
 
         javafx.scene.layout.StackPane playAgainBtn = com.rst.outspelled.util.DialogBuilder.buildDialogButton("Rematch", true);
         playAgainBtn.setOnMouseClicked(e -> {
             SoundManager.playClick();
-            dialog.close();
+            com.rst.outspelled.util.OverlayManager.hideOverlay();
             engine.shutdown();
             aiOpponent.shutdown();
             SoloGameController.setup(
@@ -117,7 +116,7 @@ public class SoloGameController extends GameController {
         javafx.scene.layout.StackPane menuBtn = com.rst.outspelled.util.DialogBuilder.buildDialogButton("Main Menu", false);
         menuBtn.setOnMouseClicked(e -> {
             SoundManager.playClick();
-            dialog.close();
+            com.rst.outspelled.util.OverlayManager.hideOverlay();
             engine.shutdown();
             aiOpponent.shutdown();
             Main.navigateTo("menu-view.fxml");
@@ -131,8 +130,7 @@ public class SoloGameController extends GameController {
         body.setAlignment(javafx.geometry.Pos.CENTER);
         body.getChildren().addAll(headerLabel, contentLabel, btnBox);
 
-        javafx.scene.layout.VBox dialogRoot = com.rst.outspelled.util.DialogBuilder.buildDialogRoot("🏆 Duel Over 🏆", false, body, dialog);
-        dialog.getScene().setRoot(dialogRoot);
-        dialog.showAndWait();
+        javafx.scene.layout.VBox dialogRoot = com.rst.outspelled.util.DialogBuilder.buildDialogRoot("🏆 Duel Over 🏆", false, body, 400, 250);
+        com.rst.outspelled.util.OverlayManager.showOverlay(dialogRoot);
     }
 }

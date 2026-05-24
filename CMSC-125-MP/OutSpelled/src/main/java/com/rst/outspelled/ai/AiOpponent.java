@@ -12,18 +12,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-interface AiBrain {
-    /*
-     * Find the best word the AI can form from the given grid, excluding
-     * already-used words.
-     * Returns an empty string if no valid word is found
-     */
-    String findBestWord(LetterGrid grid, Set<String> usedWords);
-
-    // Simulated thinking delay in milliseconds before the AI submits (varies with
-    // difficulty)
-    long getThinkingDelayMs();
-}
 
 // Schedules AI turns on a background thread, then fires callbacks on the FX
 // thread
