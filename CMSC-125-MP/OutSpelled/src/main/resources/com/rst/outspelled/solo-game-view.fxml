@@ -13,7 +13,7 @@
            prefHeight="650">
 
     <!-- Main Game Screen -->
-    <BorderPane style="-fx-background-color: #1a1a2e;">
+    <BorderPane fx:id="gameRoot" style="-fx-background-color: #1a1a2e;">
 
         <!-- TOP: HP Bars -->
         <top>
@@ -70,10 +70,9 @@
                     <padding>
                         <Insets top="4" right="4" bottom="4" left="4"/>
                     </padding>
-                    <Rectangle fx:id="wizard1Portrait" width="120" height="160"
-                               arcWidth="10" arcHeight="10"
-                               fill="#2a1a4a" stroke="#444466" strokeWidth="1.5"/>
-                    <Label text="🧙 You"
+                    <StackPane fx:id="wizard1Portrait" prefWidth="120" prefHeight="160"
+                               style="-fx-border-color: #444466; -fx-border-width: 1.5; -fx-border-radius: 6; -fx-background-radius: 6; -fx-background-color: #2a1a4a;"/>
+                    <Label fx:id="wizard1NameTag" text="🧙 You"
                            style="-fx-text-fill: #e2b96f; -fx-font-size: 12px;"/>
                 </VBox>
 
@@ -155,10 +154,9 @@
                     <padding>
                         <Insets top="4" right="4" bottom="4" left="4"/>
                     </padding>
-                    <Rectangle fx:id="wizard2Portrait" width="120" height="160"
-                               arcWidth="10" arcHeight="10"
-                               fill="#1a2a4a" stroke="#444466" strokeWidth="1.5"/>
-                    <Label text="🤖 AI"
+                    <StackPane fx:id="wizard2Portrait" prefWidth="120" prefHeight="160"
+                               style="-fx-border-color: #444466; -fx-border-width: 1.5; -fx-border-radius: 6; -fx-background-radius: 6; -fx-background-color: #1a2a4a;"/>
+                    <Label fx:id="wizard2NameTag" text="🤖 AI"
                            style="-fx-text-fill: #7eb8e2; -fx-font-size: 12px;"/>
                 </VBox>
 

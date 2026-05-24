@@ -11,16 +11,25 @@ import com.rst.outspelled.util.SoundManager;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.animation.Transition;
+import javafx.geometry.Rectangle2D;
+import javafx.util.Duration;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class GameController implements GameEngine.GameListener {
+
+    @FXML
+    protected BorderPane gameRoot;
 
     @FXML
     protected Label player1NameLabel;
@@ -51,9 +60,13 @@ public class GameController implements GameEngine.GameListener {
     @FXML
     protected Label skillCheckStatusLabel;
     @FXML
-    protected Rectangle wizard1Portrait;
+    protected StackPane wizard1Portrait;
     @FXML
-    protected Rectangle wizard2Portrait;
+    protected StackPane wizard2Portrait;
+    @FXML
+    protected Label wizard1NameTag;
+    @FXML
+    protected Label wizard2NameTag;
 
     // Last Stand overlay fields
     @FXML
@@ -70,6 +83,9 @@ public class GameController implements GameEngine.GameListener {
     protected static Wizard wizard1;
     protected static Wizard wizard2;
     protected GameEngine engine;
+
+    protected CustomSpriteTransition wizard1Animation;
+    protected CustomSpriteTransition wizard2Animation;
 
     protected ScheduledExecutorService skillCheckTimerExecutor;
     protected int skillCheckSecondsRemaining;
@@ -99,7 +115,70 @@ public class GameController implements GameEngine.GameListener {
         lastStandOverlay.setVisible(false);
         skillCheckStatusLabel.setText("");
 
+        // Set background to Game-BG.png in assets
+        java.net.URL bgUrl = GameController.class.getResource("/assets/BG-platform.png");
+        if (bgUrl != null) {
+            gameRoot.setStyle("-fx-background-color: #1a1a2e; " +
+                    "-fx-background-image: url('" + bgUrl.toExternalForm() + "'); " +
+                    "-fx-background-size: 100% 100%; " +
+                    "-fx-background-repeat: no-repeat; " +
+                    "-fx-background-position: center;");
+        }
+
+        // Load wizard skin portraits
+        loadWizardPortrait(wizard1Portrait, wizard1);
+        loadWizardPortrait(wizard2Portrait, wizard2);
+
         engine.initialize();
+    }
+
+    /**
+     * Fills a portrait StackPane with the wizard's skin image, clipped to rounded
+     * corners and animated if a sprite sheet.
+     */
+    private void loadWizardPortrait(StackPane pane, Wizard wizard) {
+        if (pane == null || wizard == null)
+            return;
+        String imageName = wizard.getSkin().getImagePath();
+        java.net.URL imgUrl = GameController.class.getResource("/assets/" + imageName);
+        if (imgUrl == null)
+            return;
+        try {
+            Image img = new Image(imgUrl.toExternalForm());
+            ImageView iv = new ImageView(img);
+            iv.setFitWidth(120);
+            iv.setFitHeight(120);
+            iv.setPreserveRatio(true);
+            iv.setSmooth(false);
+            iv.setViewport(new Rectangle2D(0, 0, 128, 128));
+
+            // Rounded clip to match the border-radius
+            Rectangle clip = new Rectangle(120, 120);
+            clip.setArcWidth(12);
+            clip.setArcHeight(12);
+            iv.setClip(clip);
+
+            CustomSpriteTransition animation = new CustomSpriteTransition(
+                    iv, Duration.millis(800), 2, 2, 128.0, 128.0);
+            animation.setCycleCount(Transition.INDEFINITE);
+            animation.play();
+
+            if (pane == wizard1Portrait) {
+                if (wizard1Animation != null) {
+                    wizard1Animation.stop();
+                }
+                wizard1Animation = animation;
+            } else if (pane == wizard2Portrait) {
+                if (wizard2Animation != null) {
+                    wizard2Animation.stop();
+                }
+                wizard2Animation = animation;
+            }
+
+            pane.getChildren().setAll(iv);
+        } catch (Exception ignored) {
+            // image stays as empty styled pane on failure
+        }
     }
 
     // --- Grid Rendering ---
@@ -494,21 +573,20 @@ public class GameController implements GameEngine.GameListener {
         if (wizard1Portrait == null || wizard2Portrait == null)
             return;
 
-        final double activeStrokeWidth = 6;
-        final double inactiveStrokeWidth = 1.5;
-        final String activeColor = "#e2b96f"; // gold — current player
-        final String inactiveColor = "#444466"; // dim border — other player
+        final String w1Bg = "-fx-background-color: #2a1a4a; ";
+        final String w2Bg = "-fx-background-color: #1a2a4a; ";
+
+        final String activeBorder = "-fx-border-color: #e2b96f; -fx-border-width: 4; " +
+                "-fx-border-radius: 6; -fx-background-radius: 6;";
+        final String inactiveBorder = "-fx-border-color: #444466; -fx-border-width: 1.5; " +
+                "-fx-border-radius: 6; -fx-background-radius: 6;";
 
         if (currentPlayer == wizard1) {
-            wizard1Portrait.setStroke(Color.web(activeColor));
-            wizard1Portrait.setStrokeWidth(activeStrokeWidth);
-            wizard2Portrait.setStroke(Color.web(inactiveColor));
-            wizard2Portrait.setStrokeWidth(inactiveStrokeWidth);
+            wizard1Portrait.setStyle(w1Bg + activeBorder);
+            wizard2Portrait.setStyle(w2Bg + inactiveBorder);
         } else {
-            wizard2Portrait.setStroke(Color.web(activeColor));
-            wizard2Portrait.setStrokeWidth(activeStrokeWidth);
-            wizard1Portrait.setStroke(Color.web(inactiveColor));
-            wizard1Portrait.setStrokeWidth(inactiveStrokeWidth);
+            wizard2Portrait.setStyle(w2Bg + activeBorder);
+            wizard1Portrait.setStyle(w1Bg + inactiveBorder);
         }
     }
 
