@@ -745,53 +745,6 @@ public class MenuController {
     }
 
     private StackPane buildQuitButton() {
-        Label label = new Label("— Quit —");
-        label.setStyle(
-                "-fx-font-family: 'Pixelify Sans'; -fx-font-size: 12px; -fx-text-fill: #506275; -fx-cursor: hand;");
-        label.setMouseTransparent(true);
-
-        StackPane btn = new StackPane(label);
-        btn.setPrefSize(120, 28);
-        btn.setStyle("-fx-background-color: transparent; -fx-cursor: hand;");
-
-        ScaleTransition hoverPulse = new ScaleTransition(Duration.millis(120), btn);
-
-        btn.setOnMouseEntered(e -> {
-            label.setStyle(
-                    "-fx-font-family: 'Pixelify Sans'; -fx-font-size: 12px; -fx-text-fill: #ff6b6b; -fx-cursor: hand;");
-            hoverPulse.stop();
-            hoverPulse.setFromX(btn.getScaleX());
-            hoverPulse.setFromY(btn.getScaleY());
-            hoverPulse.setToX(1.08);
-            hoverPulse.setToY(1.08);
-            hoverPulse.play();
-        });
-        btn.setOnMouseExited(e -> {
-            label.setStyle(
-                    "-fx-font-family: 'Pixelify Sans'; -fx-font-size: 12px; -fx-text-fill: #506275; -fx-cursor: hand;");
-            hoverPulse.stop();
-            hoverPulse.setFromX(btn.getScaleX());
-            hoverPulse.setFromY(btn.getScaleY());
-            hoverPulse.setToX(1.0);
-            hoverPulse.setToY(1.0);
-            hoverPulse.play();
-        });
-        btn.setOnMousePressed(e -> {
-            label.setStyle(
-                    "-fx-font-family: 'Pixelify Sans'; -fx-font-size: 12px; -fx-text-fill: #cc3333; -fx-cursor: hand;");
-            label.setTranslateY(1);
-        });
-        btn.setOnMouseReleased(e -> {
-            label.setTranslateY(0);
-            if (btn.isHover()) {
-                label.setStyle(
-                        "-fx-font-family: 'Pixelify Sans'; -fx-font-size: 12px; -fx-text-fill: #ff6b6b; -fx-cursor: hand;");
-            } else {
-                label.setStyle(
-                        "-fx-font-family: 'Pixelify Sans'; -fx-font-size: 12px; -fx-text-fill: #506275; -fx-cursor: hand;");
-            }
-        });
-
-        return btn;
+        return buildSecondaryButton("🚪   Quit");
     }
 }
