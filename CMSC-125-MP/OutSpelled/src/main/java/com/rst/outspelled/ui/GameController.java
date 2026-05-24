@@ -25,6 +25,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javafx.scene.transform.Scale;
+import javafx.beans.binding.Bindings;
+
 public class GameController implements GameEngine.GameListener {
 
     @FXML
@@ -127,6 +130,44 @@ public class GameController implements GameEngine.GameListener {
         // Load wizard skin portraits
         loadWizardPortrait(wizard1Portrait, wizard1);
         loadWizardPortrait(wizard2Portrait, wizard2);
+
+        // Flawless Auto-scaling: calculate scale based on the limiting dimension
+        Scale scale = new Scale(1, 1);
+        scale.pivotXProperty().bind(gameRoot.widthProperty().divide(2));
+        scale.pivotYProperty().bind(gameRoot.heightProperty().divide(2));
+        
+        gameRoot.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                // The scale factor ensures the UI never shrinks below 900x650 physical proportion
+                javafx.beans.binding.NumberBinding scaleFactor = Bindings.min(
+                        newScene.widthProperty().divide(900.0),
+                        newScene.heightProperty().divide(650.0)
+                );
+                scale.xProperty().bind(scaleFactor);
+                scale.yProperty().bind(scaleFactor);
+
+                // Inverse scale the layout bounds so that the scaled visual bounds EXACTLY match the window
+                javafx.beans.binding.NumberBinding invWidth = newScene.widthProperty().divide(scaleFactor);
+                javafx.beans.binding.NumberBinding invHeight = newScene.heightProperty().divide(scaleFactor);
+
+                gameRoot.minWidthProperty().bind(invWidth);
+                gameRoot.maxWidthProperty().bind(invWidth);
+                gameRoot.minHeightProperty().bind(invHeight);
+                gameRoot.maxHeightProperty().bind(invHeight);
+
+                if (lastStandOverlay != null) {
+                    lastStandOverlay.minWidthProperty().bind(invWidth);
+                    lastStandOverlay.maxWidthProperty().bind(invWidth);
+                    lastStandOverlay.minHeightProperty().bind(invHeight);
+                    lastStandOverlay.maxHeightProperty().bind(invHeight);
+                }
+            }
+        });
+        
+        gameRoot.getTransforms().add(scale);
+        if (lastStandOverlay != null) {
+            lastStandOverlay.getTransforms().add(scale);
+        }
 
         engine.initialize();
     }
