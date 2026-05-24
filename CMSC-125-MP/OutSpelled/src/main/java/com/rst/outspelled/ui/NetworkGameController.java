@@ -540,20 +540,12 @@ public class NetworkGameController {
 
     private void updatePortraitHighlight() {
         if (wizard1Portrait == null || wizard2Portrait == null) return;
-        final double activeStroke = 6;
-        final double inactiveStroke = 1.5;
-        final String activeColor = "#e2b96f";
-        final String inactiveColor = "#444466";
         if (currentTurn == 1) {
-            wizard1Portrait.setStroke(Color.web(activeColor));
-            wizard1Portrait.setStrokeWidth(activeStroke);
-            wizard2Portrait.setStroke(Color.web(inactiveColor));
-            wizard2Portrait.setStrokeWidth(inactiveStroke);
+            wizard1Portrait.setOpacity(1.0);
+            wizard2Portrait.setOpacity(0.5);
         } else {
-            wizard2Portrait.setStroke(Color.web(activeColor));
-            wizard2Portrait.setStrokeWidth(activeStroke);
-            wizard1Portrait.setStroke(Color.web(inactiveColor));
-            wizard1Portrait.setStrokeWidth(inactiveStroke);
+            wizard2Portrait.setOpacity(1.0);
+            wizard1Portrait.setOpacity(0.5);
         }
     }
 
