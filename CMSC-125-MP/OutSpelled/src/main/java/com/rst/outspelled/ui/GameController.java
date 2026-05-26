@@ -11,16 +11,27 @@ import com.rst.outspelled.util.SoundManager;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.paint.Color;
+import javafx.animation.Transition;
+import javafx.geometry.Rectangle2D;
+import javafx.util.Duration;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javafx.scene.transform.Scale;
+import javafx.beans.binding.Bindings;
+
 public class GameController implements GameEngine.GameListener {
+
+    @FXML
+    protected BorderPane gameRoot;
 
     @FXML
     protected Label player1NameLabel;
@@ -51,9 +62,13 @@ public class GameController implements GameEngine.GameListener {
     @FXML
     protected Label skillCheckStatusLabel;
     @FXML
-    protected Rectangle wizard1Portrait;
+    protected StackPane wizard1Portrait;
     @FXML
-    protected Rectangle wizard2Portrait;
+    protected StackPane wizard2Portrait;
+    @FXML
+    protected Label wizard1NameTag;
+    @FXML
+    protected Label wizard2NameTag;
 
     // Last Stand overlay fields
     @FXML
@@ -70,6 +85,9 @@ public class GameController implements GameEngine.GameListener {
     protected static Wizard wizard1;
     protected static Wizard wizard2;
     protected GameEngine engine;
+
+    protected CustomSpriteTransition wizard1Animation;
+    protected CustomSpriteTransition wizard2Animation;
 
     protected ScheduledExecutorService skillCheckTimerExecutor;
     protected int skillCheckSecondsRemaining;
@@ -99,7 +117,110 @@ public class GameController implements GameEngine.GameListener {
         lastStandOverlay.setVisible(false);
         skillCheckStatusLabel.setText("");
 
+        // Set background to Game-BG.png in assets
+        java.net.URL bgUrl = GameController.class.getResource("/assets/BG-platform.png");
+        if (bgUrl != null) {
+            gameRoot.setStyle("-fx-background-color: #1a1a2e; " +
+                    "-fx-background-image: url('" + bgUrl.toExternalForm() + "'); " +
+                    "-fx-background-size: 100% 100%; " +
+                    "-fx-background-repeat: no-repeat; " +
+                    "-fx-background-position: center;");
+        }
+
+        // Load wizard skin portraits
+        loadWizardPortrait(wizard1Portrait, wizard1);
+        loadWizardPortrait(wizard2Portrait, wizard2);
+
+        // Flawless Auto-scaling: calculate scale based on the limiting dimension
+        Scale scale = new Scale(1, 1);
+        scale.pivotXProperty().bind(gameRoot.widthProperty().divide(2));
+        scale.pivotYProperty().bind(gameRoot.heightProperty().divide(2));
+        
+        gameRoot.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                // The scale factor ensures the UI never shrinks below 900x650 physical proportion
+                javafx.beans.binding.NumberBinding scaleFactor = Bindings.min(
+                        newScene.widthProperty().divide(900.0),
+                        newScene.heightProperty().divide(650.0)
+                );
+                scale.xProperty().bind(scaleFactor);
+                scale.yProperty().bind(scaleFactor);
+
+                // Inverse scale the layout bounds so that the scaled visual bounds EXACTLY match the window
+                javafx.beans.binding.NumberBinding invWidth = newScene.widthProperty().divide(scaleFactor);
+                javafx.beans.binding.NumberBinding invHeight = newScene.heightProperty().divide(scaleFactor);
+
+                gameRoot.minWidthProperty().bind(invWidth);
+                gameRoot.maxWidthProperty().bind(invWidth);
+                gameRoot.minHeightProperty().bind(invHeight);
+                gameRoot.maxHeightProperty().bind(invHeight);
+
+                if (lastStandOverlay != null) {
+                    lastStandOverlay.minWidthProperty().bind(invWidth);
+                    lastStandOverlay.maxWidthProperty().bind(invWidth);
+                    lastStandOverlay.minHeightProperty().bind(invHeight);
+                    lastStandOverlay.maxHeightProperty().bind(invHeight);
+                }
+            }
+        });
+        
+        gameRoot.getTransforms().add(scale);
+        if (lastStandOverlay != null) {
+            lastStandOverlay.getTransforms().add(scale);
+        }
+
         engine.initialize();
+    }
+
+    /**
+     * Fills a portrait StackPane with the wizard's skin image, clipped to rounded
+     * corners and animated if a sprite sheet.
+     */
+    private void loadWizardPortrait(StackPane pane, Wizard wizard) {
+        if (pane == null || wizard == null)
+            return;
+        String imageName = wizard.getSkin().getImagePath();
+        java.net.URL imgUrl = GameController.class.getResource("/assets/" + imageName);
+        if (imgUrl == null)
+            return;
+        try {
+            Image img = new Image(imgUrl.toExternalForm());
+            ImageView iv = new ImageView(img);
+            iv.setFitWidth(120);
+            iv.setFitHeight(120);
+            iv.setPreserveRatio(true);
+            iv.setSmooth(false);
+            iv.setViewport(new Rectangle2D(0, 0, 128, 128));
+
+            // Rounded clip to match the border-radius
+            Rectangle clip = new Rectangle(120, 120);
+            clip.setArcWidth(12);
+            clip.setArcHeight(12);
+            iv.setClip(clip);
+
+            CustomSpriteTransition animation = new CustomSpriteTransition(
+                    iv, Duration.millis(800), 2, 2, 128.0, 128.0);
+            animation.setCycleCount(Transition.INDEFINITE);
+            animation.play();
+
+            if (pane == wizard1Portrait) {
+                if (wizard1Animation != null) {
+                    wizard1Animation.stop();
+                }
+                wizard1Animation = animation;
+            } else if (pane == wizard2Portrait) {
+                if (wizard2Animation != null) {
+                    wizard2Animation.stop();
+                }
+                wizard2Animation = animation;
+                // Mirror the opponent so it faces the player
+                iv.setScaleX(-1);
+            }
+
+            pane.getChildren().setAll(iv);
+        } catch (Exception ignored) {
+            // image stays as empty styled pane on failure
+        }
     }
 
     // --- Grid Rendering ---
@@ -136,18 +257,72 @@ public class GameController implements GameEngine.GameListener {
 
     private Button createTileButton(LetterTile tile, int row, int col,
             LetterGrid grid) {
-        Button btn = new Button(
-                String.valueOf(tile.getLetter()) + "\n" + tile.getValue());
+        Button btn = new Button();
         btn.setPrefSize(62, 62);
-        btn.setStyle(tile.isSelected() ? getSelectedStyle() : getIdleStyle());
+        btn.setMinSize(62, 62);
+        btn.setMaxSize(62, 62);
+
+        StackPane graphicPane = new StackPane();
+        graphicPane.setPrefSize(58, 58);
+        graphicPane.setMinSize(58, 58);
+        graphicPane.setMaxSize(58, 58);
+
+        Label letterLabel = new Label(String.valueOf(tile.getLetter()));
+        letterLabel.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 24px; -fx-font-weight: bold;");
+
+        Label valueLabel = new Label(String.valueOf(tile.getValue()));
+        valueLabel.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 9px; -fx-font-weight: bold;");
+
+        graphicPane.getChildren().addAll(letterLabel, valueLabel);
+        StackPane.setAlignment(letterLabel, javafx.geometry.Pos.CENTER);
+        StackPane.setAlignment(valueLabel, javafx.geometry.Pos.BOTTOM_RIGHT);
+        valueLabel.setTranslateX(-2);
+        valueLabel.setTranslateY(-1);
+
+        btn.setGraphic(graphicPane);
+
+        java.util.function.Consumer<String> updateColors = (state) -> {
+            if ("selected".equals(state)) {
+                btn.setStyle(getSelectedStyle());
+                letterLabel.setStyle(
+                        "-fx-font-family: 'Pixelify Sans'; -fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1a1000;");
+                valueLabel.setStyle(
+                        "-fx-font-family: 'Pixelify Sans'; -fx-font-size: 9px; -fx-font-weight: bold; -fx-text-fill: rgba(26, 16, 0, 0.65);");
+            } else if ("hover".equals(state)) {
+                btn.setStyle(getHoverStyle());
+                letterLabel.setStyle(
+                        "-fx-font-family: 'Pixelify Sans'; -fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #ffffff;");
+                valueLabel.setStyle(
+                        "-fx-font-family: 'Pixelify Sans'; -fx-font-size: 9px; -fx-font-weight: bold; -fx-text-fill: rgba(255, 255, 255, 0.65);");
+            } else {
+                btn.setStyle(getIdleStyle());
+                letterLabel.setStyle(
+                        "-fx-font-family: 'Pixelify Sans'; -fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #e2b96f;");
+                valueLabel.setStyle(
+                        "-fx-font-family: 'Pixelify Sans'; -fx-font-size: 9px; -fx-font-weight: bold; -fx-text-fill: rgba(226, 185, 111, 0.65);");
+            }
+        };
+
+        updateColors.accept(tile.isSelected() ? "selected" : "idle");
+
+        btn.setOnMouseEntered(e -> {
+            if (!tile.isSelected() && !btn.isDisabled()) {
+                updateColors.accept("hover");
+            }
+        });
+        btn.setOnMouseExited(e -> {
+            if (!btn.isDisabled()) {
+                updateColors.accept(tile.isSelected() ? "selected" : "idle");
+            }
+        });
 
         btn.setOnAction(e -> {
             if (tile.isSelected()) {
                 grid.deselectTile(row, col);
-                btn.setStyle(getIdleStyle());
+                updateColors.accept(btn.isHover() ? "hover" : "idle");
             } else if (tile.isIdle()) {
                 grid.selectTile(row, col);
-                btn.setStyle(getSelectedStyle());
+                updateColors.accept("selected");
             }
             updateSelectedWordDisplay();
         });
@@ -160,7 +335,69 @@ public class GameController implements GameEngine.GameListener {
                 ? currentSharedGrid
                 : engine.getCurrentGrid();
         String word = grid.getSelectedWord();
-        selectedWordLabel.setText(word.isEmpty() ? "_ _ _" : word);
+
+        if (word.isEmpty()) {
+            selectedWordLabel.setText("");
+            selectedWordLabel.setGraphic(null);
+        } else {
+            javafx.scene.layout.HBox tiles = new javafx.scene.layout.HBox(4);
+            tiles.setAlignment(javafx.geometry.Pos.CENTER);
+
+            for (int i = 0; i < word.length(); i++) {
+                char letter = word.charAt(i);
+                int points = 1;
+                for (int r = 0; r < grid.getRows(); r++) {
+                    for (int c = 0; c < grid.getCols(); c++) {
+                        LetterTile t = grid.getTile(r, c);
+                        if (t.getLetter() == letter) {
+                            points = t.getValue();
+                            break;
+                        }
+                    }
+                }
+
+                StackPane tile = new StackPane();
+                tile.setPrefSize(56, 62);
+                tile.setMinSize(56, 62);
+                tile.setMaxSize(56, 62);
+                tile.setStyle(
+                        "-fx-background-color: linear-gradient(to bottom, #ffe9a0 0%, #ffe9a0 3px, #f0c040 3px, #e8a828 100%); "
+                                +
+                                "-fx-background-insets: 0; " +
+                                "-fx-background-radius: 0; " +
+                                "-fx-border-color: #fff5c0 #c09030 #c09030 #fff5c0; " +
+                                "-fx-border-width: 2px; " +
+                                "-fx-border-radius: 0; " +
+                                "-fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.35), 0, 0.0, 2, 2);");
+
+                Label letterLbl = new Label(String.valueOf(letter));
+                letterLbl.setStyle(
+                        "-fx-font-family: 'Pixelify Sans'; -fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1a1000;");
+
+                Label valueLbl = new Label(String.valueOf(points));
+                valueLbl.setStyle(
+                        "-fx-font-family: 'Pixelify Sans'; -fx-font-size: 8px; -fx-font-weight: bold; -fx-text-fill: rgba(26, 16, 0, 0.65);");
+
+                tile.getChildren().addAll(letterLbl, valueLbl);
+                StackPane.setAlignment(letterLbl, javafx.geometry.Pos.CENTER);
+                StackPane.setAlignment(valueLbl, javafx.geometry.Pos.BOTTOM_RIGHT);
+                valueLbl.setTranslateX(-3);
+                valueLbl.setTranslateY(-2);
+
+                tiles.getChildren().add(tile);
+            }
+            selectedWordLabel.setText("");
+            selectedWordLabel.setGraphic(tiles);
+
+            for (int i = 0; i < tiles.getChildren().size(); i++) {
+                javafx.scene.Node n = tiles.getChildren().get(i);
+                javafx.animation.TranslateTransition tt = new javafx.animation.TranslateTransition(Duration.millis(300),
+                        n);
+                tt.setFromY(6);
+                tt.setToY(0);
+                tt.play();
+            }
+        }
     }
 
     // --- Button Actions ---
@@ -263,7 +500,8 @@ public class GameController implements GameEngine.GameListener {
                 caster == wizard1 ? player2HpBar : player1HpBar,
                 target.getHpPercentage());
 
-        selectedWordLabel.setText("_ _ _");
+        selectedWordLabel.setText("");
+        selectedWordLabel.setGraphic(null);
     }
 
     @Override
@@ -295,7 +533,8 @@ public class GameController implements GameEngine.GameListener {
         setInputEnabled(true);
         renderGrid();
         updatePortraitHighlight(currentPlayer);
-        selectedWordLabel.setText("_ _ _");
+        selectedWordLabel.setText("");
+        selectedWordLabel.setGraphic(null);
         skillCheckStatusLabel.setText("");
         feedbackLabel.setText(currentPlayer.getName()
                 + "'s turn — select your letters!");
@@ -329,27 +568,45 @@ public class GameController implements GameEngine.GameListener {
     @Override
     public void onHalfHpPrompt(Wizard initiator) {
         SoundManager.playSkillCheck();
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Skill Check Available!");
-        alert.setHeaderText(initiator.getName() + " can initiate a challenge!");
-        alert.setContentText(
+
+        javafx.scene.control.Label headerLabel = com.rst.outspelled.util.DialogBuilder
+                .styledDialogLabel(initiator.getName() + " can initiate a challenge!");
+        javafx.scene.control.Label contentLabel = new javafx.scene.control.Label(
                 "You are at or below 50% HP.\n\n" +
                         "Initiate the Half HP Challenge?\n" +
                         "Win → opponent drops to your HP level\n" +
                         "Lose → you take word damage\n\n" +
                         "This can only be used once per match!");
+        contentLabel.setStyle(
+                "-fx-text-fill: #a0a0c0; -fx-font-size: 13px; -fx-wrap-text: true; -fx-text-alignment: center;");
+        contentLabel.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
 
-        ButtonType initiate = new ButtonType("⚔ Initiate!");
-        ButtonType skip = new ButtonType("Skip");
-        alert.getButtonTypes().setAll(initiate, skip);
-
-        alert.showAndWait().ifPresent(response -> {
-            if (response == initiate) {
-                engine.initiateHalfHpChallenge(initiator);
-            } else {
-                engine.skipHalfHpChallenge();
-            }
+        javafx.scene.layout.StackPane initiateBtn = com.rst.outspelled.util.DialogBuilder
+                .buildDialogButton("⚔ Initiate!", true);
+        initiateBtn.setOnMouseClicked(e -> {
+            SoundManager.playClick();
+            com.rst.outspelled.util.OverlayManager.hideOverlay();
+            engine.initiateHalfHpChallenge(initiator);
         });
+
+        javafx.scene.layout.StackPane skipBtn = com.rst.outspelled.util.DialogBuilder.buildDialogButton("Skip", false);
+        skipBtn.setOnMouseClicked(e -> {
+            SoundManager.playClick();
+            com.rst.outspelled.util.OverlayManager.hideOverlay();
+            engine.skipHalfHpChallenge();
+        });
+
+        javafx.scene.layout.HBox btnBox = new javafx.scene.layout.HBox(15, skipBtn, initiateBtn);
+        btnBox.setAlignment(javafx.geometry.Pos.CENTER);
+
+        javafx.scene.layout.VBox body = new javafx.scene.layout.VBox(15);
+        body.setStyle("-fx-padding: 20 24 24 24;");
+        body.setAlignment(javafx.geometry.Pos.CENTER);
+        body.getChildren().addAll(headerLabel, contentLabel, btnBox);
+
+        javafx.scene.layout.VBox dialogRoot = com.rst.outspelled.util.DialogBuilder
+                .buildDialogRoot("Skill Check Available!", true, body, 420, 320);
+        com.rst.outspelled.util.OverlayManager.showOverlay(dialogRoot);
     }
 
     @Override
@@ -366,7 +623,8 @@ public class GameController implements GameEngine.GameListener {
                 "-fx-text-fill: #ff6b6b; -fx-font-size: 30px; -fx-font-weight: bold;");
 
         renderSharedGrid(sharedGrid);
-        selectedWordLabel.setText("_ _ _");
+        selectedWordLabel.setText("");
+        selectedWordLabel.setGraphic(null);
         feedbackLabel.setText("Select letters and cast your best spell!");
         feedbackLabel.setStyle("-fx-text-fill: #e2b96f;");
         setInputEnabled(true);
@@ -495,21 +753,12 @@ public class GameController implements GameEngine.GameListener {
         if (wizard1Portrait == null || wizard2Portrait == null)
             return;
 
-        final double activeStrokeWidth = 6;
-        final double inactiveStrokeWidth = 1.5;
-        final String activeColor = "#e2b96f"; // gold — current player
-        final String inactiveColor = "#444466"; // dim border — other player
-
         if (currentPlayer == wizard1) {
-            wizard1Portrait.setStroke(Color.web(activeColor));
-            wizard1Portrait.setStrokeWidth(activeStrokeWidth);
-            wizard2Portrait.setStroke(Color.web(inactiveColor));
-            wizard2Portrait.setStrokeWidth(inactiveStrokeWidth);
+            wizard1Portrait.setOpacity(1.0);
+            wizard2Portrait.setOpacity(0.5);
         } else {
-            wizard2Portrait.setStroke(Color.web(activeColor));
-            wizard2Portrait.setStrokeWidth(activeStrokeWidth);
-            wizard1Portrait.setStroke(Color.web(inactiveColor));
-            wizard1Portrait.setStrokeWidth(inactiveStrokeWidth);
+            wizard2Portrait.setOpacity(1.0);
+            wizard1Portrait.setOpacity(0.5);
         }
     }
 
@@ -518,15 +767,17 @@ public class GameController implements GameEngine.GameListener {
         player2HpBar.setProgress(wizard2.getHpPercentage());
         player1HpLabel.setText(wizard1.getHp() + " / " + wizard1.getMaxHp());
         player2HpLabel.setText(wizard2.getHp() + " / " + wizard2.getMaxHp());
+        updateHpBarColor(player1HpBar, wizard1.getHpPercentage());
+        updateHpBarColor(player2HpBar, wizard2.getHpPercentage());
     }
 
     protected void updateHpBarColor(ProgressBar bar, double percentage) {
         if (percentage > 0.5) {
-            bar.setStyle("-fx-accent: #4caf50;");
+            bar.setStyle("-fx-accent: #3fc53f;"); // Vibrant retro forest green
         } else if (percentage > 0.25) {
-            bar.setStyle("-fx-accent: #ff9800;");
+            bar.setStyle("-fx-accent: #ff9f3a;"); // Radiant pixel amber orange
         } else {
-            bar.setStyle("-fx-accent: #f44336;");
+            bar.setStyle("-fx-accent: #ff4f4f;"); // Fiery pixel crimson red
         }
     }
 
@@ -536,25 +787,48 @@ public class GameController implements GameEngine.GameListener {
     }
 
     protected String getIdleStyle() {
-        return "-fx-background-color: #2a2a4a;" +
+        return "-fx-background-color: linear-gradient(to bottom, #424266 0%, #424266 3px, #2a2a4a 3px, #1a1a30 100%);" +
+                "-fx-background-insets: 0;" +
+                "-fx-background-radius: 0;" +
+                "-fx-border-color: #555588 #1a1a2a #1a1a2a #555588;" +
+                "-fx-border-width: 2px;" +
+                "-fx-border-radius: 0;" +
                 "-fx-text-fill: #e2b96f;" +
+                "-fx-font-family: 'Pixelify Sans';" +
                 "-fx-font-size: 14px;" +
                 "-fx-font-weight: bold;" +
-                "-fx-border-color: #444466;" +
-                "-fx-border-radius: 6;" +
-                "-fx-background-radius: 6;" +
-                "-fx-cursor: hand;";
+                "-fx-cursor: hand;" +
+                "-fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.55), 0, 0.0, 2, 2);";
+    }
+
+    protected String getHoverStyle() {
+        return "-fx-background-color: linear-gradient(to bottom, #50507d 0%, #50507d 3px, #33335c 3px, #202042 100%);" +
+                "-fx-background-insets: 0;" +
+                "-fx-background-radius: 0;" +
+                "-fx-border-color: #6e6eab #222238 #222238 #6e6eab;" +
+                "-fx-border-width: 2px;" +
+                "-fx-border-radius: 0;" +
+                "-fx-text-fill: #ffffff;" +
+                "-fx-font-family: 'Pixelify Sans';" +
+                "-fx-font-size: 14px;" +
+                "-fx-font-weight: bold;" +
+                "-fx-cursor: hand;" +
+                "-fx-effect: dropshadow(three-pass-box, rgba(110,110,180,0.18), 6, 0.1, 0, 0);";
     }
 
     protected String getSelectedStyle() {
-        return "-fx-background-color: #e2b96f;" +
-                "-fx-text-fill: #1a1a2e;" +
+        return "-fx-background-color: linear-gradient(to bottom, #ffe9a0 0%, #ffe9a0 3px, #f0c040 3px, #e8a828 100%);" +
+                "-fx-background-insets: 0;" +
+                "-fx-background-radius: 0;" +
+                "-fx-border-color: #fff5c0 #c09030 #c09030 #fff5c0;" +
+                "-fx-border-width: 2px;" +
+                "-fx-border-radius: 0;" +
+                "-fx-text-fill: #1a1000;" +
+                "-fx-font-family: 'Pixelify Sans';" +
                 "-fx-font-size: 14px;" +
                 "-fx-font-weight: bold;" +
-                "-fx-border-color: #ffffff;" +
-                "-fx-border-radius: 6;" +
-                "-fx-background-radius: 6;" +
-                "-fx-cursor: hand;";
+                "-fx-cursor: hand;" +
+                "-fx-effect: dropshadow(three-pass-box, rgba(255,200,60,0.22), 6, 0.1, 0, 0);";
     }
 
     protected String getSpellEmoji(Spell spell) {
@@ -570,16 +844,19 @@ public class GameController implements GameEngine.GameListener {
         SoundManager.stopBgm();
         SoundManager.playVictory(); // local 2P: play victory for the match winner
 
-        javafx.stage.Stage dialog = com.rst.outspelled.util.DialogBuilder.buildDialogStage("Duel Over!", 400, 250);
+        javafx.scene.control.Label headerLabel = com.rst.outspelled.util.DialogBuilder
+                .styledDialogLabel(winner.getName() + " wins!");
+        javafx.scene.control.Label contentLabel = new javafx.scene.control.Label(
+                winner.getName() + " defeated " + loser.getName() + "!\n\nPlay again?");
+        contentLabel.setStyle(
+                "-fx-text-fill: #a0a0c0; -fx-font-size: 14px; -fx-alignment: center; -fx-text-alignment: center;");
+        contentLabel.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
 
-        javafx.scene.control.Label headerLabel = com.rst.outspelled.util.DialogBuilder.styledDialogLabel(winner.getName() + " wins!");
-        javafx.scene.control.Label contentLabel = new javafx.scene.control.Label(winner.getName() + " defeated " + loser.getName() + "!\n\nPlay again?");
-        contentLabel.setStyle("-fx-text-fill: #a0a0c0; -fx-font-size: 14px;");
-
-        javafx.scene.layout.StackPane playAgainBtn = com.rst.outspelled.util.DialogBuilder.buildDialogButton("Rematch", true);
+        javafx.scene.layout.StackPane playAgainBtn = com.rst.outspelled.util.DialogBuilder.buildDialogButton("Rematch",
+                true);
         playAgainBtn.setOnMouseClicked(e -> {
             SoundManager.playClick();
-            dialog.close();
+            com.rst.outspelled.util.OverlayManager.hideOverlay();
             engine.shutdown();
             GameController.setWizards(
                     new Wizard(wizard1.getName(), 200, wizard1.getSkin()),
@@ -587,10 +864,11 @@ public class GameController implements GameEngine.GameListener {
             Main.navigateTo("game-view.fxml");
         });
 
-        javafx.scene.layout.StackPane menuBtn = com.rst.outspelled.util.DialogBuilder.buildDialogButton("Main Menu", false);
+        javafx.scene.layout.StackPane menuBtn = com.rst.outspelled.util.DialogBuilder.buildDialogButton("Main Menu",
+                false);
         menuBtn.setOnMouseClicked(e -> {
             SoundManager.playClick();
-            dialog.close();
+            com.rst.outspelled.util.OverlayManager.hideOverlay();
             engine.shutdown();
             Main.navigateTo("menu-view.fxml");
         });
@@ -603,9 +881,9 @@ public class GameController implements GameEngine.GameListener {
         body.setAlignment(javafx.geometry.Pos.CENTER);
         body.getChildren().addAll(headerLabel, contentLabel, btnBox);
 
-        javafx.scene.layout.VBox dialogRoot = com.rst.outspelled.util.DialogBuilder.buildDialogRoot("🏆 Duel Over 🏆", false, body, dialog);
-        dialog.getScene().setRoot(dialogRoot);
-        dialog.showAndWait();
+        javafx.scene.layout.VBox dialogRoot = com.rst.outspelled.util.DialogBuilder.buildDialogRoot("🏆 Duel Over 🏆",
+                false, body, 400, 250);
+        com.rst.outspelled.util.OverlayManager.showOverlay(dialogRoot);
     }
 
     @FXML
@@ -615,9 +893,8 @@ public class GameController implements GameEngine.GameListener {
     }
 
     private void showSettingsDialog() {
-        javafx.stage.Stage dialog = com.rst.outspelled.util.DialogBuilder.buildDialogStage("Settings", 400, 380);
-
-        javafx.scene.control.Label headerLabel = com.rst.outspelled.util.DialogBuilder.styledDialogLabel("Adjust Game Volumes");
+        javafx.scene.control.Label headerLabel = com.rst.outspelled.util.DialogBuilder
+                .styledDialogLabel("Adjust Game Volumes");
         headerLabel.setStyle("-fx-font-family: 'Pixelify Sans'; -fx-font-size: 13px; -fx-text-fill: #8899aa;");
 
         // BGM Slider
@@ -642,20 +919,22 @@ public class GameController implements GameEngine.GameListener {
         bgmBox.setAlignment(javafx.geometry.Pos.CENTER);
         sfxBox.setAlignment(javafx.geometry.Pos.CENTER);
 
-        javafx.scene.layout.StackPane closeBtn = com.rst.outspelled.util.DialogBuilder.buildDialogButton("Resume", true);
+        javafx.scene.layout.StackPane closeBtn = com.rst.outspelled.util.DialogBuilder.buildDialogButton("Resume",
+                true);
         closeBtn.setOnMouseClicked(e -> {
             SoundManager.playClick();
-            dialog.close();
+            com.rst.outspelled.util.OverlayManager.hideOverlay();
         });
 
-        javafx.scene.layout.StackPane quitBtn = com.rst.outspelled.util.DialogBuilder.buildDialogButton("Quit to Menu", false);
+        javafx.scene.layout.StackPane quitBtn = com.rst.outspelled.util.DialogBuilder.buildDialogButton("Quit to Menu",
+                false);
         quitBtn.setOnMouseClicked(e -> {
             SoundManager.playClick();
-            dialog.close();
+            com.rst.outspelled.util.OverlayManager.hideOverlay();
             engine.shutdown();
             Main.navigateTo("menu-view.fxml");
         });
-        
+
         javafx.scene.layout.HBox buttons = new javafx.scene.layout.HBox(10, closeBtn, quitBtn);
         buttons.setAlignment(javafx.geometry.Pos.CENTER);
 
@@ -664,9 +943,9 @@ public class GameController implements GameEngine.GameListener {
         body.setAlignment(javafx.geometry.Pos.CENTER);
         body.getChildren().addAll(headerLabel, bgmBox, sfxBox, buttons);
 
-        javafx.scene.layout.VBox dialogRoot = com.rst.outspelled.util.DialogBuilder.buildDialogRoot("⚙  Options  ⚙", false, body, dialog);
-        dialog.getScene().setRoot(dialogRoot);
-        dialog.showAndWait();
+        javafx.scene.layout.VBox dialogRoot = com.rst.outspelled.util.DialogBuilder.buildDialogRoot("⚙  Options  ⚙",
+                false, body, 400, 380);
+        com.rst.outspelled.util.OverlayManager.showOverlay(dialogRoot);
     }
 
     protected void handleKeyInput(javafx.scene.input.KeyEvent event) {

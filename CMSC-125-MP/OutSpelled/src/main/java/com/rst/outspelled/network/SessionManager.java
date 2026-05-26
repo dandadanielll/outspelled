@@ -1,7 +1,7 @@
 package com.rst.outspelled.network;
 
 import com.rst.outspelled.model.Wizard;
-import javafx.application.Platform;
+
 
 /**
  * Holds the LAN client and session state so multiple screens can use it.

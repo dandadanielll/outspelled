@@ -4,6 +4,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
+<?import java.net.URL?>
+
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.rst.outspelled.ui.ConnectController"
@@ -13,13 +15,17 @@
       prefWidth="500"
       prefHeight="420">
 
+    <stylesheets>
+        <URL value="@../../../assets/style.css"/>
+    </stylesheets>
+
     <padding>
         <Insets top="40" bottom="40" left="50" right="50"/>
     </padding>
 
     <Label text="🌐 LAN / Online"
            style="-fx-font-size: 26px; -fx-font-weight: bold;
-                  -fx-text-fill: #e2b96f; -fx-font-family: 'Georgia';"/>
+                  -fx-text-fill: #e2b96f; -fx-font-family: 'Pixelify Sans';"/>
 
     <Label text="Server IP (for Join; leave blank when Hosting)"
            style="-fx-text-fill: #a0a0c0; -fx-font-size: 12px;"/>

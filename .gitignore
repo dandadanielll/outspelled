@@ -1,0 +1,22 @@
+.aider*
+
+# Only track the OutSpelled project — ignore all other sibling projects
+CMSC-23-MP/
+Calculator/
+Millionaire/
+OOP/
+OOP_Blueprint/
+untitled/
+
+# IntelliJ IDEA project-wide config
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Maven wrapper binaries (not needed in source control)
+.mvn/wrapper/maven-wrapper.jar
+
+# OS junk
+.DS_Store
+Thumbs.db

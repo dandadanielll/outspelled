@@ -168,3 +168,173 @@
     -fx-padding: 0;
     -fx-background-color: #0d0f18;
 }
+
+/* ==========================================
+   RETRO PIXEL HEALTH BARS
+   ========================================== */
+.progress-bar,
+.pixel-hp-bar {
+    -fx-background-color: #3e3e3e, #111111;
+    /* Outer dark gray, inner black border */
+    -fx-background-insets: 0, 3;
+    -fx-background-radius: 0;
+    -fx-padding: 6;
+    /* padding keeps the track inside the border */
+    -fx-pref-height: 28px;
+    -fx-min-height: 28px;
+    -fx-max-height: 28px;
+    -fx-effect: dropshadow(two-pass-box, rgba(0, 0, 0, 0.8), 0, 0, 5, 5);
+    /* Crisp, blocky pixel drop shadow */
+}
+
+.progress-bar .track,
+.pixel-hp-bar .track {
+    -fx-background-color: #1a1a1a;
+    /* Empty HP slot background */
+    -fx-background-radius: 0;
+    -fx-background-insets: 0;
+}
+
+.progress-bar .bar,
+.pixel-hp-bar .bar {
+    -fx-background-radius: 0;
+    -fx-background-insets: 0;
+    -fx-background-color: linear-gradient(to bottom,
+            derive(-fx-accent, 60%) 0%,
+            derive(-fx-accent, 60%) 15%,
+            -fx-accent 15%,
+            -fx-accent 75%,
+            derive(-fx-accent, -35%) 75%,
+            derive(-fx-accent, -35%) 100%);
+}
+
+/* ==========================================
+   FLAT TRANSPARENT BATTLE LOG
+   ========================================== */
+.battle-log-flat {
+    -fx-background-color: transparent !important;
+    -fx-background-insets: 0 !important;
+    -fx-padding: 0 !important;
+    -fx-border-color: transparent !important;
+    -fx-border-width: 0 !important;
+    -fx-max-height: 38px !important;
+    -fx-pref-height: 38px !important;
+    -fx-min-height: 38px !important;
+    -fx-fixed-cell-size: 38px !important;
+}
+
+.battle-log-flat .viewport {
+    -fx-background-color: transparent !important;
+}
+
+.battle-log-flat .list-cell {
+    -fx-background-color: transparent !important;
+    -fx-text-fill: #ffd54f !important;
+    /* Premium bright gold */
+    -fx-font-size: 26px !important;
+    -fx-font-weight: bold !important;
+    -fx-alignment: CENTER !important;
+    /* Center the action text */
+    -fx-padding: 0 !important;
+    -fx-effect: dropshadow(one-pass-box, rgba(0, 0, 0, 0.95), 0, 0, 1.5, 1.5) !important;
+}
+
+.battle-log-flat .list-cell:empty {
+    -fx-background-color: transparent !important;
+    -fx-text-fill: transparent !important;
+}
+
+.battle-log-flat .list-cell:filled:hover,
+.battle-log-flat .list-cell:filled:selected {
+    -fx-background-color: transparent !important;
+    -fx-text-fill: #ffd54f !important;
+}
+
+/* Hide scrollbars */
+.battle-log-flat .scroll-bar:horizontal,
+.battle-log-flat .scroll-bar:vertical {
+    -fx-opacity: 0 !important;
+    -fx-pref-width: 0 !important;
+    -fx-pref-height: 0 !important;
+}
+
+.battle-log-flat .placeholder {
+    -fx-background-color: transparent !important;
+    -fx-text-fill: transparent !important;
+}
+
+/* ==========================================
+   GLOBAL RETRO TYPOGRAPHY CONSISTENCY
+   ========================================== */
+.root,
+.button,
+.label,
+.text-field,
+.list-cell,
+.list-view,
+.dialog-pane {
+    -fx-font-family: 'Pixelify Sans';
+}
+
+/* ==========================================
+   PREMIUM GAME ACTION BUTTONS (IMPROVED)
+   ========================================== */
+.action-btn-primary {
+    -fx-background-color: linear-gradient(to bottom, #f5d080 0%, #f5d080 3px, #d4a035 3px, #c8922a 100%);
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-border-color: #fce89a #a07020 #a07020 #fce89a;
+    -fx-border-width: 2px;
+    -fx-border-radius: 0;
+    -fx-text-fill: #1a1000;
+    -fx-font-family: 'Pixelify Sans';
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 20 8 20;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(one-pass-box, rgba(0, 0, 0, 0.6), 0, 0.0, 3, 3);
+}
+
+.action-btn-primary:hover {
+    -fx-background-color: linear-gradient(to bottom, #ffe9a0 0%, #ffe9a0 3px, #f0c040 3px, #e8a828 100%);
+    -fx-border-color: #fff5c0 #c09030 #c09030 #fff5c0;
+    -fx-text-fill: #1a1000;
+    -fx-effect: dropshadow(three-pass-box, rgba(255, 200, 60, 0.18), 6, 0.1, 0, 0);
+}
+
+.action-btn-primary:pressed {
+    -fx-background-color: linear-gradient(to bottom, #b07820 0%, #b07820 3px, #c8922a 3px, #d4a035 100%);
+    -fx-border-color: #7a5010 #fce89a #fce89a #7a5010;
+    -fx-padding: 10 18 6 22;
+    -fx-effect: none;
+}
+
+.action-btn-secondary {
+    -fx-background-color: linear-gradient(to bottom, #728198 0%, #728198 3px, #424e61 3px, #364050 100%);
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-border-color: #9bb0cc #262e3b #262e3b #9bb0cc;
+    -fx-border-width: 2px;
+    -fx-border-radius: 0;
+    -fx-text-fill: #0a0d14;
+    -fx-font-family: 'Pixelify Sans';
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 20 8 20;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(one-pass-box, rgba(0, 0, 0, 0.6), 0, 0.0, 3, 3);
+}
+
+.action-btn-secondary:hover {
+    -fx-background-color: linear-gradient(to bottom, #8496b0 0%, #8496b0 3px, #4f5d75 3px, #414d61 100%);
+    -fx-border-color: #adccf5 #303b4d #303b4d #adccf5;
+    -fx-text-fill: #0a0d14;
+    -fx-effect: dropshadow(three-pass-box, rgba(150, 180, 220, 0.15), 6, 0.1, 0, 0);
+}
+
+.action-btn-secondary:pressed {
+    -fx-background-color: linear-gradient(to bottom, #2b3340 0%, #2b3340 3px, #424e61 3px, #4d5b70 100%);
+    -fx-border-color: #1a2029 #9bb0cc #9bb0cc #1a2029;
+    -fx-padding: 10 18 6 22;
+    -fx-effect: none;
+}

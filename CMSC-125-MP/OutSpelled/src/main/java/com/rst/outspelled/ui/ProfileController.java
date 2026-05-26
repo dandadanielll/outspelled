@@ -14,11 +14,9 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.util.List;
-import java.util.Optional;
 
 public class ProfileController {
 
@@ -462,8 +460,6 @@ public class ProfileController {
     // ─── REPLACE onCreateProfile with this ────────────────────────────────────
 
     private void onCreateProfile(int slot) {
-        Stage dialog = buildDialogStage("New Wizard", 380, 310);
-
         // Input field
         javafx.scene.control.TextField nameField = new javafx.scene.control.TextField();
         nameField.setPromptText("Enter name...");
@@ -516,11 +512,12 @@ public class ProfileController {
                 errorLabel,
                 btnRow);
 
-        dialog.getScene().setRoot(buildDialogRoot("✦  New Wizard  ✦", false, body, dialog));
+        VBox dialogRoot = buildDialogRoot("✦  New Wizard  ✦", false, body, 380, 310);
+        com.rst.outspelled.util.OverlayManager.showOverlay(dialogRoot);
 
         cancelBtn.setOnMouseClicked(e -> {
             SoundManager.playClick();
-            dialog.close();
+            com.rst.outspelled.util.OverlayManager.hideOverlay();
         });
         confirmBtn.setOnMouseClicked(e -> {
             SoundManager.playClick();
@@ -532,7 +529,7 @@ public class ProfileController {
             Wizard w = new Wizard(name, 200, Wizard.WizardSkin.ARCANE_WIZARD);
             profiles.set(slot, w);
             ProfileManager.saveSlot(slot, w);
-            dialog.close();
+            com.rst.outspelled.util.OverlayManager.hideOverlay();
             renderSlots();
             updateStatus("Wizard \"" + name + "\" created!", "status-success");
         });
@@ -543,15 +540,12 @@ public class ProfileController {
                         javafx.scene.input.MouseEvent.MOUSE_CLICKED, 0, 0, 0, 0,
                         javafx.scene.input.MouseButton.PRIMARY, 1,
                         false, false, false, false, true, false, false, false, false, false, null)));
-
-        dialog.showAndWait();
     }
 
     // ─── REPLACE onDeleteSlot with this ───────────────────────────────────────
 
     private void onDeleteSlot(int slot) {
         String wizardName = profiles.get(slot).getName();
-        Stage dialog = buildDialogStage("Delete Wizard", 380, 280);
 
         // Warning box
         VBox warningBox = new VBox(6);
@@ -580,11 +574,12 @@ public class ProfileController {
         body.setStyle("-fx-padding: 20 24 20 24;");
         body.getChildren().addAll(warningBox, subNote, btnRow);
 
-        dialog.getScene().setRoot(buildDialogRoot("⚠  Delete Wizard  ⚠", true, body, dialog));
+        VBox dialogRoot = buildDialogRoot("⚠  Delete Wizard  ⚠", true, body, 380, 280);
+        com.rst.outspelled.util.OverlayManager.showOverlay(dialogRoot);
 
         cancelBtn.setOnMouseClicked(e -> {
             SoundManager.playClick();
-            dialog.close();
+            com.rst.outspelled.util.OverlayManager.hideOverlay();
         });
         deleteBtn.setOnMouseClicked(e -> {
             SoundManager.playClick();
@@ -592,35 +587,16 @@ public class ProfileController {
             profiles.set(slot, null);
             if (selectedSlot == slot)
                 selectedSlot = -1;
-            dialog.close();
+            com.rst.outspelled.util.OverlayManager.hideOverlay();
             renderSlots();
             updateStatus("Wizard deleted.", "status-neutral");
         });
-
-        dialog.showAndWait();
     }
 
     // ─── SHARED DIALOG HELPERS ─────────────────────────────────────────────────
 
-    private Stage buildDialogStage(String title, double width, double height) {
-        Stage stage = new Stage();
-        stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
-        stage.initStyle(javafx.stage.StageStyle.TRANSPARENT);
-        stage.setTitle(title);
-        stage.setResizable(false);
-
-        // Transparent scene so our custom border shows cleanly
-        javafx.scene.layout.StackPane placeholder = new javafx.scene.layout.StackPane();
-        placeholder.setPrefSize(width, height);
-        javafx.scene.Scene scene = new javafx.scene.Scene(placeholder, width, height);
-        scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
-        stage.setScene(scene);
-        stage.centerOnScreen();
-        return stage;
-    }
-
     // Assembles the full dialog chrome: gold/red bevel frame + title bar + body
-    private VBox buildDialogRoot(String titleText, boolean danger, VBox body, Stage stage) {
+    private VBox buildDialogRoot(String titleText, boolean danger, VBox body, double width, double height) {
         // Title bar
         Label titleLabel = new Label(titleText);
         titleLabel.setStyle(
@@ -639,17 +615,6 @@ public class ProfileController {
                         "-fx-border-width: 0 0 1 0;" +
                         "-fx-border-opacity: 0.5;");
 
-        // Allow dragging the dialog by its title bar
-        final double[] dragDelta = new double[2];
-        titleBar.setOnMousePressed(e -> {
-            dragDelta[0] = stage.getX() - e.getScreenX();
-            dragDelta[1] = stage.getY() - e.getScreenY();
-        });
-        titleBar.setOnMouseDragged(e -> {
-            stage.setX(e.getScreenX() + dragDelta[0]);
-            stage.setY(e.getScreenY() + dragDelta[1]);
-        });
-
         VBox inner = new VBox(0, titleBar, body);
         inner.setStyle(
                 "-fx-background-color: #1a1e2e;" +
@@ -666,6 +631,8 @@ public class ProfileController {
         StackPane.setAlignment(notchBR, Pos.BOTTOM_RIGHT);
 
         StackPane root = new StackPane(inner, notchTL, notchTR, notchBL, notchBR);
+        root.setPrefSize(width, height);
+        root.setMaxSize(width, height);
         root.setStyle("-fx-background-color: transparent;");
 
         VBox outerShell = new VBox(root);
@@ -793,11 +760,6 @@ public class ProfileController {
         });
 
         return outerBevel;
-    }
-
-    private void styleDialog(Dialog<?> dialog) {
-        dialog.getDialogPane().setStyle("-fx-background-color: #1a1a2e;");
-        dialog.getDialogPane().lookupAll(".label").forEach(node -> node.setStyle("-fx-font-family: 'Georgia';"));
     }
 
     private String idleCardStyle() {

@@ -22,7 +22,7 @@
                        style="-fx-text-fill: #e2b96f;
                               -fx-font-size: 22px;
                               -fx-font-weight: bold;
-                              -fx-font-family: 'Georgia';"/>
+                              -fx-font-family: 'Pixelify Sans';"/>
                 <Label text="Press SPACEBAR when the needle hits the golden zone!"
                        style="-fx-text-fill: #a0a0c0; -fx-font-size: 13px;"/>
             </VBox>
@@ -59,7 +59,7 @@
                     <Label fx:id="statusLabel" text="Get Ready..."
                            style="-fx-text-fill: #a0a0c0;
                                   -fx-font-size: 14px;
-                                  -fx-font-family: 'Georgia';"/>
+                                  -fx-font-family: 'Pixelify Sans';"/>
                 </VBox>
 
                 <!-- Player 2 Panel -->

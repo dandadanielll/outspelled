@@ -173,8 +173,8 @@ public class ConnectController {
             }
 
             @Override
-            public void onShuffleGrid(String letters) {
-                Platform.runLater(() -> NetworkGameController.applyShuffleGrid(letters));
+            public void onShuffleGrid(int shufflerId, String letters) {
+                Platform.runLater(() -> NetworkGameController.applyShuffleGrid(shufflerId, letters));
             }
 
             @Override

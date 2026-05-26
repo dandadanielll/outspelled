@@ -1,8 +1,8 @@
 package com.rst.outspelled.network;
 
 import com.rst.outspelled.dictionary.DictionaryLoader;
+import com.rst.outspelled.model.LetterGrid;
 import com.rst.outspelled.model.Spell;
-import com.rst.outspelled.model.Wizard;
 import com.rst.outspelled.util.LetterValues;
 
 import java.io.*;
@@ -20,14 +20,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class GameServer {
 
     private static final int TURN_SECONDS = 30;
-    private static final int WHEEL_TIMEOUT_MS = 20_000;
-
     private final int port;
     private final ServerSocket serverSocket;
     private final AtomicInteger connected = new AtomicInteger(0);
     private ClientHandler client1;
     private ClientHandler client2;
-    private volatile boolean bothReady = false;
     private volatile int wheelScore1 = -1;
     private volatile int wheelScore2 = -1;
     private ScheduledExecutorService turnTimer;
@@ -141,7 +138,6 @@ public class GameServer {
         else client2.setReady(true);
         broadcast(client1, client2, Protocol.READY_ACK + " " + playerId);
         if (client1.isReady() && client2.isReady()) {
-            bothReady = true;
             broadcast(client1, client2, Protocol.BOTH_READY);
             broadcast(client1, client2, Protocol.WHEEL_START);
         }
@@ -170,7 +166,7 @@ public class GameServer {
         p1Hp = MAX_HP;
         p2Hp = MAX_HP;
         lastSpellDesc = "";
-        long seed = gridRandom.nextLong();
+        long seed = nextValidGridSeed();
         String msg = Protocol.GAME_START + " " + Protocol.quote(p1Name) + " " + Protocol.quote(p2Name) + " " + firstPlayerId + " " + seed;
         broadcast(client1, client2, msg);
         turnTimer = Executors.newSingleThreadScheduledExecutor(r -> {
@@ -274,7 +270,7 @@ public class GameServer {
         }
 
         currentTurn = currentTurn == 1 ? 2 : 1;
-        long seed = gridRandom.nextLong();
+        long seed = nextValidGridSeed();
         broadcast(client1, client2, Protocol.GRID_SEED + " " + seed);
         broadcastState();
         scheduleTurnTick();
@@ -439,7 +435,7 @@ public class GameServer {
         }
         currentTurn = currentTurn == 1 ? 2 : 1;
         broadcastState();
-        long seed = gridRandom.nextLong();
+        long seed = nextValidGridSeed();
         broadcast(client1, client2, Protocol.GRID_SEED + " " + seed);
         broadcastState();
         scheduleTurnTick();
@@ -449,7 +445,7 @@ public class GameServer {
         if (playerId != currentTurn) return;
         if (halfHpActive || lastStandActive) return;
         if (letters == null || letters.length() < 16) return;
-        broadcast(client1, client2, Protocol.SHUFFLE_GRID + " " + letters.substring(0, 16));
+        broadcast(client1, client2, Protocol.SHUFFLE_GRID + " " + playerId + " " + letters.substring(0, 16));
     }
 
     public void onTyping(int playerId, String word) {
@@ -461,6 +457,48 @@ public class GameServer {
     private void broadcastState() {
         String msg = Protocol.STATE + " " + p1Hp + " " + p2Hp + " " + currentTurn + " " + Protocol.quote(lastSpellDesc);
         broadcast(client1, client2, msg);
+    }
+
+    /**
+     * Generates a grid seed that guarantees at least one valid dictionary word
+     * can be spelled from the resulting 16 tiles. Falls back to any seed if the
+     * dictionary is not yet loaded (should not happen in normal flow).
+     */
+    private long nextValidGridSeed() {
+        long seed;
+        do {
+            seed = gridRandom.nextLong();
+        } while (DictionaryLoader.isLoaded() && !hasSolvableWord(new LetterGrid(seed)));
+        return seed;
+    }
+
+    /**
+     * Returns true if at least one word in the dictionary (3+ letters) can be
+     * formed using the tiles on the given grid (each tile used at most once).
+     */
+    private boolean hasSolvableWord(LetterGrid grid) {
+        Map<Character, Integer> available = new HashMap<>();
+        for (int r = 0; r < 4; r++) {
+            for (int c = 0; c < 4; c++) {
+                char letter = grid.getTile(r, c).getLetter();
+                available.merge(letter, 1, Integer::sum);
+            }
+        }
+        for (String word : DictionaryLoader.getWords()) {
+            if (word.length() < 3 || word.length() > 16) continue;
+            String upper = word.toUpperCase();
+            Map<Character, Integer> needed = new HashMap<>();
+            for (char ch : upper.toCharArray()) needed.merge(ch, 1, Integer::sum);
+            boolean canSpell = true;
+            for (Map.Entry<Character, Integer> e : needed.entrySet()) {
+                if (available.getOrDefault(e.getKey(), 0) < e.getValue()) {
+                    canSpell = false;
+                    break;
+                }
+            }
+            if (canSpell) return true;
+        }
+        return false;
     }
 
     private ClientHandler client(int id) { return id == 1 ? client1 : client2; }
